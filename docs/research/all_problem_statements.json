@@ -1,0 +1,595 @@
+[
+  {
+    "id": "idea_8d2c52e2",
+    "title": "AI Brain \u2014 A Personal Intelligence and Memory System",
+    "description": "Build a secure personal AI Brain that connects multiple data sources, maintains long-term memory, understands user context and relationships, and proactively suggests useful actions. The system should retrieve relevant information from connected sources, provide context-aware responses, and execute tasks only after user approval.",
+    "track": "product",
+    "difficulty": "advanced",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 1,
+      "views_count": 12,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-04T17:35:16.491002+00:00",
+    "approved_at": "2026-11-05T06:12:30.032319+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+      "full_name": "Kartikeya Yadav",
+      "display_name": null,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocL4smIidyiBNwiSF4HUC8-Ie5-O9XcjfZ9U3TovC1A6qd2m2w=s96-c",
+      "email": "kartikeya.25bcs10304@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "python",
+      "LLMs",
+      "RAG",
+      "Vector Databases",
+      "Embeddings and Semantic Search",
+      "Agentic AI",
+      "API Integration"
+    ],
+    "rough_roadmap": [
+      "Data Source Integration",
+      "Memory Architecture Design",
+      "Long-Term Memory Storage",
+      "Context Retrieval Engine",
+      "Context-Aware Reasoning",
+      "Agent Automation",
+      "Privacy and Access Controls",
+      "End-to-End Testing"
+    ],
+    "learning_outcomes": [
+      "Long-Term AI Memory",
+      "Context-Aware Reasoning",
+      "Multi-Source Data Integration",
+      "Retrieval-Augmented Generation",
+      "Privacy and Security Engineering"
+    ],
+    "updated_at": "2026-11-05T06:12:30.032319+00:00"
+  },
+  {
+    "id": "idea_1033fb95",
+    "title": "EvoArena \u2014 Self-Evolving Multi-Agent Reinforcement Learning Gaming Environment",
+    "description": "Build an interactive reinforcement learning gaming environment where autonomous AI agents learn, compete, cooperate, and evolve strategies through self-play and environmental interaction. The platform should support procedurally generated maps, dynamic challenges, adaptive opponents, and multi-agent coordination. It should demonstrate measurable learning improvements and the ability to generalize strategies to previously unseen environments through an interactive training and performance dashboard.",
+    "track": "product",
+    "difficulty": "advanced",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 9,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-04T17:50:36.067471+00:00",
+    "approved_at": "2026-11-05T06:12:52.423480+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+      "full_name": "Kartikeya Yadav",
+      "display_name": null,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocL4smIidyiBNwiSF4HUC8-Ie5-O9XcjfZ9U3TovC1A6qd2m2w=s96-c",
+      "email": "kartikeya.25bcs10304@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python",
+      "Reinforcement Learning",
+      "Deep Learning",
+      "PyTorch",
+      "Gymnasium",
+      "PettingZoo",
+      "Multi-Agent Systems",
+      "Game Theory",
+      "Neural Networks"
+    ],
+    "rough_roadmap": [
+      "Gaming Environment Design",
+      "Procedural Map Generation",
+      "Agent Observation and Action Spaces",
+      "Reward Function Design",
+      "PPO Implementation",
+      "Multi-Agent Reinforcement Learning",
+      "Self-Play Training Framework",
+      "Multi-Agent Cooperation and Competition",
+      "Adaptive Opponent Training",
+      "Unseen Environment Generalization",
+      "Interactive Training Dashboard",
+      "Performance Benchmarking and Evaluation"
+    ],
+    "learning_outcomes": [
+      "Deep Reinforcement Learning",
+      "Multi-Agent Reinforcement Learning",
+      "Self-Play and Emergent Strategies",
+      "Reward Engineering",
+      "Autonomous Decision-Making",
+      "Policy Optimization",
+      "Game-Theoretic Reasoning",
+      "Strategy Generalization",
+      "AI Simulation and Visualization"
+    ],
+    "updated_at": "2026-11-05T06:12:52.423480+00:00"
+  },
+  {
+    "id": "idea_77475108",
+    "title": "\"Acoustic-Alchemist\": Non-Verbal Audio & Environmental Trigger System",
+    "description": "A real-time audio classification and DSP pipeline that reacts to non-speech acoustic events\u2014like beatboxing, whistling pitch, finger snaps, or table drumming\u2014to control creative software or games.",
+    "track": "product",
+    "difficulty": "intermediate",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 12,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-05T06:57:23.263014+00:00",
+    "approved_at": "2026-11-05T06:57:59.851393+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+      "full_name": "Aryan Mishra",
+      "display_name": null,
+      "avatar_url": "https://firebasestorage.googleapis.com/v0/b/reinforce-sst-bfda8.firebasestorage.app/o/users%2FiyU7zQkTj0VF94jhPtKYb9UzeCl1%2Favatars%2F42bb8b4d42594921a095ac57491c02af.png?alt=media&token=791cb958-f58d-4f55-8805-d5b3a5141545",
+      "email": "aryan.25bcs10006@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python proficiency",
+      "Audio DSP fundamentals (FFT, STFT,etc.)",
+      "Audio processing libraries",
+      "Deep Learning for audio (1D/2D CNNs or RNNs in PyTorch/TensorFlow)"
+    ],
+    "rough_roadmap": [
+      "Set up a low-latency sliding-window microphone stream and implement background noise profiling/subtraction.",
+      "Record and augment a custom dataset of non-verbal acoustic triggers (snaps, claps, beatbox kicks/hi-hats, whistles) alongside ambient room noise.",
+      "Extract real-time Mel-spectrograms/MFCCs and train a lightweight CNN classifier + pitch/onset detector for continuous inference.",
+      "Build a state-machine router that maps acoustic triggers and pitch variations to application controls (e.g., a rhythm-strategy game, live loop station, or hands-free coding macros).",
+      "Optimize inference latency, add a live spectrogram HUD, and test robustness in noisy environments."
+    ],
+    "learning_outcomes": [
+      "Real-time acoustic stream processing, spectral feature extraction, and noise suppression",
+      "Training custom audio classification models on spectrogram representations without relying on speech-to-text APIs",
+      "Designing low-latency audio buffer pipelines for interactive human-computer control",
+      "A fully voice/sound-driven game or creative software tool operable via non-verbal acoustics"
+    ],
+    "updated_at": "2026-11-05T06:57:59.851393+00:00"
+  },
+  {
+    "id": "idea_7abd10b9",
+    "title": "Foley-Craft: Vision-to-Audio Procedural Soundscape Engine",
+    "description": "A multimodal system that watches silent video clips, live webcam feeds, or gameplay screens and dynamically generates or mixes a synchronized, multi-layered soundtrack and sound-effects landscape in real time.",
+    "track": "product",
+    "difficulty": "intermediate",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "Xw4RARA2bIc2PiRg58vWDGiWjYi1",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 6,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-05T06:53:58.990376+00:00",
+    "approved_at": "2026-11-05T06:58:17.639019+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "Xw4RARA2bIc2PiRg58vWDGiWjYi1",
+      "full_name": "Krishna Sharma",
+      "display_name": null,
+      "avatar_url": "data:image/png;base64,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",
+      "email": "krishna.25bcs10074@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python proficiency",
+      "Computer Vision fundamentals (OpenCV, Optical Flow, Object Detection)",
+      "Digital Signal Processing (DSP) basics and audio manipulation libraries (Librosa, PyAudio, Pydub, or Pygame.mixer)",
+      "Familiarity with pre-trained scene/emotion classification models"
+    ],
+    "rough_roadmap": [
+      "Build the video ingestion pipeline to extract frame-by-frame visual metrics (dense/sparse optical flow for motion speed, color histograms, and object bounding boxes).",
+      "Design the state-mapping logic that translates visual telemetry (e.g., sudden motion spikes or bounding-box overlaps) into musical parameters (tempo, intensity, volume envelopes, SFX triggers).",
+      "Construct the real-time audio mixing and synthesis engine capable of crossfading stems, modulating BPM, and triggering low-latency impact sound effects.",
+      "Build an interactive visualizer UI to display live visual telemetry alongside audio waveforms and genre/mood controls.",
+      "Test across diverse silent video inputs (e.g., corridor sprints, gameplay footage) and package the final demo."
+    ],
+    "learning_outcomes": [
+      "Cross-modal translation between computer vision telemetry and procedural audio synthesis",
+      "Real-time optical flow calculation, collision heuristics, and visual scene analysis",
+      "Programmatic audio mixing, DSP manipulation, and low-latency audio buffer management",
+      "A working procedural soundscape engine with an interactive control dashboard"
+    ],
+    "updated_at": "2026-11-05T06:58:17.639019+00:00"
+  },
+  {
+    "id": "idea_84e84c6c",
+    "title": "Zero-Text Multimodal Desktop Search",
+    "description": "A local, visual-first \"Second Brain\" search engine for messy image folders, lecture screenshots, and meme dumps that lets users search by vibe, rough sketch, color palette, or visual similarity.",
+    "track": "product",
+    "difficulty": "intermediate",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 7,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-05T06:54:22.345408+00:00",
+    "approved_at": "2026-11-05T06:58:09.917864+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+      "full_name": "Aryan Mishra",
+      "display_name": null,
+      "avatar_url": "https://firebasestorage.googleapis.com/v0/b/reinforce-sst-bfda8.firebasestorage.app/o/users%2FiyU7zQkTj0VF94jhPtKYb9UzeCl1%2Favatars%2F42bb8b4d42594921a095ac57491c02af.png?alt=media&token=791cb958-f58d-4f55-8805-d5b3a5141545",
+      "email": "aryan.25bcs10006@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python backend development",
+      "Basic frontend/UI skills",
+      "Vision-Language Models (CLIP, SigLIP)",
+      "Vector similarity search",
+      "Dimensionality reduction & clustering",
+      "OCR basics (EasyOCR/Tesseract)"
+    ],
+    "rough_roadmap": [
+      "Build the local directory indexer that scans image folders, extracts OCR text, computes dominant color palettes, and generates CLIP/SigLIP vision embeddings.",
+      "Set up a local vector index (FAISS) for sub-millisecond cross-modal retrieval (text-to-image, image-to-image, and sketch-to-image).",
+      "Implement dimensionality reduction (UMAP/t-SNE) and clustering to project the entire image library into 2D/3D coordinates grouped by visual theme/vibe.",
+      "Build an interactive frontend featuring a 2D/3D embedding galaxy explorer, a live sketch-pad query tool, and semantic search filters.",
+      "Optimize batch indexing speed (ONNX/FP16 quantization), add duplicate detection, and record a demo on a chaotic multi-thousand-image dataset."
+    ],
+    "learning_outcomes": [
+      "Working with contrastive multimodal embeddings (CLIP/SigLIP) and cross-modal retrieval pipelines",
+      "Vector database indexing (FAISS) and high-dimensional data visualization using UMAP/t-SNE",
+      "Combining OCR, color-space heuristics, and semantic vectors into a unified hybrid search engine",
+      "A fast, local multimodal desktop search application with an interactive 3D embedding explorer"
+    ],
+    "updated_at": "2026-11-05T06:58:09.917864+00:00"
+  },
+  {
+    "id": "idea_8dd40f9d",
+    "title": "ProofGraph \u2014 Autonomous AI Evidence Intelligence Engine",
+    "description": "Build an autonomous AI investigation platform where specialized agents independently research information, verify factual claims, challenge unreliable findings, detect contradictions, and validate evidence against original sources. The platform should construct an interactive knowledge graph connecting claims, sources, supporting evidence, and conflicting findings to generate transparent research reports with traceable citations and uncertainty assessments.",
+    "track": "product",
+    "difficulty": "advanced",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 8,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-04T17:46:48.550999+00:00",
+    "approved_at": "2026-11-05T06:31:18.119065+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+      "full_name": "Kartikeya Yadav",
+      "display_name": null,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocL4smIidyiBNwiSF4HUC8-Ie5-O9XcjfZ9U3TovC1A6qd2m2w=s96-c",
+      "email": "kartikeya.25bcs10304@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python",
+      "Large Language Models (LLMs)",
+      "Multi-Agent Systems",
+      "Natural Language Processing (NLP)",
+      "Retrieval-Augmented Generation (RAG)",
+      "Knowledge Graphs",
+      "Web Search APIs",
+      "Graph Databases",
+      "Information Retrieval"
+    ],
+    "rough_roadmap": [
+      "Research Query Understanding",
+      "Multi-Agent Architecture Design",
+      "Autonomous Source Collection",
+      "Claim Extraction Engine",
+      "Evidence Retrieval and Verification",
+      "Independent Agent Cross-Verification",
+      "Contradiction Detection",
+      "Source Credibility Assessment",
+      "Knowledge Graph Construction",
+      "Interactive Evidence Visualization",
+      "Citation Validation",
+      "Research Report Generation"
+    ],
+    "learning_outcomes": [
+      "Multi-Agent Research Systems",
+      "Autonomous Evidence Verification",
+      "Knowledge Graph Engineering",
+      "Fact Checking and Claim Validation",
+      "Contradiction Detection",
+      "Source Credibility Assessment",
+      "Evidence-Based AI Reasoning",
+      "Explainable and Trustworthy AI",
+      "Uncertainty Quantification"
+    ],
+    "updated_at": "2026-11-05T06:31:18.119065+00:00"
+  },
+  {
+    "id": "idea_92d91e15",
+    "title": "Shadow-Boxer: Full-Body Kinetic Controller",
+    "description": "A real-time, zero-controller human-computer interface that uses webcam pose estimation, hand landmarks, or facial mesh tracking to control interactive games, simulations, or desktop workspaces.",
+    "track": "product",
+    "difficulty": "intermediate",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "Xw4RARA2bIc2PiRg58vWDGiWjYi1",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 5,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-05T06:50:05.391837+00:00",
+    "approved_at": "2026-11-05T06:58:26.291544+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "Xw4RARA2bIc2PiRg58vWDGiWjYi1",
+      "full_name": "Krishna Sharma",
+      "display_name": null,
+      "avatar_url": "data:image/png;base64,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",
+      "email": "krishna.25bcs10074@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python proficiency",
+      "Basic Computer Vision (OpenCV)",
+      "Familiarity with pre-trained pose/landmark models (MediaPipe, YOLO-Pose)",
+      "Basic understanding of time-series smoothing or simple neural networks (MLP/LSTM)",
+      "OS input simulation libraries (PyAutoGUI, pynput)"
+    ],
+    "rough_roadmap": [
+      "Set up the webcam capture pipeline and integrate MediaPipe/YOLO-Pose for real-time skeletal and facial landmark extraction.",
+      "Implement temporal smoothing filters (e.g., One-Euro or Kalman filter) to eliminate landmark jitter and stabilize coordinates.",
+      "Build the gesture recognition engine\u2014starting with geometric heuristics and upgrading to a custom temporal sequence classifier over frame buffers.",
+      "Map recognized states to low-latency OS input events (<100ms) and connect the pipeline to a target game or interactive application.",
+      "Polish the visual overlay HUD, fine-tune responsiveness, and record a live gameplay demo."
+    ],
+    "learning_outcomes": [
+      "Real-time spatial computing and human-centric computer vision pipeline engineering",
+      "Low-latency asynchronous frame processing and temporal signal smoothing",
+      "Training custom sequence classifiers on spatial keypoint buffers",
+      "End-to-end functional kinetic controller with a playable live demonstration"
+    ],
+    "updated_at": "2026-11-05T06:58:26.291544+00:00"
+  },
+  {
+    "id": "idea_98b198bb",
+    "title": "Scalpel: Weight-Space Programming, Editing a Neural Network's Weights with an LLM",
+    "description": "Build an LLM agent that changes another network's behaviour by directly editing its weights from a natural-language goal, with no gradient descent. Inspired by MIT CSAIL's \"Sparks of Weight-Space Programming\" (2026)",
+    "track": "research",
+    "difficulty": "advanced",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "AtwVyDDs4vOJMzP39LzkOZSBCQj1",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 6,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-04T20:39:45.924663+00:00",
+    "approved_at": "2026-11-05T06:32:01.311894+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "AtwVyDDs4vOJMzP39LzkOZSBCQj1",
+      "full_name": "Shivendu Kumar",
+      "display_name": null,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocJ4v8cXhbP3Z8cUueNYfaJsBm5atn3wwB694cK7ZBK_yJ3NLt4=s96-c",
+      "email": "shivendu.25bcs10590@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Transformer architecture and mechanistic interpretability basics",
+      "LLM APIs and agent tool use",
+      "Experiment design and statistics",
+      "Learn , adapt & implement"
+    ],
+    "rough_roadmap": [
+      "Pre-register hypothesis, build model zoo and gradient-free edit sandbox",
+      "Toy MLP and small-policy edits, with and without tools",
+      "Toy-transformer algorithm edits",
+      "Small-LM edits plus baselines (LoRA, steering, ROME, random)",
+      "Side-effect and mechanism analysis, verdict and paper"
+    ],
+    "learning_outcomes": [
+      "Weight-space learning and model editing",
+      "Mechanistic interpretability of edits",
+      "Rigorous baseline design and pre-registration",
+      "A NeurIPS-style paper on a brand-new research direction"
+    ],
+    "updated_at": "2026-11-05T06:32:01.311894+00:00"
+  },
+  {
+    "id": "idea_ac35dca9",
+    "title": "Pocket: Distilling a Large Agent into a Small Model That Runs on a Laptop",
+    "description": "Distill a strong teacher model's multi-step agent trajectories into a \u22642B student model, then quantize it so it runs locally. Measure how much of the teacher's success survives, and at what cost and speed.",
+    "track": "research",
+    "difficulty": "intermediate",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "AtwVyDDs4vOJMzP39LzkOZSBCQj1",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 9,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-04T20:30:33.130443+00:00",
+    "approved_at": "2026-11-05T06:35:15.814622+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "AtwVyDDs4vOJMzP39LzkOZSBCQj1",
+      "full_name": "Shivendu Kumar",
+      "display_name": null,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocJ4v8cXhbP3Z8cUueNYfaJsBm5atn3wwB694cK7ZBK_yJ3NLt4=s96-c",
+      "email": "shivendu.25bcs10590@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "PyTorch and Hugging Face Transformers",
+      "LLM agents and tool calling",
+      "Learn & Implement",
+      "Basic quantization"
+    ],
+    "rough_roadmap": [
+      "Environment harness and teacher baseline",
+      "Collect and filter teacher trajectories",
+      "Student fine-tuning with ablations (with/without",
+      "Improvement beyond plain imitation (DAgger / recovery / DPO)",
+      "bit quantization, local deployment, error analysis and demo"
+    ],
+    "learning_outcomes": [
+      "Knowledge distillation and imitation learning for agents",
+      "Handling compounding errors (DAgger)",
+      "Model quantization and local inference",
+      "A laptop-runnable agent with a benchmark report"
+    ],
+    "updated_at": "2026-11-05T06:35:15.814622+00:00"
+  },
+  {
+    "id": "idea_c936ee75",
+    "title": "Doodle-2-Dungeon: Sketch-to-Interactive World Pipeline",
+    "description": "A physical-to-digital pipeline that takes a hand-drawn 2D paper sketch of a level layout, circuit, or wireframe and compiles it into a playable game level, physics sandbox, or working web app.",
+    "track": "product",
+    "difficulty": "intermediate",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "Xw4RARA2bIc2PiRg58vWDGiWjYi1",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 18,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-05T06:56:08.008229+00:00",
+    "approved_at": "2026-11-05T06:58:04.675181+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "Xw4RARA2bIc2PiRg58vWDGiWjYi1",
+      "full_name": "Krishna Sharma",
+      "display_name": null,
+      "avatar_url": "data:image/png;base64,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",
+      "email": "krishna.25bcs10074@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python and JavaScript/Game Engine basics (Pygame, Godot, Three.js, or HTML5 Canvas)",
+      "Classical Computer Vision (OpenCV thresholding, morphological operations, Canny edges, contour hierarchies)",
+      "Convolutional Neural Networks (PyTorch/TensorFlow) for custom symbol classification",
+      "Data augmentation techniques for small image datasets"
+    ],
+    "rough_roadmap": [
+      "Build the OpenCV preprocessing pipeline (grayscale conversion, adaptive thresholding, perspective/homography warping, and contour extraction to isolate individual drawn components).",
+      "Curate and augment a dataset of hand-drawn symbols representing level elements (walls, hazards, spawn points, coins) and train a lightweight CNN/ViT classifier.",
+      "Convert spatial bounding boxes, contour geometry, and classified labels into a structured intermediate JSON level schema.",
+      "Build the game/sandbox parser that reads the JSON schema and instantiates playable physics objects, collision meshes, and custom segmented sprites.",
+      "Add live camera/upload UI, refine classification accuracy under varied lighting, and record end-to-end paper-to-playable demos."
+    ],
+    "learning_outcomes": [
+      "Hybrid pipelines combining classical OpenCV morphological processing with deep learning classifiers",
+      "Dataset curation, synthetic augmentation, and training custom CNNs from scratch",
+      "Homography estimation and spatial coordinate mapping from 2D images to interactive engines",
+      "An end-to-end compiler that turns physical paper drawings into playable digital environments"
+    ],
+    "updated_at": "2026-11-05T06:58:04.675181+00:00"
+  },
+  {
+    "id": "idea_e2515314",
+    "title": "SwarmFlow \u2014 Multi-Agent Task Coordination Engine",
+    "description": "Build an intelligent multi-agent orchestration platform where specialized AI agents collaborate to complete complex tasks. The system should automatically divide tasks, assign responsibilities, share progress, resolve conflicting decisions, and recover from failures through a centralized supervisor agent. It should produce one verified and consolidated final deliverable.",
+    "track": "product",
+    "difficulty": "advanced",
+    "spg_creation_type": "project",
+    "is_verified": true,
+    "created_by_uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+    "approved_by_uid": "iyU7zQkTj0VF94jhPtKYb9UzeCl1",
+    "stats": {
+      "upvote_count": 0,
+      "views_count": 5,
+      "claims_count": 0
+    },
+    "created_at": "2026-11-04T17:42:30.135154+00:00",
+    "approved_at": "2026-11-05T06:12:46.112478+00:00",
+    "is_upvoted": null,
+    "status": "approved",
+    "creator_profile": {
+      "uid": "jtMHHRrr3JU42C4AOZpvMHD1idi2",
+      "full_name": "Kartikeya Yadav",
+      "display_name": null,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocL4smIidyiBNwiSF4HUC8-Ie5-O9XcjfZ9U3TovC1A6qd2m2w=s96-c",
+      "email": "kartikeya.25bcs10304@sst.scaler.com",
+      "batch": "2029",
+      "track": null
+    },
+    "prerequisites": [
+      "Python",
+      "LLMs",
+      "Multi-Agent Systems",
+      "LangGraph",
+      "Async Programming",
+      "API Integration",
+      "Agent Orchestration"
+    ],
+    "rough_roadmap": [
+      "Agent Role Design",
+      "Task Decomposition Engine",
+      "Supervisor Architecture",
+      "Agent Communication Protocol",
+      "Shared State Management",
+      "Conflict Detection and Resolution",
+      "Failure Detection and Recovery",
+      "Workflow Verification",
+      "Final Output Generation"
+    ],
+    "learning_outcomes": [
+      "Multi-Agent Orchestration",
+      "Autonomous Task Decomposition",
+      "Agent Communication and Coordination",
+      "Conflict Resolution",
+      "Fault-Tolerant AI Systems",
+      "Workflow Automation",
+      "Distributed AI Architecture"
+    ],
+    "updated_at": "2026-11-05T06:12:46.112478+00:00"
+  }
+]
