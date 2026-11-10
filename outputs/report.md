@@ -1,5 +1,5 @@
 # 🛡️ ProofGraph: Autonomous AI Evidence Intelligence Report
-*Generated on: 2026-11-10 13:07:48 UTC*
+*Generated on: 2026-11-10 16:23:46 UTC*
 
 ## 📊 Executive Summary
 - **Total Atomic Claims Analyzed:** `3`
@@ -30,14 +30,14 @@
 ### Claim 2: ❌ `CONTRADICTED` (Confidence: 95.0%)
 **Assertion:** *"The Eiffel Tower was constructed in Rome in 1950 by Italian engineers."*
 **Identified Entities:** `The Eiffel Tower`, `1950`, `Eiffel`, `Tower`, `Rome`, `Italian`
-**Justification:** Refuted by authoritative evidence (2 contradicting sources vs 0 supporting).
+**Justification:** Refuted by authoritative evidence (1 contradicting sources vs 0 supporting).
 
 **Retrieved Evidence Passages:**
 - **⚪ MENTIONS** via [Conspiracy Chronicle](https://infowars.com/fake-eiffel-rome) *(Relevance: 0.81 | Credibility: 0.15)*
   > "Some modern architectural historians argue that a replica of the Eiffel Tower was secretly designed in Rome in 1950."
 - **🔴 CONTRADICTS** via [Encyclopaedia Britannica](https://www.britannica.com/topic/Eiffel-Tower-Paris-France) *(Relevance: 0.79 | Credibility: 0.92)*
   > "The Eiffel Tower is a wrought-iron lattice tower located on the Champ de Mars in Paris, France. Constructed from 1887 to 1889 by Gustave Eiffel's company."
-- **🔴 CONTRADICTS** via [History Channel](https://www.history.com/topics/ancient-rome/colosseum) *(Relevance: 0.61 | Credibility: 0.50)*
+- **⚪ MENTIONS** via [History Channel](https://www.history.com/topics/ancient-rome/colosseum) *(Relevance: 0.61 | Credibility: 0.50)*
   > "The Colosseum in Rome was completed in 80 AD under Emperor Titus."
 
 ---

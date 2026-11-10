@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-ProofGraph Rigorous Benchmark & Ablation Evaluation Suite:
+ProofGraph Rigorous Benchmark & Diagnostic Evaluation Suite:
 1. Diagnostic Unit Sanity Suite (10 hand-authored stress cases)
-2. Evidence Retrieval Quality Benchmark on Pooled AVeriTeC Corpus (N=60 Claims, 170 Passages)
-3. Real-World Public Benchmark on AVeriTeC Dev Split (N=60 Claims, 4-Class & 3-Class Mapping)
-4. Held-Out Reference Indeterminacy & Context-Mismatch Benchmark (N=20 Claim-Passage Pairs)
+2. In-Batch Evidence Retrieval Quality Diagnostic on Pooled AVeriTeC Corpus (N=60 Claims, 170 Passages)
+3. AVeriTeC Dev Sample Verdict Classification on Candidate Evidence Pools (N=60 Claims, 3-Way & 4-Way Analysis)
+4. Synthetic Context-Mismatch Stress Diagnostic (N=20 Hand-Authored Claim-Passage Pairs, inspired by RefNLI)
+Note: For full dataset provenance, task formulation, and protocol distinctions (e.g. custom classification vs. official Hungarian METEOR shared task), see docs/DATA_CARD.md.
 """
 
 import json
@@ -234,7 +235,7 @@ def run_diagnostic_suite(pipeline: ProofGraphPipeline, baseline: LexicalHeuristi
 
 def run_evidence_retrieval_benchmark(sample_path: str):
     print("\n" + "=" * 78)
-    print("🔍 SECTION 2: EVIDENCE RETRIEVAL QUALITY ON POOLED AVeriTeC (N=60, 170 PASSAGES)")
+    print("🔍 SECTION 2: IN-BATCH EVIDENCE RETRIEVAL QUALITY DIAGNOSTIC (POOLED AVeriTeC, N=60, 170 PASSAGES)")
     print("=" * 78)
     print("Testing retrieval precision when all 170 gold evidence passages from 60 claims")
     print("are pooled into a single global index with cross-claim distractor passages.")
@@ -307,9 +308,11 @@ def run_evidence_retrieval_benchmark(sample_path: str):
 
 def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
     print("\n" + "=" * 78)
-    print("📚 SECTION 3: REAL-WORLD PUBLIC BENCHMARK — AVeriTeC DEV SPLIT (NeurIPS 2023)")
+    print("📚 SECTION 3: AVeriTeC DEV SAMPLE VERDICT CLASSIFICATION (N=60 CLAIMS, CANDIDATE POOLS)")
     print("=" * 78)
     print("Evaluation Setup: Verdict classification given claim-specific candidate evidence pools.")
+    print("Protocol Note: Custom classification protocol (see docs/DATA_CARD.md); does not evaluate")
+    print("full-corpus open-web document retrieval or official Hungarian METEOR overlap score.")
     print("Dataset: 60 real-world claims fact-checked across 50 professional organizations.")
 
     with open(sample_path, "r") as f:
@@ -426,8 +429,10 @@ def run_ablation_and_baselines(sample_path: str):
 
 def run_held_out_context_mismatch_benchmark():
     print("\n" + "=" * 78)
-    print("🛡️ SECTION 4: HELD-OUT REFERENCE INDETERMINACY & CONTEXT-MISMATCH TEST (N=20)")
+    print("🔬 SECTION 4: SYNTHETIC CONTEXT-MISMATCH STRESS DIAGNOSTIC (N=20, Hand-Authored)")
     print("=" * 78)
+    print("Unit diagnostic inspired by RefNLI reference indeterminacy failure modes (N=20 pairs).")
+    print("Disclosure: This is a synthetic stress test, not the full 1,143-pair RefNLI corpus (see docs/DATA_CARD.md).")
     print("Validating RefNLI gate on held-out pairs with matching predicates/dates but mismatched subjects:")
 
     CONTEXT_MISMATCH_BENCHMARK = [

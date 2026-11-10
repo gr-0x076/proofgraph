@@ -10,6 +10,7 @@ import urllib.parse
 from proofgraph.schemas.evidence import EvidencePassage
 from proofgraph.schemas.claim import AtomicClaim
 from proofgraph.retriever.fire_policy import FIREIterativeDecisionModule
+from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
 
 import hashlib
 
@@ -53,13 +54,15 @@ class HybridRetriever:
         embedding_model=None,
         embedding_model_name: str = "BAAI/bge-small-en-v1.5",
         max_hops: int = 3,
-        prefer_offline: bool = False
+        prefer_offline: bool = False,
+        tinyfish_agent: Optional[TinyFishWebAgent] = None
     ):
         self.passages: List[EvidencePassage] = []
         self.corpus_tokens: List[List[str]] = []
         self.bm25: Optional[BM25Okapi] = None
         self.dense_embeddings: Optional[np.ndarray] = None
         self.fire_module = FIREIterativeDecisionModule(max_hops=max_hops)
+        self.tinyfish_agent = tinyfish_agent or TinyFishWebAgent()
 
         if embedding_model is not None:
             self.embed_model = embedding_model
@@ -128,6 +131,12 @@ class HybridRetriever:
             results.append(res_passage)
 
         return results
+
+    def search_tinyfish_live(self, query: str, max_results: int = 3) -> List[EvidencePassage]:
+        """Dispatches an autonomous fact-checking query to the TinyFish Web Agent."""
+        if not self.tinyfish_agent.is_available:
+            return []
+        return self.tinyfish_agent.research_claim_on_web(query, max_evidence=max_results)
 
     def search_wikipedia_live(self, query: str, max_results: int = 3) -> List[EvidencePassage]:
         """Live fallback search against Wikipedia API for open-domain claims."""
@@ -205,11 +214,21 @@ class HybridRetriever:
 
             # 2. Live fallback if local corpus is empty or top relevance is weak
             if use_live_fallback and (not pooled_evidence or pooled_evidence[0].relevance_score < 0.65):
-                live_hits = self.search_wikipedia_live(current_query, max_results=top_k)
-                for hit in live_hits:
-                    if hit.id not in seen_ids:
-                        seen_ids.add(hit.id)
-                        pooled_evidence.append(hit)
+                # Priority 2a: Query TinyFish autonomous web research agent if configured
+                if self.tinyfish_agent.is_available:
+                    tf_hits = self.tinyfish_agent.research_claim_on_web(current_query, max_evidence=top_k)
+                    for hit in tf_hits:
+                        if hit.id not in seen_ids:
+                            seen_ids.add(hit.id)
+                            pooled_evidence.append(hit)
+
+                # Priority 2b: Wikipedia live search API fallback
+                if not pooled_evidence or pooled_evidence[0].relevance_score < 0.65:
+                    live_hits = self.search_wikipedia_live(current_query, max_results=top_k)
+                    for hit in live_hits:
+                        if hit.id not in seen_ids:
+                            seen_ids.add(hit.id)
+                            pooled_evidence.append(hit)
 
             # Sort pooled evidence by relevance
             pooled_evidence.sort(key=lambda x: x.relevance_score, reverse=True)

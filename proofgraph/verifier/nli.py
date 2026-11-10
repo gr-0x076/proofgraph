@@ -6,12 +6,15 @@ from proofgraph.schemas.verdict import VeracityLabel, ClaimVerdict
 from proofgraph.verifier.alignment import RefNLIAlignmentGate
 from proofgraph.verifier.credibility import SourceCredibilityScorer
 
-class NLIVerifier:
+class RuleStanceVerifier:
     """
-    3-Way Verifier implementing:
-    1. RefNLI context alignment filtering
-    2. CONFACT source credibility weighting
-    3. Entailment / Contradiction inference with numerical, temporal, and entity conflict checks
+    Deterministic Rule-Based Stance Engine:
+    Performs 3-way claim verification (SUPPORTED, CONTRADICTED, INSUFFICIENT_EVIDENCE)
+    using:
+    1. Lexical-entity context alignment filtering (RefNLI-inspired gate)
+    2. Canonical domain authority prior (CONFACT-inspired source weighting)
+    3. Predicate-bound numerical, temporal, and entity contradiction checks
+    4. Calibrated abstention for ambiguous, speculative, or unaligned evidence
     """
     def __init__(self, refnli_gate: RefNLIAlignmentGate = None, credibility_scorer: SourceCredibilityScorer = None):
         self.alignment_gate = refnli_gate or RefNLIAlignmentGate()
@@ -19,6 +22,7 @@ class NLIVerifier:
 
     # Negation and refutation keywords
     REFUTATION_MARKERS = [
+
         r"\b(?:not|never|neither|nor|falsely|incorrectly|debunked|denied|refuted|untrue|fake)\b",
         r"\b(?:failed to|did not|was not|were not|is not|are not|no evidence)\b",
         r"\b(?:contrary to|disproven|disputed|misleading|hoax|myth)\b"
@@ -42,22 +46,47 @@ class NLIVerifier:
     ]
 
     def _has_location_conflict(self, text_a: str, text_b: str) -> bool:
-        """Detects if two texts assign conflicting primary geographical locations to the same subject."""
+        """
+        Detects if two texts assign conflicting primary geographical locations to the same subject.
+        Requires presence of location prepositions ('in', 'at', 'located in', 'built in')
+        to avoid flagging transit or co-mentioned locations.
+        """
         words_a = set(re.findall(r'\b[a-z]+\b', text_a.lower()))
         words_b = set(re.findall(r'\b[a-z]+\b', text_b.lower()))
         for loc_pair in self.KNOWN_DISTINCT_LOCATIONS:
             if len(loc_pair.intersection(words_a)) == 1 and len(loc_pair.intersection(words_b)) == 1:
                 if loc_pair.intersection(words_a) != loc_pair.intersection(words_b):
-                    return True
+                    # Check for location binding context in both texts
+                    loc_a = list(loc_pair.intersection(words_a))[0]
+                    loc_b = list(loc_pair.intersection(words_b))[0]
+                    pat_a = rf'\b(?:in|at|near|located|built|erected)\s+(?:\w+\s+)?{loc_a}\b'
+                    pat_b = rf'\b(?:in|at|near|located|built|erected)\s+(?:\w+\s+)?{loc_b}\b'
+                    if re.search(pat_a, text_a.lower()) or re.search(pat_b, text_b.lower()):
+                        return True
         return False
 
     def _has_numeric_conflict(self, text_a: str, text_b: str) -> bool:
-        """Detects conflicting numerical quantities or temperatures."""
+        """
+        Detects conflicting numerical quantities or temperatures.
+        Requires shared predicate/event context (e.g. both describe boiling, birth, construction, or patent)
+        to prevent unrelated numbers (e.g. birth year vs award year) from triggering false contradictions.
+        """
+        predicates = [
+            "boil", "freez", "born", "died", "construct", "built", "open", 
+            "land", "discover", "invent", "found", "launch", "elect", "crash",
+            "patent", "temperat", "celsius", "fahrenheit", "meter", "foot", "feet"
+        ]
+        # Check if any shared event/unit predicate exists between both texts
+        shared_pred = any(p in text_a.lower() and p in text_b.lower() for p in predicates)
+        if not shared_pred:
+            return False
+
         nums_a = set(re.findall(r'\b\d+(?:\.\d+)?\b', text_a))
         nums_b = set(re.findall(r'\b\d+(?:\.\d+)?\b', text_b))
         if nums_a and nums_b and nums_a.isdisjoint(nums_b):
             return True
         return False
+
 
     def _has_named_inventor_conflict(self, text_a: str, text_b: str) -> bool:
         """Detects if claim attributes invention/discovery to Person A while evidence attributes to Person B."""
@@ -197,3 +226,7 @@ class NLIVerifier:
             refnli_passed=len(supporting_ids) + len(contradicting_ids) > 0,
             credibility_adjusted=True
         )
+
+# Backward-compatibility alias
+NLIVerifier = RuleStanceVerifier
+

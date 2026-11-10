@@ -180,4 +180,61 @@ def test_live_fastembed_download_if_online():
     except Exception as e:
         pytest.skip(f"Live network access or cached model unavailable in this sandbox: {e}")
 
+def test_tinyfish_agent_parsing_and_fallback():
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+    agent = TinyFishWebAgent(api_key="sk-tinyfish-mock-key")
+    assert agent.is_available is True
+
+    # Test structured response parsing
+    mock_payload = {
+        "status": "completed",
+        "output": {
+            "evidence": [
+                {
+                    "text": "Apollo 11 landed humans on the Moon on July 20, 1969.",
+                    "url": "https://www.nasa.gov/mission/apollo-11",
+                    "source_title": "NASA Official Mission Archive"
+                }
+            ]
+        }
+    }
+    passages = agent._parse_agent_response(mock_payload, "Apollo 11 landed on the moon", "https://default.org")
+    assert len(passages) == 1
+    assert "Apollo 11 landed" in passages[0].text
+    assert passages[0].source_domain == "www.nasa.gov"
+    assert passages[0].relevance_score == 0.88
+
+    # Unkeyed agent should safely abstain
+    unkeyed_agent = TinyFishWebAgent(api_key="")
+    assert unkeyed_agent.is_available is False
+    assert unkeyed_agent.research_claim_on_web("test claim") == []
+
+def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+    mock_agent = TinyFishWebAgent(api_key="sk-tinyfish-mock")
+    
+    mock_passage = EvidencePassage(
+        id="tf_1",
+        text="The Great Wall of China is over 13,000 miles long.",
+        source_title="UNESCO World Heritage",
+        source_domain="unesco.org",
+        relevance_score=0.92
+    )
+    monkeypatch.setattr(mock_agent, "research_claim_on_web", lambda q, max_evidence=3: [mock_passage])
+    
+    retriever = HybridRetriever(prefer_offline=True, tinyfish_agent=mock_agent)
+    # Search with empty local index: should trigger TinyFish fallback
+    claim = AtomicClaim(text="Great wall of china length", parent_sentence="")
+    results = retriever.retrieve(claim, top_k=2, use_live_fallback=True)
+    assert len(results) == 1
+    assert results[0].id == "tf_1"
+    assert "Great Wall of China" in results[0].text
+    
+    # Also test direct search_tinyfish_live
+    tf_direct = retriever.search_tinyfish_live("test query", max_results=2)
+    assert len(tf_direct) == 1
+    assert tf_direct[0].id == "tf_1"
+
+
+
 
