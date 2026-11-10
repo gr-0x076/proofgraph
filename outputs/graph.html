@@ -1,0 +1,127 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #0f172a;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#3b82f6", "credibility": 0.92, "font": {"color": "#f8fafc"}, "full_text": "The Apollo 11 mission landed humans on the Moon on July 20, 1969, with commander Neil Armstrong and lunar module pilot Buzz Aldrin.", "id": "ev_40608d19", "label": "\ud83d\udcc4 The Apollo 11 mission landed h...", "node_type": "evidence", "relevance": 0.8980552554130554, "shape": "dot", "size": 15, "source_url": "https://www.nasa.gov/mission/apollo-11/", "title": "Evidence from NASA Historical Archive:\n\"The Apollo 11 mission landed humans on the Moon on July 20, 1969, with commander Neil Armstrong and lunar module pilot Buzz Aldrin.\"\nRelevance: 0.90 | Credibility: 0.92"}, {"color": "#8b5cf6", "credibility": 0.92, "domain": "nasa.gov", "font": {"color": "#f8fafc"}, "id": "src_nasa_gov", "label": "\ud83c\udf10 NASA Historical Archive", "node_type": "source", "shape": "ellipse", "size": 20, "title": "Source: NASA Historical Archive (nasa.gov)\nCredibility: 0.92"}, {"borderWidth": 2, "color": "#10b981", "confidence": 0.95, "font": {"color": "#f8fafc"}, "full_text": "Apollo 11 successfully landed on the moon on July 20, 1969 with Neil Armstrong.", "id": "claim_9f71811e", "label": "[SUPPORTED]\nApollo 11 successfully landed on th...", "node_type": "claim", "shape": "box", "size": 25, "title": "Claim: Apollo 11 successfully landed on the moon on July 20, 1969 w...", "veracity": "SUPPORTED"}, {"color": "#3b82f6", "credibility": 0.95, "font": {"color": "#f8fafc"}, "full_text": "The Eiffel Tower is a wrought-iron lattice tower located on the Champ de Mars in Paris, France. Constructed from 1887 to 1889 by Gustave Eiffel\u0027s company.", "id": "ev_5cc1c539", "label": "\ud83d\udcc4 The Eiffel Tower is a wrought-...", "node_type": "evidence", "relevance": 0.598825216293335, "shape": "dot", "size": 15, "source_url": "https://www.britannica.com/topic/Eiffel-Tower-Paris-France", "title": "Evidence from Encyclopaedia Britannica:\n\"The Eiffel Tower is a wrought-iron lattice tower located on the Champ de Mars in Paris, France. Constructed from 1887 to 1889 by Gustave Eiffel\u0027s company.\"\nRelevance: 0.60 | Credibility: 0.95"}, {"color": "#8b5cf6", "credibility": 0.92, "domain": "britannica.com", "font": {"color": "#f8fafc"}, "id": "src_britannica_com", "label": "\ud83c\udf10 Encyclopaedia Britannica", "node_type": "source", "shape": "ellipse", "size": 20, "title": "Source: Encyclopaedia Britannica (britannica.com)\nCredibility: 0.92"}, {"borderWidth": 2, "color": "#ef4444", "confidence": 0.95, "font": {"color": "#f8fafc"}, "full_text": "The Eiffel Tower was constructed in Rome in 1950 by Italian engineers.", "id": "claim_0c7a2dec", "label": "[CONTRADICTED]\nThe Eiffel Tower was constructed in...", "node_type": "claim", "shape": "box", "size": 25, "title": "Claim: The Eiffel Tower was constructed in Rome in 1950 by Italian ...", "veracity": "CONTRADICTED"}, {"borderWidth": 2, "color": "#f59e0b", "confidence": 1.0, "font": {"color": "#f8fafc"}, "full_text": "Personally, I think Rome is the greatest architectural city in the world.", "id": "claim_8e3c71dc", "label": "[INSUFFICIENT_EVIDENCE]\nPersonally, I think Rome is the gre...", "node_type": "claim", "shape": "box", "size": 25, "title": "Claim: Personally, I think Rome is the greatest architectural city ...", "veracity": "INSUFFICIENT_EVIDENCE"}, {"color": "#3b82f6", "credibility": 0.85, "font": {"color": "#f8fafc"}, "full_text": "The Colosseum in Rome was completed in 80 AD under Emperor Titus.", "id": "ev_14a6e33b", "label": "\ud83d\udcc4 The Colosseum in Rome was comp...", "node_type": "evidence", "relevance": 0.6295093297958374, "shape": "dot", "size": 15, "source_url": "https://www.history.com/topics/ancient-rome/colosseum", "title": "Evidence from History Channel:\n\"The Colosseum in Rome was completed in 80 AD under Emperor Titus.\"\nRelevance: 0.63 | Credibility: 0.85"}, {"color": "#8b5cf6", "credibility": 0.5, "domain": "history.com", "font": {"color": "#f8fafc"}, "id": "src_history_com", "label": "\ud83c\udf10 History Channel", "node_type": "source", "shape": "ellipse", "size": 20, "title": "Source: History Channel (history.com)\nCredibility: 0.50"}, {"color": "#3b82f6", "credibility": 0.15, "font": {"color": "#f8fafc"}, "full_text": "Some modern architectural historians argue that a replica of the Eiffel Tower was secretly designed in Rome in 1950.", "id": "ev_1cf763af", "label": "\ud83d\udcc4 Some modern architectural hist...", "node_type": "evidence", "relevance": 0.6110138893127441, "shape": "dot", "size": 15, "source_url": "https://infowars.com/fake-eiffel-rome", "title": "Evidence from Conspiracy Chronicle:\n\"Some modern architectural historians argue that a replica of the Eiffel Tower was secretly designed in Rome in 1950.\"\nRelevance: 0.61 | Credibility: 0.15"}, {"color": "#8b5cf6", "credibility": 0.15, "domain": "infowars.com", "font": {"color": "#f8fafc"}, "id": "src_infowars_com", "label": "\ud83c\udf10 Conspiracy Chronicle", "node_type": "source", "shape": "ellipse", "size": 20, "title": "Source: Conspiracy Chronicle (infowars.com)\nCredibility: 0.15"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "color": "#a78bfa", "dashes": true, "from": "ev_40608d19", "relation": "wasAttributedTo", "to": "src_nasa_gov", "width": 1}, {"arrows": "to", "color": "#10b981", "from": "ev_40608d19", "relation": "SUPPORTS", "title": "SUPPORTS: NASA Historical Archive", "to": "claim_9f71811e", "width": 1}, {"arrows": "to", "color": "#a78bfa", "dashes": true, "from": "ev_5cc1c539", "relation": "wasAttributedTo", "to": "src_britannica_com", "width": 1}, {"arrows": "to", "color": "#9ca3af", "dashes": true, "from": "ev_5cc1c539", "relation": "MENTIONS", "title": "MENTIONS: Context retrieved but does not directly entail", "to": "claim_9f71811e", "width": 1}, {"arrows": "to", "color": "#ef4444", "from": "ev_5cc1c539", "relation": "CONTRADICTS", "title": "CONTRADICTS: Encyclopaedia Britannica actively refutes this assertion", "to": "claim_0c7a2dec", "width": 1}, {"arrows": "to", "color": "#9ca3af", "dashes": true, "from": "ev_5cc1c539", "relation": "MENTIONS", "title": "MENTIONS: Context retrieved but does not directly entail", "to": "claim_8e3c71dc", "width": 1}, {"arrows": "to", "color": "#a78bfa", "dashes": true, "from": "ev_14a6e33b", "relation": "wasAttributedTo", "to": "src_history_com", "width": 1}, {"arrows": "to", "color": "#9ca3af", "dashes": true, "from": "ev_14a6e33b", "relation": "MENTIONS", "title": "MENTIONS: Context retrieved but does not directly entail", "to": "claim_9f71811e", "width": 1}, {"arrows": "to", "color": "#9ca3af", "dashes": true, "from": "ev_14a6e33b", "relation": "MENTIONS", "title": "MENTIONS: Context retrieved but does not directly entail", "to": "claim_0c7a2dec", "width": 1}, {"arrows": "to", "color": "#9ca3af", "dashes": true, "from": "ev_14a6e33b", "relation": "MENTIONS", "title": "MENTIONS: Context retrieved but does not directly entail", "to": "claim_8e3c71dc", "width": 1}, {"arrows": "to", "color": "#a78bfa", "dashes": true, "from": "ev_1cf763af", "relation": "wasAttributedTo", "to": "src_infowars_com", "width": 1}, {"arrows": "to", "color": "#9ca3af", "dashes": true, "from": "ev_1cf763af", "relation": "MENTIONS", "title": "MENTIONS: Context retrieved but does not directly entail", "to": "claim_0c7a2dec", "width": 1}, {"arrows": "to", "color": "#9ca3af", "dashes": true, "from": "ev_1cf763af", "relation": "MENTIONS", "title": "MENTIONS: Context retrieved but does not directly entail", "to": "claim_8e3c71dc", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"nodes": {"font": {"face": "system-ui,sans-serif", "size": 13, "color": "#f8fafc"}}, "edges": {"smooth": {"type": "cubicBezier", "forceDirection": "horizontal", "roundness": 0.4}, "font": {"size": 11, "align": "top"}}, "physics": {"forceAtlas2Based": {"gravitationalConstant": -50, "centralGravity": 0.01, "springLength": 100, "springConstant": 0.08}, "maxVelocity": 50, "solver": "forceAtlas2Based", "timestep": 0.35, "stabilization": {"iterations": 150}}, "interaction": {"hover": true, "navigationButtons": true, "keyboard": true}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
