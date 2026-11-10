@@ -1,6 +1,6 @@
 import re
 import numpy as np
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Set
 from rank_bm25 import BM25Okapi
 from fastembed import TextEmbedding
 import urllib.request
@@ -9,23 +9,24 @@ import urllib.parse
 
 from proofgraph.schemas.evidence import EvidencePassage
 from proofgraph.schemas.claim import AtomicClaim
-from proofgraph.retriever.fire_policy import FIREStoppingPolicy
+from proofgraph.retriever.fire_policy import FIREIterativeDecisionModule
 
 class HybridRetriever:
     """
-    Two-stage Hybrid Retriever:
+    Multi-Stage Hybrid Retriever with FIRE Iterative Loop:
     - Sparse Lexical: BM25 (rank_bm25) for high-precision entity/number matches
     - Dense Semantic: FastEmbed (BAAI/bge-small-en-v1.5) for conceptual alignment
     - Reciprocal Rank Fusion (RRF, k=60)
-    - Fallback: Live Wikipedia API search when local corpus lacks sufficient evidence
+    - FIRE Iterative Retrieval Loop: Dynamic stopping with entity-gap query reformulation
+    - Live Wikipedia API fallback for open-domain fact verification
     """
-    def __init__(self, embedding_model_name: str = "BAAI/bge-small-en-v1.5"):
+    def __init__(self, embedding_model_name: str = "BAAI/bge-small-en-v1.5", max_hops: int = 3):
         self.embed_model = TextEmbedding(model_name=embedding_model_name)
         self.passages: List[EvidencePassage] = []
         self.corpus_tokens: List[List[str]] = []
         self.bm25: Optional[BM25Okapi] = None
         self.dense_embeddings: Optional[np.ndarray] = None
-        self.fire_policy = FIREStoppingPolicy()
+        self.fire_module = FIREIterativeDecisionModule(max_hops=max_hops)
 
     def tokenize(self, text: str) -> List[str]:
         return re.findall(r'\w+', text.lower())
@@ -38,7 +39,6 @@ class HybridRetriever:
         self.corpus_tokens = [self.tokenize(p.text) for p in passages]
         self.bm25 = BM25Okapi(self.corpus_tokens)
         
-        # Compute dense embeddings
         texts = [p.text for p in passages]
         embeddings_gen = self.embed_model.embed(texts)
         self.dense_embeddings = np.array(list(embeddings_gen))
@@ -77,7 +77,6 @@ class HybridRetriever:
         results: List[EvidencePassage] = []
         for idx in top_indices:
             p = self.passages[idx]
-            # Create a copy with updated relevance score
             relevance = float(dense_sims[idx])
             res_passage = p.model_copy()
             res_passage.relevance_score = max(0.0, min(1.0, relevance))
@@ -109,35 +108,81 @@ class HybridRetriever:
                         source_url=source_url,
                         source_title=f"Wikipedia: {title}",
                         source_domain="wikipedia.org",
-                        credibility_score=0.88,  # Established encyclopedic baseline
+                        credibility_score=0.88,
                         relevance_score=0.75,
                         metadata={"title": title, "pageid": page_id}
                     )
                 )
             return live_passages
-        except Exception as e:
+        except Exception:
             return []
 
+    def _deduplicate_passages(self, passages: List[EvidencePassage], threshold: float = 0.90) -> List[EvidencePassage]:
+        """Filters out near-duplicate passages to avoid context redundancy (SANCTUARY pattern)."""
+        if len(passages) <= 1:
+            return passages
+        texts = [p.text for p in passages]
+        embeddings = np.array(list(self.embed_model.embed(texts)))
+        sim_matrix = self._cosine_similarity(embeddings, embeddings)
+        
+        keep_indices = []
+        for i in range(len(passages)):
+            is_dup = False
+            for j in keep_indices:
+                if sim_matrix[i, j] > threshold:
+                    is_dup = True
+                    break
+            if not is_dup:
+                keep_indices.append(i)
+                
+        return [passages[i] for i in keep_indices]
+
     def retrieve(self, claim: AtomicClaim, top_k: int = 5, use_live_fallback: bool = True) -> List[EvidencePassage]:
-        """Executes hybrid retrieval with FIRE dynamic stopping policy and optional live web fallback."""
-        query = claim.text
-        # Query augmentation: if claim has entities, prioritize entity context
-        if claim.entities:
-            query = f"{' '.join(claim.entities[:2])} {claim.text}"
+        """
+        Executes the FIRE iterative retrieval loop:
+        1. Formulates initial query.
+        2. Evaluates retrieved evidence pool.
+        3. Decides whether to terminate early or generate next targeted query.
+        4. Continues across hops until evidence is sufficient or max_hops is reached.
+        """
+        current_query = claim.text
+        executed_queries = [current_query]
+        pooled_evidence: List[EvidencePassage] = []
+        seen_ids: Set[str] = set()
 
-        retrieved = self.search_local(query, top_k=top_k)
+        for hop in range(1, self.fire_module.max_hops + 1):
+            # 1. Search local corpus
+            local_hits = self.search_local(current_query, top_k=top_k)
+            for hit in local_hits:
+                if hit.id not in seen_ids:
+                    seen_ids.add(hit.id)
+                    pooled_evidence.append(hit)
 
-        # FIRE Early-Stopping Check
-        if self.fire_policy.should_terminate(claim, retrieved, current_hop=1):
-            return retrieved
+            # 2. Live fallback if local corpus is empty or top relevance is weak
+            if use_live_fallback and (not pooled_evidence or pooled_evidence[0].relevance_score < 0.65):
+                live_hits = self.search_wikipedia_live(current_query, max_results=top_k)
+                for hit in live_hits:
+                    if hit.id not in seen_ids:
+                        seen_ids.add(hit.id)
+                        pooled_evidence.append(hit)
 
-        # If local retrieval yielded low relevance or empty, fallback to live Wikipedia
-        if use_live_fallback and (not retrieved or retrieved[0].relevance_score < 0.65):
-            search_query = ' '.join(claim.entities[:3]) if claim.entities else claim.text
-            live_hits = self.search_wikipedia_live(search_query, max_results=top_k)
-            if live_hits:
-                # Merge local and live hits, avoiding near-duplicates
-                retrieved = live_hits + retrieved
-                retrieved = retrieved[:top_k]
+            # Sort pooled evidence by relevance
+            pooled_evidence.sort(key=lambda x: x.relevance_score, reverse=True)
 
-        return retrieved
+            # 3. FIRE Decision Module: Should we terminate early or reformulate query?
+            should_stop, next_query = self.fire_module.evaluate_step(
+                claim=claim,
+                retrieved_pool=pooled_evidence,
+                current_hop=hop,
+                executed_queries=executed_queries
+            )
+
+            if should_stop or not next_query:
+                break
+
+            current_query = next_query
+            executed_queries.append(current_query)
+
+        # Deduplicate and return top_k
+        deduped = self._deduplicate_passages(pooled_evidence)
+        return deduped[:top_k]

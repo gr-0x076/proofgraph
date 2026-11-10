@@ -1,0 +1,1392 @@
+[
+  {
+    "claim": "In a letter to Steve Jobs, Sean Connery refused to appear in an apple commercial.",
+    "label": "Refuted",
+    "justification": "The answer and sources show that the claim was published in a fake news site so the claim is refuted.",
+    "speaker": null,
+    "claim_date": "31-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Where was the claim first published\": It was first published on Sccopertino",
+        "source_url": "https://web.archive.org/web/20201129141238/https://scoopertino.com/exposed-the-imac-disaster-that-almost-was/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What kind of website is Scoopertino\": Scoopertino is an imaginary news organization devoted to ferreting out the most relevant stories in the world of Apple, whether or not they actually occurred - says their about page",
+        "source_url": "https://web.archive.org/web/20201202085933/https://scoopertino.com/about-scoopertino/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Trump Administration claimed songwriter Billie Eilish Is Destroying Our Country In Leaked Documents",
+    "label": "Refuted",
+    "justification": "Seems that the Wzshington post accused the singer wrong lyrics. Therefore the claim is refuted",
+    "speaker": null,
+    "claim_date": "31-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Has the Trump administration voiced that Billie Eilish was destroying the country\": A Washington Post story wrongly claimed the Trump administration accused Billie Eilish of \u201cdestroying our country",
+        "source_url": "https://web.archive.org/web/20201101145631/https://nypost.com/2020/10/30/washington-post-wrongly-claims-trump-officials-criticized-billie-eilish/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Due to Imran Khan's criticism of Macron's comments on Islam, French authorities cancelled the visas of 183 Pakistani citizens and deported 118 from the country.",
+    "label": "Refuted",
+    "justification": "The tweet was not the official government page and there is no evidence that visas were cancelled so the claim is refuted.",
+    "speaker": "Consulate General Of Pakistan France",
+    "claim_date": "31-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"How did Macron criticise Islam?\": Macron described Islam as a religion \u201cin crisis\u201d worldwide and vowed to present a bill in December to strengthen a law that officially separated church and state in France.",
+        "source_url": "https://www.aljazeera.com/news/2020/10/26/french-president-comments-over-islam-keep-sparking-outrage",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How did Imran Khan criticise Macron?\": It is unfortunate that he has chosen to encourage Islamophobia by attacking Islam rather than the terrorists who carry out violence, be it Muslims, White Supremacists or Nazi ideologists. Sadly, President Macron has chosen to deliberately provoke Muslims, incl his own citizens, through encouraging the display of blasphemous cartoons targeting Islam & our Prophet PBUH. By attacking Islam,   clearly without having any understanding of it, President Macron has attacked & hurt the sentiments of millions of Muslims in Europe & across the world",
+        "source_url": "https://web.archive.org/web/20210905081440/https://twitter.com/ImranKhanPTI/status/1320286665785704448",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has France cancelled Pakistani citizens' visas?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has France deported any Pakistanis due to Khan's comments?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Who tweeted the original claim?\": They were tweeted by @PakConsulateFr, which is not Pakistani Consulate of France official Twitter account.",
+        "source_url": "https://web.archive.org/web/20210629013122/https://twitter.com/PakConsulateFr/status/1322495811993903104",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "UNESCO declared Nadar community as the most ancient race in the world.",
+    "label": "Refuted",
+    "justification": "This claim is refuted. According to the QA pairs, UNESCO have never declared a \"most ancient race\", and for those who have analysed this question, they have theorised that the San people of southern Africa may be the most \"ancient race\"- no the Nadar community. Therefore, this claim is refuted.",
+    "speaker": "Kumar Shankar",
+    "claim_date": "31-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What is Nadar?\": Nadar (also referred as Nadan, Shanar) is a caste of Tamil Nadu & Kerala, South India. The Nadars are an entrepreneurial south Indian caste] and constitute 12% of Tamil Nadu's population. The Nadar community was not a singular caste, but an assortment of sub-castes and classes of different origins, which in course of time, came under the single banner Nadar. Nadars are predominant in the southern districts of Tuticorin, Kaniyakumari, Tirunelveli and Virudhunagar.",
+        "source_url": "https://www.familytreedna.com/groups/nadar/about/background",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is the world's most ancient race according to UNESCO?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is the world's most ancient race?\": The San people of southern Africa, who have lived as hunter-gatherers for thousands of years, are likely to be the oldest population of humans on Earth, according to the biggest and most detailed analysis of African DNA.",
+        "source_url": "https://www.independent.co.uk/news/science/world-s-most-ancient-race-traced-in-dna-study-1677113.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Republican Matt Gaetz was part of a company that had to pay 75 million in hospice fraud. They stole from dying people.",
+    "label": "Refuted",
+    "justification": "The company was sold in 2004 and the law suit was filed in 2013",
+    "speaker": "",
+    "claim_date": "31-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Did Matt Gaetz work for Chemed Corporation, Vitas Hospice Services LLC or Vitas Healthcare Corporation?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did Matt Gaetz's father Don Gaetz co-found Vitas?\": Gaetz is the retired co-founder of VITAS Healthcare Corp., a hospice care provider that comforts patients and their families and preserves their dignity in the face of terminal illness. He was also president of the National Hospice Organization.",
+        "source_url": "https://erau.edu/gaetz-aerospace-institute/about/don-gaetz",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What year did Don Gaetz sell Vitas to Chemed?\": In 2004, VITAS was acquired by Roto Rooter's parent company Chemed for $400 million.",
+        "source_url": "https://www.celebritynetworth.com/richest-politicians/republicans/don-gaetz-net-worth/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was Chemed Corporation involved in a $75m Fraud charge?\": Yes :\nThe lawsuit against the company was filed in 2013 \u2014 nine years after Don Gaetz sold the company to Chemed in 2004. It\u2019s true that at least some of the instances were alleged to have occurred before that sale date (dating back to 2002), but it\u2019s worth noting that Don Gaetz was not a party to the lawsuit. At the time of the lawsuit\u2019s filing, he denied that the matters in the complaint related to his work with Vitas.",
+        "source_url": "https://web.archive.org/web/20210713185816/http://ir.chemed.com/news-releases/news-release-details/roto-rooter-inc-completes-merger-vitas-healthcare-corporation",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The United States of America and its Western allies have been using their media outlets to publish articles based on fabricated information under allegations of non-compliance with the Chemical Weapons Convention.",
+    "label": "Refuted",
+    "justification": "Refuted by answer/source.",
+    "speaker": "Syrian Arab News Agency (SANA)",
+    "claim_date": "30-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Has Syria complied with the Chemical Weapons Convention?\": No",
+        "source_url": "https://web.archive.org/web/20210302193538/https://www.theguardian.com/world/2020/apr/06/report-set-to-blame-syria-chemical-attacks-on-bashar-al-assad",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "You\u2019re watching the cheaters and all those people that send in the phony ballots. \u2026 They want to have the count weeks after November 3.",
+    "label": "Refuted",
+    "justification": "The mail in ballots have to be counted no later than 7 days after election day. so that it would be weeks later is refuted. ",
+    "speaker": "Donald Trump",
+    "claim_date": "30-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"When are mail-in ballots counted?\": Vote-by-mail ballots that are mailed must be postmarked on or before Election Day and received by your county elections office no later than 7 days after Election Day.",
+        "source_url": "https://www.sos.ca.gov/elections/voter-registration/vote-mail",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"are all non-mail ballots counted by election day?\": No",
+        "source_url": "https://calmatters.org/politics/california-election-2020/2020/03/california-primary-election-results-delayed/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "New Zealand\u2019s new Food Bill bans gardening",
+    "label": "Refuted",
+    "justification": "The bill is not into legislation for now. I see claim as false. ",
+    "speaker": null,
+    "claim_date": "29-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Which Food Bill does the claim refer to?\": The claim refers to the Food Act 2014, first read in New Zealand Parliament in May 2010.",
+        "source_url": "https://www.parliament.nz/en/pb/bills-and-laws/bills-proposed-laws/document/00DBHOH_BILL9974_1/food-bill",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does the blog post imply that this Food Bill\nis already legislation?\": No",
+        "source_url": "https://archive.ph/jqW1g#selection-1753.196-1753.231",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does the blog post imply that this Food Bill\nis already legislation?\": The title of the blog refers to the Food Bill as \"New Food Bill in New Zealand...\"",
+        "source_url": "https://archive.ph/jqW1g#selection-1541.0-1541.28",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does the blog post imply that this Food Bill\nis already legislation?\": This bill would on commencement replace the Food Act 1981 and over time the Food Hygiene Regulations 1974 and the Food (Safety) Regulations 2002.",
+        "source_url": "https://archive.ph/jqW1g#selection-1931.0-1931.145",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is the date of the blog post?\": The date on the post is October 29, 2020",
+        "source_url": "https://archive.ph/jqW1g#selection-1541.0-1541.28",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What amendments have been made to the Act up to the claim date?\": Public Service Act 2020 (2020 No 40): section 135\nEducation and Training Act 2020 (2020 No 38): section 668\nPrivacy Act 2020 (2020 No 31): section 217\nCOVID-19 Response (Further Management Measures) Legislation Act 2020 (2020 No 13): section 3\nStatutes Amendment Act 2019 (2019 No 56): Part 18\nCustoms and Excise Act 2018 (2018 No 4): section 443(3)\nFood Safety Law Reform Act 2018 (2018 No 3): Part 1\nDistrict Court Act 2016 (2016 No 49): section 261\nSenior Courts Act 2016 (2016 No 48): section 183(b), (c)\nFood Regulations 2015 (LI 2015/310): Schedule 1 clause 7\nLegislation (Confirmable Instruments) Amendment Act 2015 (2015 No 120): section 14",
+        "source_url": "http://www.nzlii.org/nz/legis/consol_act/fa201457/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What did the New Zealand Food Safety Minister say about the Bill on 12 October, 2011?\": The new Food Bill is about modernising legislation that is now 30 years old. It is about ensuring that people who sell and prepare food do so safely.",
+        "source_url": "https://www.beehive.govt.nz/release/greens-wrong-food-bill",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Jammu and Kashmir (J&K) in Pakistan/India was removed from the United Nations (UN) list of \u201cunresolved disputes\u201d.",
+    "label": "Refuted",
+    "justification": "The answer and source show that they were never on the list so the claim is refuted.",
+    "speaker": "Paresh Rawal \u200f",
+    "claim_date": "29-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What is the dispute in Jammu and Kasmir about?\": The first Indo-Pakistan war, in 1947-1948, split Jammu and Kashmir in two, with both countries since claiming ownership over the entire territory. As such, Kashmir is both the cause and consequence of war and hostilities between the two nuclear-armed states",
+        "source_url": "https://www.crisisgroup.org/asia/south-asia/kashmir/310-raising-stakes-jammu-and-kashmir",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was Jammu and Kashmir an item on the agenda of the Security Council?\": \u201cHowever, the point is Jammu & Kashmir has never been an item on the agenda of the Security Council. It has always been \u201cIndia-Pakistan question\u201d. Further, since the last formal meeting of the Council on this agenda item also took place in November 1965, even this is listed in a separate category by the Secretary-General in his regular report on the list of items seized by the Council. The India/Pakistan question is listed in a separate category of items which have not been considered in the last 3 years",
+        "source_url": "https://web.archive.org/web/20210608054144/https://www.undocs.org/en/S/2020/10/Add.40",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The plentiful evidence we have indicates that masks would not meaningfully help with aerosol transmission of COVID 19.",
+    "label": "Refuted",
+    "justification": "Evidence finds that surgical face masks could prevent transmission of human coronaviruses and influenza viruses from symptomatic individuals. The CDC and the World Health Organization (WHO), at the time of the claim, also recommended cloth masks for the general public.",
+    "speaker": "Yinon Weiss",
+    "claim_date": "29-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Have any studies been done to show if masks help with Aerosol transmission ?\": Surgical face masks significantly reduced detection of influenza virus RNA in respiratory droplets and coronavirus RNA in aerosols, with a trend toward reduced detection of coronavirus RNA in respiratory droplets. Our results indicate that surgical face masks could prevent transmission of human coronaviruses and influenza viruses from symptomatic individuals.",
+        "source_url": "https://www.nature.com/articles/s41591-020-0843-2?error=cookies_not_supported&code=06c46169-a951-475f-84e1-3761c88a0a71",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Do any health body's recommend wearing a facemask to help slow down aerosol transmission of viruses at the time of the claim (2020)?\": At of claim yes, the (CDC) and the World Health Organization now recommended cloth masks for the general public, but earlier in the pandemic, both organizations recommended just the opposite.",
+        "source_url": "https://www.ucsf.edu/news/2020/06/417906/still-confused-about-masks-heres-science-behind-how-face-masks-prevent",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "All USA Ballots Arriving After Election Day Will Be Thrown Out",
+    "label": "Refuted",
+    "justification": "Two sources confirm that postal ballots received after election day can still be counted, therefore not all will be thrown out.",
+    "speaker": "Eric Holder",
+    "claim_date": "28-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What was the election day in the 2020 US presidential elections?\": November 3, 2020.",
+        "source_url": "https://elections.maryland.gov/elections/2020/index.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"When was the deadline to receiving votes by mail?\": Your mail-in ballot must be mailed or dropped in a drop off box location location by 8 pm on Election Day, November 3. If you mail your ballot, it must be postmarked on or before November 3, 2020 to be counted.",
+        "source_url": "https://elections.maryland.gov/elections/2020/index.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was there an extension to the deadline of receipt of mail ballots in the 2020 elections?\": Yes",
+        "source_url": "https://oag.dc.gov/sites/default/files/2020-10/Wise-v-Circosta-Amicus.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What was the deadline for receipt of mail ballots in Alaska and Maryland in the 2020 US presidential elections?\": Absentee ballots must be postmarked by Nov. 3 and received by Nov. 13.",
+        "source_url": "https://projects.fivethirtyeight.com/how-to-vote-2020/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Video shows attack of French embassy in Sudan",
+    "label": "Refuted",
+    "justification": "It is the \"German\" embassy that was under attack in Sudan.",
+    "speaker": "Anmol Alphonso",
+    "claim_date": "28-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"When was the video taken\": The video was taken on 14th September 2012",
+        "source_url": "https://web.archive.org/web/20220311134915/https://www.tagesspiegel.de/politik/proteste-gegen-anti-islam-film-demonstranten-setzen-deutsche-botschaft-im-sudan-in-brand/7132474.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Which embassy was being attacked in the video\": In Sudan, demonstrators stormed the German embassy and set it on fire in a bloody protest against an Islam-critical abusive video",
+        "source_url": "https://web.archive.org/web/20220311134915/https://www.tagesspiegel.de/politik/proteste-gegen-anti-islam-film-demonstranten-setzen-deutsche-botschaft-im-sudan-in-brand/7132474.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Viral video purportedly shows Pakistani opposition MPs chanted \u2018Modi, Modi\u2019 (India's PM)  inside the Pakistani Parliament",
+    "label": "Refuted",
+    "justification": "They were shouting voting not modi",
+    "speaker": "BJP MP Shobha Karandlaje",
+    "claim_date": "28-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Were there any reports of the event in the pakistani parliament?\": A detailed report of the proceedings are detailed in a report in the Dawn, there is no mention of people shouting Modi Modi. But people did shout 'voting, voting'",
+        "source_url": "https://www.dawn.com/news/1587131",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Taylor Zundel claimed on Instagram that she and other early voters in Utah, were unable to cast ballots in the 2020 presidential elections, as they were told they had already voted.",
+    "label": "Refuted",
+    "justification": "She was able to vote, after a temporary problem. ",
+    "speaker": "Taylor Zundel",
+    "claim_date": "27-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Was Utah resident  Taylor Zundel able to vote in the 2020 presidential elections?\": Yes",
+        "source_url": "https://web.archive.org/web/20201119224000/https://hermancain.com/instagram-testimony-people-showing-vote-told-already-voted/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Trash Can Plastered With 'Ballot Box' Sign In Philadelphia Was Intended To Get People To Toss Their Ballots In The Trash.",
+    "label": "Refuted",
+    "justification": "From the question and answer pair it seems that the claim is refuted.",
+    "speaker": null,
+    "claim_date": "27-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Did a worker in Philadelphia mark the trash cans so that people would throw away their ballots?\": The posters proclaiming Ballot Box on sidewalk solar-powered trash compactors were created to advertise Ballot Box an exhibit and not to throw votes in the trash.",
+        "source_url": "https://www.instagram.com/p/CG2aethncKr/?utm_source=ig_embed",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "More than 225,000 people dead, 225,000. The estimates are, if we\u2019d have acted responsibly, there\u2019d be 160,000 fewer dead than there are today, because of covid-19.",
+    "label": "Supported",
+    "justification": "It seems that indeed the  umbers are true therefore the claim is supported ",
+    "speaker": "Joe Biden",
+    "claim_date": "30-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"How many deaths were recorded in the US on October 31, 2020\": 230,512",
+        "source_url": "https://injuryfacts.nsc.org/home-and-community/safety-topics/covid-19-cases-in-the-united-states/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Would a faster COVID response in the US reduced the death toll\": Due to exponential viral spread, our delay in action was devastating. In the wake of the U.S. response, 117,858 Americans died in the four months following the first 15 confirmed cases. After an equivalent period, Germany suffered only 8,863 casualties. Scaling up the German population of 83.7 million to America\u2019s 331 million, a U.S.-sized Germany would have suffered 35,049 Covid-19 deaths. So if the U.S. had acted as effectively as Germany, 70% of U.S. coronavirus deaths might have been prevented.",
+        "source_url": "https://www.statnews.com/2020/06/19/faster-response-prevented-most-us-covid-19-deaths/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is 70% of 230,512\": 161,358",
+        "source_url": "https://www.calculator.net/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Why should you pay more taxes than Donald Trump pays? And that\u2019s a fact. $750. Remember what he said when that was raised a while ago, how he only pays \u2026 He said, \u2018Because I\u2019m smart. I know how to game the system.\u2019",
+    "label": "Supported",
+    "justification": "True, question mark required (?) ",
+    "speaker": "Joe Biden",
+    "claim_date": "30-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What was Trump's tax return in 2017\": Trump Paid $750 in Federal Income Taxes in 2017",
+        "source_url": "https://web.archive.org/web/20210212182804/https://www.nytimes.com/2020/09/29/us/trump-750-taxes.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"When did Trump say he was smart for not paying taxes\": He made the boast during the 2016 electoral debate with Hilary Clinton",
+        "source_url": "https://web.archive.org/web/20210212190344/https://www.cnbc.com/2016/09/26/trump-brags-about-not-paying-taxes-that-makes-me-smart.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Wearing face masks will stop the spread of covid 19",
+    "label": "Supported",
+    "justification": "From the question and answer pair it does indeed seem that face masks are useful in stopping the spread of covid19. Therefore, the claim is supported.",
+    "speaker": "Yinon Weiss",
+    "claim_date": "29-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Does a face mask prevent the spread of Covid 19?\": Cloth face coverings, even homemade masks made of the correct material, are effective in reducing the spread of COVID-19 - for the wearer and those around them - according to a new study from Oxford\u2019s Leverhulme Centre for Demographic Science.",
+        "source_url": "https://www.ox.ac.uk/news/2020-07-08-oxford-covid-19-study-face-masks-and-coverings-work-act-now",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "McDonald\u2019s Azerbaijan's official account was promoting the military taking of Nagorno-Karabakh.",
+    "label": "Supported",
+    "justification": "Evidence is provided but question should really mention it is an instagram account.",
+    "speaker": null,
+    "claim_date": "27-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Was Mc Donald's Azerbaijan official account posting about military stuff\": Yes",
+        "source_url": "https://web.archive.org/web/20210303123859mp_/https://t.co/oo9Sbfoq7U",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Amy Coney Barrett was confirmed as US Supreme Court Justice on October 26, 2020",
+    "label": "Supported",
+    "justification": "Although the date is not confirmed in the QA pair, it is stated in the source for the Answer provided.",
+    "speaker": "Meena Harris @meenaharris",
+    "claim_date": "26-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Is Amy Coney Barrett confirmed as supreme Court justice ?\": Yes",
+        "source_url": "https://edition.cnn.com/politics/live-news/amy-coney-barrett-senate-confirmation-vote/index.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The New York post Endorsed Donald trumps bid for re-election.",
+    "label": "Supported",
+    "justification": "Claim is correct",
+    "speaker": null,
+    "claim_date": "26-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Was Donald Trump endorsed by the New York Post for reelection\": The New York Post endorses President Donald J. Trump for re-election.",
+        "source_url": "https://web.archive.org/web/20210119183455/https://nypost.com/2020/10/26/the-new-york-post-endorses-president-donald-j-trump-for-re-election/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The United States, New Zealand, U.K., Australia, and the EU have not included the NDF in their official list of terrorist groups.",
+    "label": "Supported",
+    "justification": "NDF is not listed on any of the official lists of terrorist groups. ",
+    "speaker": "Jonathan Malaya",
+    "claim_date": "26-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Has the USA included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://web.archive.org/web/20210116025723/https://www.state.gov/foreign-terrorist-organizations/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has the USA included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://web.archive.org/web/20210116025723/https://www.state.gov/foreign-terrorist-organizations/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has the UK  included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://web.archive.org/web/20210124041112/https://ofsistorage.blob.core.windows.net/publishlive/ConList.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has the UK  included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://web.archive.org/web/20210124041112/https://ofsistorage.blob.core.windows.net/publishlive/ConList.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has Australia included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://www.legislation.gov.au/Details/C2019G00862",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has the EU included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://web.archive.org/web/20210120070334/https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX:32020D1132",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has New Zealand included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://www.police.govt.nz/sites/default/files/publications/designated-entities-12-october-2020.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has New Zealand included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://www.police.govt.nz/sites/default/files/publications/designated-entities-12-october-2020.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has Australia  included the NDF in their official list of terrorist groups?\": No",
+        "source_url": "https://web.archive.org/web/20210116025723/https://www.state.gov/foreign-terrorist-organizations/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has EU included NDF on the list of terrorists?\": No",
+        "source_url": "https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32020D1132",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Speaker Robin Vos lost a Republican-held seat in the 2018 election for the first time.",
+    "label": "Supported",
+    "justification": "True",
+    "speaker": "Robyn Vining",
+    "claim_date": "25-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Is Robin Vos a Republican?\": Yes",
+        "source_url": "https://www.fox6now.com/news/boss-vos-as-walker-exits-robin-vos-ready-to-become-most-powerful-republican-in-wisconsin",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did Robin Vos lose a Republican-held seat in the 2018 election?\": Yes",
+        "source_url": "https://www.cbs58.com/news/vos-emerges-as-wisconsin-republican-leader-as-walker-gets-ready-to-step-down",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was it a first loss whilst vos was speaker?\": Yes",
+        "source_url": "https://www.cbs58.com/news/vos-emerges-as-wisconsin-republican-leader-as-walker-gets-ready-to-step-down",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "An 'anti-Black Lives Matter' flag replaced the American flag behind President Trump during a Waukesha campaign rally.",
+    "label": "Supported",
+    "justification": "The 2nd QA seems to support this claim.",
+    "speaker": "Jeff Sharlet",
+    "claim_date": "24-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What flag is seen as an anti Black Lives Matter flag?\": The Blue Lives Matter Flag is said to have racist symbolism which is anti Black Lives Matter.",
+        "source_url": "https://www.reformer.com/opinion/letters/letter-racist-symbolism-behind-the-blue-lives-matter-flag/article_ebf0cd26-2791-513a-8372-96edf1c48ae4.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did the Blue Lives Matter Flag show at a Donald trump Rally in Waukesha campaign rally in 2020?\": Yes",
+        "source_url": "https://web.archive.org/web/20210525130943im_/https://www.gannett-cdn.com/-mm-/2887f5d7d58a75a6437c45e987fd994202334aff/c=0-156-3000-1844/local/-/media/2020/10/17/Rockford/ghows_gallery_ei-IR-201019800-593e424c.jpg?width=660&height=372&fit=crop&format=pjpg&auto=webp",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The FBI is in possession of the president of the US's son  Hunter Biden's laptop.",
+    "label": "Supported",
+    "justification": "It seems that the FBi is indeed in the possession of the laptop, therefore the claim is supported",
+    "speaker": null,
+    "claim_date": "22-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Is the FBI In possession of Hunter Bidens Laptop?\": Yes",
+        "source_url": "https://web.archive.org/web/20210304085240mp_/https://www.foxnews.com/politics/fbi-purported-hunter-biden-laptop-sources",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "While serving as Town Supervisor on Grand Island, Nebraska, US Nate McMurray voted to raise taxes on homeowners.",
+    "label": "Supported",
+    "justification": "Confirmed in QA Pairs with Vote date and the vote he cast.",
+    "speaker": "US Rep. Chris Jacobs",
+    "claim_date": "21-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Did  Nate McMurray voted to raise taxes on U.S homeowners?\": Yes",
+        "source_url": "https://web.archive.org/web/20220322021746/https://buffalonews.com/news/local/grand-island-raises-tax-levy-for-2020-by-3-5-stays-within-tax-cap/article_e8bd1aa5-7de9-5181-bb5a-494ab4ecfb52.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"When did Nate McMurray vote for this increase?\": The 8th of November, 2018.",
+        "source_url": "https://ecode360.com/documents/GR0053/public/466406368.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"was Nate McMurray the  Town Supervisor on Grand Island in November 2018?\": Yes",
+        "source_url": "https://ecode360.com/documents/GR0053/public/466406368.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Officer who wore Trump 2020 mask to polls to face disciplinary action",
+    "label": "Supported",
+    "justification": "The Q&A pair confirm that the officer in the claim did breach protocol and so you would expect a disciplinary action as the claim states.",
+    "speaker": "Steve Simeonidis",
+    "claim_date": "20-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Did the Officer who wore Trump 2020 mask to polls face disciplinary action?\": Miami Mayor Francis Suarez confirmed that the officer had breached department policy by promoting a political candidate.",
+        "source_url": "Metadata",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Hunter Biden was chairman of the Nobel Peace Prize winning World Food Program.",
+    "label": "Supported",
+    "justification": "Hunter Biden served as chairman from 2011 to 2015, according to the nonprofit\u2019s annual reports.",
+    "speaker": "Left Action",
+    "claim_date": "20-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Who is the chairman of World Food Program at time of claim?\": Randy Russel",
+        "source_url": "https://web.archive.org/web/20210506211312/https://www.wfpusa.org/about-us/board-of-directors/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Has Hunter Biden ever been Chairman of World Food Program?\": Hunter Biden, son of Democratic presidential nominee Joe Biden, was on the World Food Program USA board of directors from 2011 to 2017 and served as chairman from 2011 to 2015, according to the nonprofit\u2019s annual reports.",
+        "source_url": "https://web.archive.org/web/20210506220717/https://www.wfpusa.org/about-us/financial-information/annual-reports/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Joe and Jill Biden's income has increased recently.",
+    "label": "Supported",
+    "justification": "The answers show that the couples income in recent years had increased so it is supported.",
+    "speaker": "Kitty Freed",
+    "claim_date": "18-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What was Joe and Jill Biden's income in 2017?\": $11 million",
+        "source_url": "https://web.archive.org/web/20201223113926/https://www.businessinsider.com/personal-finance/bidens-earned-156-million-from-book-deals-speeches-since-2017-2019-7?r=US&IR=T",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What was Joe and Jill Biden's income in 2018?\": $4.5 million",
+        "source_url": "https://web.archive.org/web/20201223113926/https://www.businessinsider.com/personal-finance/bidens-earned-156-million-from-book-deals-speeches-since-2017-2019-7?r=US&IR=T",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What was Joe and Jill Biden's income in 2019?\": $944,000",
+        "source_url": "https://web.archive.org/web/20201223113926/https://www.businessinsider.com/personal-finance/bidens-earned-156-million-from-book-deals-speeches-since-2017-2019-7?r=US&IR=T",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What was Joe and Jill Biden's annual earnings when he was Vice President?\": $230,000 annually",
+        "source_url": "https://www.theguardian.com/us-news/2016/jan/12/joe-biden-barack-obama-money-house-beau-family",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What led to Joe and Jill Biden's annual earnings increasing between 2017 and 2019?\": The new tax returns, combined with previously released tax returns and financial disclosures made public in 2019, show that since 2017, both Bidens signed lucrative book deals. Joe Biden earned anywhere from $8,000 to $90,000 for book-tour stops to promote his 2017 memoir, \"Promise Me, Dad,\" and continued to earn royalties from his New York Times bestselling 2008 book, \"Promises to Keep.\"\n\nIn addition to a position at the University of Pennsylvania that paid over $400,000 over the course of several years, Biden regularly brought in six figures from a single paid speech, earning between $66,000 and $182,679 per speech for 18 speeches he gave in 2017 and 2018.\n\nJill Biden's disclosures released in 2019 showed she earned $90,000 a year for her position teaching English at Northern Virginia Community College, in addition to royalties from her 2012 children's book, \"Don't Forget, God Bless Our Troops,\" and an advance for her memoir, \"Where the Light Enters,\" which was released in May 2019.\n\nJill Biden also reported income from 17 speaking engagements in 2017 and 2018, earning between $25,000 and $46,000 per speech.",
+        "source_url": "https://web.archive.org/web/20201223113926/https://www.businessinsider.com/personal-finance/bidens-earned-156-million-from-book-deals-speeches-since-2017-2019-7?r=US&IR=T",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "A third of excess deaths in the United States between 1 March and  1 August 2020 during the COVID-19 pandemic could not be directly attributed to the coronavirus",
+    "label": "Supported",
+    "justification": "From the last answer it seems that the excess death was indeed 1 third. Therefore the claim is supported ",
+    "speaker": "Michael Lee  Washington Examiner",
+    "claim_date": "18-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What were the total death figures for the U.S between 1st March and the 1st August 2020?\": Between March and August, 2020 the U.S. recorded 1,336,561 deaths,",
+        "source_url": "https://archive.ph/EKPAJ#selection-1637.86-1637.186",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How many of these deaths were attributed directly to coronavirus?\": 150,541 (67%) were attributed to COVID-19.\u201d",
+        "source_url": "https://archive.ph/EKPAJ#selection-1637.202-1637.275",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How much of the total death figure is 'excess death'\": 225,530 were 'excess' deaths",
+        "source_url": "https://archive.ph/EKPAJ#selection-1637.209-1637.230",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What are 'excess deaths'?\": Excess mortality is a term used in epidemiology and public health that refers to the number of deaths that are occurring beyond what we would have normally expected.",
+        "source_url": "https://www.samrc.ac.za/media-release/merits-and-benefits-studying-excess-deaths",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Of the 225,530 excess deaths recorded in the U.S, how many were from covid?\": 150,541 (67% or around 2 3rds of all excess deaths) were attributed to COVID-19.",
+        "source_url": "https://archive.ph/EKPAJ#selection-1637.232-1637.274",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does that leave a  third of excess death for other causes?\": Yes",
+        "source_url": "https://archive.ph/EKPAJ#selection-1637.232-1637.274",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Donald Trump, when he thinks of climate change, he says hoax. Well, guess what? Speaking of hoaxes, remember what he said about these increasing violent hurricanes and the frequency? He actually said, maybe we should detonate a nuclear bomb over the Atlantic. By the way, the same stable genius who said the biggest problem we had in the Revolutionary War is we didn\u2019t have enough airports.",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "There is a few too many claims in this claim, so while one is true, he did say we should detonate a nuclear bomb, i cannot confirm all are true ",
+    "speaker": "Joe Biden",
+    "claim_date": "30-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Did Trump ever suggest bombing hurricanes to prevent them from reaching the US\": Trump suggested nuking hurricanes to stop them from hitting U.S",
+        "source_url": "https://web.archive.org/web/20210212183744/https://www.axios.com/trump-nuclear-bombs-hurricanes-97231f38-2394-4120-a3fa-8c9cf0e3f51c.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did Donald J. Trump say; ''biggest problem we had in the Revolutionary War is we didn\u2019t have enough airports''?\": He did speak of the congressional army taking all of the airports over, however there were no airports at the time. However he blamed his teleprompter.",
+        "source_url": "https://www.nbcnews.com/politics/donald-trump/trump-blames-teleprompter-revolutionary-war-airports-flub-n1026931",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The U.S. surgeon general and the Centers for Disease Control both previously said that \u2018masks are not effective in preventing [the] general public from catching coronavirus.\u2019",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "There is a 79% reduction made in certain situations. But not effective in certain other situations. ",
+    "speaker": "Yinon Weiss",
+    "claim_date": "29-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Are masks effective in preventing people from catching coronavirus?\": The effectiveness of face masks is dependent on how they are used. Face mask use was 79% effective in reducing transmission in certain situations. But not effective in certain other situations.",
+        "source_url": "https://dx.doi.org/10.1136/bmjgh-2020-002794",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Even if your mail-in ballot is postmarked prior to the Election day but arrives after the Election day it will be thrown out.",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "The claim is cherrypicking as some states do accept the ballots and some do not.",
+    "speaker": "Elizabeth Gilbert",
+    "claim_date": "28-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Do some states accept ballots that were postmarked before election day?\": There are 22 states plus the District of Columbia",
+        "source_url": "https://www.buzzfeednews.com/article/addybaird/vote-by-mail-state-deadlines",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Are there states which do require votes to arrive by election day.\": Wisconsin is one of about 30 states that require absentee ballots be received by Election Day to be counted.",
+        "source_url": "https://www.cbsnews.com/news/wisconsin-election-supreme-court-rules-againt-absentee-ballots-after-election-day/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does the original posterLiz Gilbert mention the state that does not allow voting after deadline?\": No",
+        "source_url": "https://www.facebook.com/GilbertLiz/photos/a.356148997800555/3549940058421417",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "America went from 75,000 flu deaths last year in 2019 to almost 0 in 2020",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "There were an estimated 21,909 flu deaths during the 2019-2020 flu season, not 75,000. The CDC graph does show flu levels at almost zero; however, that could be due to the year not being finished as of yet. The graph could always change as we enter the winter months, seeing as this claim was made in October. Hence, there is some conflicting evidence here.  ",
+    "speaker": null,
+    "claim_date": "26-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"How many flu deaths had the U.S recorded by the end of 2019?\": The U.S. Centers for Disease Control and Prevention (CDC) estimated 21,909 flu deaths during the 2019-2020 flu season,",
+        "source_url": "https://archive.ph/iA8lL",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"When was this claim made?\": tweet was published during week 44 of the year (26 October to 1 November).",
+        "source_url": "Metadata",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does flu effect people all year round?\": Flu season\u2019 \u2014 as determined by elevated flu activity \u2013 also varies from season to season. During most seasons, activity begins to increase in October, most often peaks between December and February and can remain elevated into May.",
+        "source_url": "https://web.archive.org/web/20210308170503/https://www.cdc.gov/flu/weekly/overview.htm//",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did the U.S record any Flu deaths in the whole year of 2020?\": The cdc graph for flu death shows the line at 0 and going down, for 2020 through to  2021!",
+        "source_url": "https://web.archive.org/web/20210310020652im_/https://healthfeedback.org/wp-content/uploads/2020/10/recorded-number-flu-deaths.png",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Donald Trump said that $15 an hour is too much for essential workers",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "Even though Trump said similar to this, it was taking out of context. The claim was cherrypicking. ",
+    "speaker": "Joe Biden",
+    "claim_date": "24-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Did Donald Trump say that $15 an hour is too much for essential workers?\": Trump Says He\u2019d \u2018Consider\u2019 $15 Per Hour Federal Minimum Wage, But Prefers To Leave It To States",
+        "source_url": "https://www.forbes.com/sites/nicholasreimann/2020/10/23/trump-says-hed-consider-15-per-hour-federal-minimum-wage-but-prefers-to-leave-it-to-states/?sh=4abf846e6486",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Joe Biden said he wants to ban fracking in the US.",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "Biden has said he would ban fracking and has also said he would rule out banning fracking.",
+    "speaker": "Charlie Kirk of the conservative student organization Turning Point USA",
+    "claim_date": "23-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What is Biden's stance on fracking?\": July 2019\nBASH: Thank you, Mr. Vice President. Just to clarify, would there be any place for fossil fuels, including coal and fracking, in a Biden administration?\n\nBIDEN: No, we would -- we would work it out. We would make sure it's eliminated and no more subsidies for either one of those, either -- any fossil fuel.",
+        "source_url": "http://transcripts.cnn.com/TRANSCRIPTS/1907/31/se.02.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does Biden want to ban fracking in the US?\": October 2020\n\u201cI have never said I oppose fracking.\u201d\n\nAsked by the moderator whether he would rule out banning the practice, he said: \u201cI do rule out banning fracking,\u201d",
+        "source_url": "https://web.archive.org/web/20210419040526/https://www.c-span.org/debates/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does Biden want to ban fracking in the US?\": April 2020\nOn the key issue of the Shell petrochemical cracker plant and fracking for natural gas in this region, Jon Delano asked Biden if he would shut down the industry.\n\n\u201cNo, I would not shut down this industry. I know our Republican friends are trying to say I said that. I said I would not do any new leases on federal lands. Ninety\npercent of the leases are not on federal land, to begin with. I would make sure \u2026 the water is not being contaminated. But I would not shut it down, no.\u201d",
+        "source_url": "https://pittsburgh.cbslocal.com/2020/04/20/joe-biden-talks-fracking-coronavirus-and-president-donald-trump/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Twitter now putting warnings on tweets that are just unedited clips of Biden saying he would end fracking",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "Twitter put those warning on tweets about Biden's speech because they were misleading but the tags were not only on the Biden's tweet",
+    "speaker": "Zach Parkinson",
+    "claim_date": "23-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Have Twitter started putting warnings on tweets that are just unedited clips of Biden saying he would end fracking?\": Twitter automatically warns when the user has not opened and read the item to be re-tweeted. \"Headlines don't tell the whole story,\" the Twitter message says. \"You can read the article on Twitter before Retweeting.\"\n\nTwitter announced a set of changes to try to stem the spread of misinformation ahead of the November 3, 2020 presidential election. Among the most significant is a request that users add their own content before retweeting someone else's:\n\n(W)e will encourage people to add their own commentary prior to amplifying content by prompting them to Quote Tweet instead of Retweet. People who go to Retweet will be brought to the Quote Tweet composer where they'll be encouraged to comment before sending their Tweet.",
+        "source_url": "https://web.archive.org/web/20201101032342/https://blog.twitter.com/en_us/topics/company/2020/2020-election-changes.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Had Twitter been putting warnings on un-edited tweets about Biden saying he would end fracking at the time of the claim (October 2020)?\": Yes",
+        "source_url": "https://web.archive.org/web/20201101024709/https://blog.twitter.com/en_us/topics/company/2020/2020-election-changes.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Why was Twitter putting warnings on Tweets about Biden's fracking stance?\": Among the most significant reasons is a request that users add their own content before retweeting someone else's:",
+        "source_url": "https://web.archive.org/web/20201101024709/https://blog.twitter.com/en_us/topics/company/2020/2020-election-changes.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did it only apply to tweets about Bidens fracking stance?\": No",
+        "source_url": "https://web.archive.org/web/20201101024709/https://blog.twitter.com/en_us/topics/company/2020/2020-election-changes.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Russia sent medical aid to the US, in the form of medical equipment to help coronavirus patients.",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "Evidence finds that Russia did send medical equipment to the United States; however, the U.S. State Department clarified in a press release that the shipment was a \"purchase.\" Evidence also finds that Aventa-M ventilators from Russia were never used by any American hospital, but in October, it was finally discovered where those ventilators ended up\u2014in the trash heap. Hence, a conflicting/cherry-picking claim.\u00a0",
+    "speaker": "Dmitry Peskov",
+    "claim_date": "21-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What did Russia send to the US during the covid-19 outbreak?\": On April 1, a Russian military plane arrived at New York\u2019s JFK Airport loaded with 60 tons of medical equipment, including 45 Russian-produced Aventa-M ventilators meant to help coronavirus patients in intensive care keep breathing.",
+        "source_url": "https://web.archive.org/web/20210718091632/https://www.nytimes.com/2020/04/02/world/europe/coronavirus-us-russia-aid.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was this aid, or was this a purchase from the US?\": Initially, there was confusion over whether the planeload of equipment was aid, as Russia portrayed it, or if the American side had paid for it. The U.S. State Department clarified this in a press release that referred to the shipment as a \u201cpurchase.\u201d",
+        "source_url": "https://web.archive.org/web/20210718091632/https://www.state.gov/u-s-purchase-of-needed-supplies-from-russia/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What happened to this equipment?\": Within about one week, Aventa-M ventilators had been found responsible for fires at two Russian hospitals in Moscow and St. Petersburg; six people were killed. Russian investigators blamed the ventilators\u2019 faulty circuitry.\n\nUltimately the Aventa-M ventilators from Russia were never used by any American hospital, but in October it was finally discovered where those ventilators ended up \u2013 in the trash heap. This week, Christopher Miller, writing for Buzzfeed, revealed that the Federal Emergency Management Agency (FEMA) disposed of the Aventa-M ventilators.",
+        "source_url": "https://web.archive.org/web/20210718091632/https://www.buzzfeednews.com/article/christopherm51/fema-russia-ventilators-coronavirus?fbclid=IwAR0NDhdqILPthpTHGNnmK_-8yH7CjmyDtbo81pzlHEVVKI9loXMnfI9uVas",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "UK Employees unable to work in tier 3 areas will get a combination of Job Support Scheme and Universal Credit, which will mean they get 80% of their wages.",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "Rather than the 80% mentioned in the claim, employees will earn 77% according to the sources provided ",
+    "speaker": "Boris Johnson",
+    "claim_date": "21-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What are the terms of the UK Furlough Scheme?\": Furlough applies across the UK and covers up to 80% of an employee's salary for the hours they can't work, up to a maximum of \u00a32,500 per month.",
+        "source_url": "https://www.bbc.com/news/explainers-52135342",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What are the terms of the UK Job Support Scheme?\": staff at UK companies told to close would get 67% of their wages from the government under the expanded Job Support Scheme.",
+        "source_url": "https://www.bbc.co.uk/news/uk-politics-54492574",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"When does the UK Job Support Scheme end?\": The Government has announced that this scheme will run for six months through to 30th April 2021.",
+        "source_url": "https://www.englandandcompany.co.uk/briefing-15-15th-october/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Is the claim regarding the new UK Job Support Scheme?\": Yes",
+        "source_url": "Metadata",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is an example of how the UK Job Support Scheme works?\": The Government example is:\n\nBeth normally works 5 days a week and earns \u00a3350 a week. Her Company is suffering with reduced sales due to Coronavirus. Rather than making Beth redundant, the company puts Beth on the Job Support Scheme, working 2 days a week (40% of her usual hours).\nHer employer pays Beth \u00a3140 for the days she works.\nAnd for the time she is not working (3 days or 60%, worth \u00a3210), she will also earn2/3, or \u00a3140, bringing her total earnings to \u00a3280, 80% of her normal wage.\nThe Government will give a grant worth \u00a370 (1/3 of hours not worked, equivalent to 20% of her normal wages) to Beth\u2019s employer to support them in keeping Beth\u2019s job.",
+        "source_url": "https://www.englandandcompany.co.uk/briefing-15-15th-october/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What are the requirements for making a claim?\": In order to make the claim, the employee must work at least 33% of their usual hours for the job to be seen as \u2018viable\u2019 and therefore eligible under this scheme. The Government will then pay a third of the hours not worked (up to a cap), with the employer also contributing a third. The remaining unpaid third is effectively the employee\u2019s contribution to the scheme. This means that an employee earns 77% of their normal wage where the Government contribution has not been capped.",
+        "source_url": "https://www.englandandcompany.co.uk/briefing-15-15th-october/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Is the UK Job Support Scheme as generous as the furlough scheme?\": This scheme is by no means as generous as the previous \u2018furlough\u2019 scheme and until further guidance is announced it is unclear whether it will be of any tangible benefit to company directors (who may typically be paid a modest PAYE salary, at the National Insurance earnings threshold).",
+        "source_url": "https://www.englandandcompany.co.uk/briefing-15-15th-october/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Chinese Diplomats Assault Taiwan Counterparts in Fiji",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "It seems both attacked each other based on the QA pairs.",
+    "speaker": null,
+    "claim_date": "19-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Was there an altercation between Chinese and Taiwanese diplomats\": Yes",
+        "source_url": "https://web.archive.org/web/20201129014717/https://apnews.com/article/international-news-china-taiwan-fiji-taipei-51b64b361844fee75db0d1922c2480e5",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was there an altercation between Chinese and Taiwanese diplomats\": Yes",
+        "source_url": "https://web.archive.org/web/20201129014717/https://apnews.com/article/international-news-china-taiwan-fiji-taipei-51b64b361844fee75db0d1922c2480e5",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was the assault done only by the Chinese on the Taiwanese\": They both attacked themselves according to the reports",
+        "source_url": "https://web.archive.org/web/20201129014717/https://apnews.com/article/international-news-china-taiwan-fiji-taipei-51b64b361844fee75db0d1922c2480e5",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was the assault done only by the Chinese on the Taiwanese\": They both attacked each other according to the reports",
+        "source_url": "https://web.archive.org/web/20201129014717/https://apnews.com/article/international-news-china-taiwan-fiji-taipei-51b64b361844fee75db0d1922c2480e5",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Who was blamed for the altercation overall?\": - Taiwan accused the Chinese officials, \n- Chinese foreign ministry spokesman Zhao Lijian said Taiwan was attempting to cover up its misdeeds by blaming others",
+        "source_url": "https://web.archive.org/web/20210302115404/https://www.theguardian.com/world/2020/oct/19/taiwan-official-in-hospital-after-alleged-violent-attack-by-chinese-diplomats-in-fiji",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "NBC News Kristen Welker gave thousands of dollars to Obama, Clinton and Biden, is registered as a Democrat & her family spent Christmas with the Obamas at the White House.",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "Q2 shows that the person named in the claim did donate money to the people named in the claim, but at lesser amounts than claimed.\nQ&A 3  states the person named in the claim did also visit the white hose at christmas as claimed, but also says she attended with other guests and may have been there in a professional manner not a personal one. so some facts are similar to as claimed, whilst others are taken out of context.\n",
+    "speaker": "Ray Martorella",
+    "claim_date": "18-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"VIRAL POST MAKES FALSE CLAIMS ABOUT DEBATE MODERATOR KRISTEN WELKER?\": A post shared on Facebook claims NBC News\u2019 Kristen Welker \u201cgave thousands of dollars to Obama, Clinton and Biden, is registered as a Democrat & her family spent Christmas with the Obamas at the White House.\u201d",
+        "source_url": "https://web.archive.org/web/20201203133943/https://www.facebook.com/xraymart/posts/10213780377302144",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was there a record of Kristen Welker donating thousands to democrats\": No",
+        "source_url": "https://www.fec.gov/data/receipts/individual-contributions/?contributor_name=Kristen+Welker",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Why did she visit the white house during Christmas\": She went for the annual White House press Christmas party which was hosted by Obama at the time and also an event which other journalist attend",
+        "source_url": "https://web.archive.org/web/20201125024031/https://obamawhitehouse.archives.gov/21stcenturygov/tools/visitor-records",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "US president Joe Biden (candidate at the time of claim) supports the new green deal (The Green New Deal is a nonbinding resolution, introduced by Rep. Alexandria Ocasio-Cortez and Sen. Ed Markey last year, to tackle climate change.)",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "Biden did not openly say that he supports the new green deal but his plans aligns with the new green deal",
+    "speaker": "Common Sense Voters Of America LLC",
+    "claim_date": "14-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Does U.S Presidential candidate  Joe Biden support the Green New Deal resolution introduced by Rep. Alexandria Ocasio-Cortez and Sen. Ed Markey in 2019\": If you set aside the most left-wing programs included in New York Representative Alexandria Ocasio-Cortez\u2019s 2019 Green New Deal resolution, like Medicare for All and a federal job guarantee, Biden\u2019s plans broadly align with an approach advocated by the green new deal.",
+        "source_url": "https://www.theguardian.com/commentisfree/2020/jul/20/joe-biden-has-endorsed-the-green-new-deal-in-all-but-name",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What are Joe Biden's environmental policies?\": Part of Biden\u2019s \u201cBuild Back Better\u201d agenda, these plans are a Green New Deal in all but name. If you set aside the most attention-grabbing left-wing programs included in New York Representative Alexandria Ocasio-Cortez\u2019s 2019 Green New Deal resolution, like Medicare for All and a federal job guarantee, Biden\u2019s plans broadly align with an approach advocated by the left-wing of the Democratic party. Firstly, like the Green New Deal, Biden\u2019s plans reframe climate action as a jobs, infrastructure and clean energy stimulus.",
+        "source_url": "https://www.theguardian.com/commentisfree/2020/jul/20/joe-biden-has-endorsed-the-green-new-deal-in-all-but-name",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Is Medicare for all included in the green new deal?\": Yes",
+        "source_url": "https://www.theguardian.com/commentisfree/2020/jul/20/joe-biden-has-endorsed-the-green-new-deal-in-all-but-name",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does Biden support Medicare for All?\": Biden railed against the Trump administration's countless attacks on the Affordable Care Act. As president, he promised to protect and build on the ACA. Although he wants to ensure healthcare is a right and not a privilege, he does not support Medicare-for-all or eliminating private insurance because it would mean getting rid of Obamacare and starting over on political negotiations.",
+        "source_url": "https://www.investopedia.com/joe-biden-s-economic-plan-save-the-middle-class-4769869",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The Tanishq jewellery store in Gandhidham,  Gujarat, India was attacked following a negative reaction to an advertisement.",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "they weren't attacker, per se, but were threatened and forced to make an apology",
+    "speaker": "Swati Bhasin",
+    "claim_date": "14-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What was in the advertisement that people werent happy with?\": The advert showed an interfaith couple.",
+        "source_url": "Metadata",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was the store attacked?\": No \"attack\" as such took place however staff members were threatened and requested to apologise for the advertisement resulting in an apology note being displayed at the store.",
+        "source_url": "https://web.archive.org/web/20210524224630/https://www.ndtv.com/india-news/threats-made-at-tanishq-store-in-gujarat-police-patrolling-area-cops-2309886",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How many people entered the store?\": 2 people, and they forced the staff to put out an apology",
+        "source_url": "https://twitter.com/vimoh/status/1316447085210734592",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "More people who wear masks become sick with COVID-19 compared to non-mask wearers",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "The claim is cherry picking as only 11 people in the test never wore a mask and as there were 314 participants it is likely that there would be more than 11 people to contract covid. The test would need to be a 50/50 split to give the claim support.",
+    "speaker": "Jordan Davidson",
+    "claim_date": "12-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"In the study, which prompted the claim that more people who wear masks become infected with the COVID-19 virus than people who don't, how many participants were there?\": There were 314 participants in the study. 154 had tested positive for COVID-19 (case-patients), while 160 had tested negative for COVID-19 (control participants).",
+        "source_url": "https://web.archive.org/web/20210712155847im_/https://healthfeedback.org/wp-content/uploads/2020/10/fisher-et-al_cdc-_table-1.png",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How many people in the survey reported to have never used a mask?\": 11 People reported never wearing a mask.",
+        "source_url": "https://web.archive.org/web/20210712155847im_/https://healthfeedback.org/wp-content/uploads/2020/10/fisher-et-al_cdc-_table-1.png",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How many people in the survey reported to have aways used a mask?\": 216 People reported always wearing a mask.",
+        "source_url": "https://web.archive.org/web/20210712155847im_/https://healthfeedback.org/wp-content/uploads/2020/10/fisher-et-al_cdc-_table-1.png",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "New Zealand spends less on pensions than most wealthy countries, spending 4.4 per cent of GDP",
+    "label": "Conflicting Evidence/Cherrypicking",
+    "justification": "The country spends 4.8% of GDP on pensions, not 4.4%, but yes it does spend less on pensions than most \"Wealthy Countries\" but not specifically lined out in the evidence source",
+    "speaker": "Winston Peters",
+    "claim_date": "8-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What does New Zealand currently spend on pensions?\": 4.8% of GDP",
+        "source_url": "https://www.treasury.govt.nz/sites/default/files/2020-05/nzsf-model-changes-befu20.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Does New Zealand spend less on pensions than most wealthy countries?\": Yes",
+        "source_url": "https://www.oecd-ilibrary.org/sites/d6831cac-en/index.html?itemId=/content/component/d6831cac-en",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "You see the number today? 33.1 GDP. The biggest in the history of our country by almost triple, right? Almost triple. Now it\u2019s very much bigger than any GDP we\u2019ve ever had. You have to go back to the 1950s, and then it\u2019s less than half. This is the greatest number, 33.1 percent.",
+    "label": "Not Enough Evidence",
+    "justification": "There is only one question and that is unanswerable. There is no evidence about the GDP in 2020 when the claim was made. Therefore there is not enough evidence to refute or support the claim.",
+    "speaker": "Donald Trump",
+    "claim_date": "30-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Was 1950's U.S GDP less than half of 2020's GDP of 33.1?\": Yes",
+        "source_url": "https://www.stlouisfed.org/on-the-economy/2017/april/us-manufacturing-really-declining",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What was the USA's GDP in the 1950s?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Illegal drug, border crossings, and human smuggling activities have decreased in areas where barriers are deployed in the United States.",
+    "label": "Not Enough Evidence",
+    "justification": "15 miles of new barriers seems unlikely to account for the halving of illegal crossing from 2019 to 2020. Particularly as 2019 is the outlier in the period 2018 to 2020.\n\nHowever the claim isn't about causation, only the fact that numbers have decreased in these areas. The 2018-2020 figures are for the whole border so it's impossible to assess if this trend is true in areas with barriers (which make up around half of the land border).",
+    "speaker": "Chase Jennings",
+    "claim_date": "29-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Which border is this claim referring to?\": The US-Mexico border.",
+        "source_url": "Metadata",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did the US-Mexico border have barriers before President Tump took office?\": Yes",
+        "source_url": "https://www.wsj.com/articles/the-border-wall-mile-by-mile-11550152535",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Did the US-Mexico border have barriers before President Tump took office?\": Yes",
+        "source_url": "https://www.bbc.com/news/world-us-canada-46824649",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How much of the border has barriers as of October 2020?\": Now, according to US Customs and Border Protection (CBP) in its 6 October status report, the southern border has 669 miles of \"primary barrier\" - the first structure people heading from Mexico to the US will encounter - and 65 miles of \"secondary barrier\" - which usually runs behind the primary structure as a further obstacle.\n\nThis means that in areas where no barricades existed before, they have built 15 miles of new, primary barrier or \"border wall system\", as it is called by CBP.\n\n\u200b\u200bAbout a further 350 miles of barrier has been built, according to CBP, made up of replacement structures and some new secondary barrier.\n\nMore is planned, too, with 378 miles of new and replacement barrier either under construction or in the \"pre-construction phase\". Less than half of this will be in locations where no barriers currently exist, according to CBP.",
+        "source_url": "https://www.bbc.com/news/world-us-canada-46824649",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"How many border encounters were there in 2018-2020?\": Fiscal years\n2018 - 521,090\n2019 - 977,509\n2020 - 458,088",
+        "source_url": "https://www.cbp.gov/newsroom/stats/southwest-land-border-encounters",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"When did the Covid-19 pandemic emerge?\": The novel coronavirus (SARS-CoV-2) that causes COVID-19 first emerged in the Chinese city of Wuhan in 2019 and was declared a pandemic by the World Health Organization (WHO)",
+        "source_url": "https://www.nfid.org/infectious-diseases/coronaviruses/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Ivermectin is a treatment for coronavirus.",
+    "label": "Not Enough Evidence",
+    "justification": "Ivermectin is licensed for anti parasitic used but not enough evidence yet exists for treatment against coronavirus. ",
+    "speaker": "Pearson Sharp",
+    "claim_date": "26-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What is ivermectin?\": Ivermectin is one of the most important antibiotics discovered.",
+        "source_url": "https://www.thelancet.com/journals/langlo/article/PIIS2214-109X(19)30490-5/fulltext",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Could invermectin be used as a treatment for Covid-19?\": The clinical efficacy and utility of ivermectin in SARS CoV-2 infected patients are unpredictable at this stage, as we are dealing with a completely novel virus. We await results of well-designed large scale randomized controlled clinical trials exploring treatment efficacy of ivermectin to treat SARS-CoV-2.",
+        "source_url": "https://www.ncbi.nlm.nih.gov/labs/pmc/articles/PMC7521351/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "There is a scam involving Santander customers being sent fake bank cards.",
+    "label": "Not Enough Evidence",
+    "justification": "Q&A 1 says that Santander was issuing new bank cards but makes no reference to the claim about a scam being linked to fake issued bank cards,  Q&A 2 and 3 give no answer for their questions so needs more evidence overall for the claim points.",
+    "speaker": "Nigel Howard Berry",
+    "claim_date": "21-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Was Santander issuing new debit cards early?\": Yes",
+        "source_url": "https://twitter.com/santanderukhelp/status/1359776098544988160",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Is there any evidence of a scam involving Santader debit cards in Oct 2020?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What did Santander say about the claim there's a scam running in their name\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Joe Biden said 'If Your 8-Year-Old Child Says They Want To Be Transgender, They Have A Right To Transition'.",
+    "label": "Not Enough Evidence",
+    "justification": "There is not enough evidence to support or refute the claim ",
+    "speaker": "On point with with pastor Greg locke",
+    "claim_date": "20-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Who is Pastor Greg Locke?\": Pastor Greg Locke is the Founding and Lead Pastor of Global Vision Bible Church in Mount Juliet, Tennessee, just outside Nashville. The social media firebrand is the author of the #1 Bestselling Spiritual Warfare Series and is the host of the top-rated podcast, On Point with Pastor Greg Locke. He has a Bachelor\u2019s Degree in Biblical Studies, a Master\u2019s Degree in Revival History, and is a popular revivalist and speaker in churches and political circles alike. The Lord has blessed him with one of the largest social media platforms in the nation, and Global Vision has the most broad-reaching livestream ministry in the world.",
+        "source_url": "https://www.amazon.com/REVIVAL-Pastor-Greg-Locke/dp/1735846279",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"When or where did Biden say this?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Hunter Biden (son of US president Joe Biden)  had 25,000 pics of him torturing and raping children under 10 in China on his laptop.",
+    "label": "Not Enough Evidence",
+    "justification": "Answers do not confirm or deny this.",
+    "speaker": null,
+    "claim_date": "18-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What is this claim based on?\": Hunter Biden's laptop was subpoena'd by an FBI agent who workd on child pornography.",
+        "source_url": "https://twitter.com/atrupar/status/1317849887438966784?s=21",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was there child pornography on the laptop?\": \u201cI don\u2019t want to speculate,\u201d said  Sen. Ron Johnson, who nevertheless went on to say, \u201cI\u2019ve heard all kinds of things that I think will probably be revealed over the next few days.\u201d",
+        "source_url": "https://twitter.com/atrupar/status/1317849887438966784?s=21",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Was there child pornography on the laptop?\": Sen. Ron Johnson is calling on FBI Director Christopher Wray to confirm or deny details regarding a laptop said to have belonged to Democratic presidential nominee Joe Biden's son Hunter Biden.\n\nJohnson, R-Wis., said in a letter to Wray obtained by Fox News that a whistleblower contacted his committee on September 24, claiming to possess a laptop that Hunter Biden left at his business, and that he had turned it over to the FBI. Johnson noted that staff immediately asked the FBI to confirm certain details in order to validate the claim, but the bureau said they would not confirm or deny any of the information included in their request.",
+        "source_url": "https://www.foxnews.com/politics/sen-johnson-presses-wray-on-validity-of-hunter-biden-laptop-claim",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "In the US lockdowns are partly responsible for excess deaths not directly attributed to COVID-19 which were observed in 2020.",
+    "label": "Not Enough Evidence",
+    "justification": "The Q&A's only mention excess death due to covid and so no data for other causes such as the claimed 'lockdowns' so more evidence is needed.",
+    "speaker": "Michael Lee ",
+    "claim_date": "18-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"How is  lockdown partly responsible for excess deaths in the US ?\": As of October 15, 216,025 deaths from coronavirus disease 2019 (COVID-19) have been reported in the United States*; however, this number might underestimate the total impact of the pandemic on mortality. Measures of excess deaths have been used to estimate the impact of public health pandemics or disasters, particularly when there are questions about underascertainment of deaths directly attributable to a given event or cause (1\u20136).\u2020 Excess deaths are defined as the number of persons who have died from all causes, in excess of the expected number of deaths for a given place and time. This report describes trends and demographic patterns in excess deaths during January 26\u2013October 3, 2020. Expected numbers of deaths were estimated using overdispersed Poisson regression models with spline terms to account for seasonal patterns, using provisional mortality data from CDC\u2019s National Vital Statistics System (NVSS) (7). Weekly numbers of deaths by age group and race/ethnicity were assessed to examine the difference between the weekly number of deaths occurring in 2020 and the average number occurring in the same week during 2015\u20132019 and the percentage change in 2020. Overall, an estimated 299,028 excess deaths have occurred in the United States from late January through October 3, 2020, with two thirds of these attributed to COVID-19. The largest percentage increases were seen among adults aged 25\u201344 years and among Hispanic or Latino (Hispanic) persons. These results provide information about the degree to which COVID-19 deaths might be underascertained and inform efforts to prevent mortality directly or indirectly associated with the COVID-19 pandemic, such as efforts to minimize disruptions to health care.\n\nEstimates of excess deaths can provide a comprehensive account of mortality related to the COVID-19 pandemic, including deaths that are directly or indirectly attributable to COVID-19. Estimates of the numbers of deaths directly attributable to COVID-19 might be limi",
+        "source_url": "https://www.cdc.gov/mmwr/volumes/69/wr/mm6942e2.htm",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Why is  lockdown directly attributed to COVID-19 which were observed in 2020 ?\": Based on NVSS data, excess deaths have occurred every week in the United States since March 2020. An estimated 299,028 more persons than expected have died since January 26, 2020; approximately two thirds of these deaths were attributed to COVID-19. A recent analysis of excess deaths from March through July reported very similar findings, but that study did not include more recent data through September (5).\n\nAlthough more excess deaths have occurred among older age groups, relative to past years, adults aged 25\u201344 years have experienced the largest average percentage increase in the number of deaths from all causes from late January through October 3, 2020. The age distribution of COVID-19 deaths shifted toward younger age groups from May through August (9); however, these disproportionate increases might also be related to underlying trends in other causes of death. Future analyses might shed light on the extent to which increases among younger age groups are driven by COVID-19 or by other causes of death. Among racial and ethnic groups, the smallest average percentage increase in numbers of deaths compared with previous years occurred among White persons (11.9%) and the largest for Hispanic persons (53.6%), with intermediate increases (28.9%\u201336.6%) among AI/AN, Black, and Asian persons. These disproportionate increases among certain racial and ethnic groups are consistent with noted disparities in COVID-19 mortality.***\n\nThe findings in this report are subject to at least five limitations. First, the weighting of provisional NVSS mortality data might not fully account for reporting lags, particularly in recent weeks. Estimated numbers of deaths in the most recent weeks are likely underestimated and will increase as more data become available. Second, there is uncertainty associated with the models used to generate the expected numbers of deaths in a given week. A range of values for excess death estimates is provided elsewhere (7), but these ranges might not refl",
+        "source_url": "https://www.cdc.gov/mmwr/volumes/69/wr/mm6942e2.htm",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Do the studies used to make the claim include lockdowns relating to excessive deaths?\": they do not mention lockdown factors in the excessive deaths",
+        "source_url": "https://web.archive.org/web/20210310112506/https://jamanetwork.com/journals/jama/fullarticle/2771761",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Do the studies used to make the claim include lockdowns relating to excessive deaths?\": they do not mention lockdown factors in the excessive deaths",
+        "source_url": "https://web.archive.org/web/20210309181157/https://www.cdc.gov/mmwr/volumes/69/wr/mm6942e2.htm",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "No one lost their health care because of the Wellmark and Iowa Farm Bureau Health Plan Bill.",
+    "label": "Not Enough Evidence",
+    "justification": "The answer shows the complaints made, however there's no evidence as to whether someone lost their health care or not.",
+    "speaker": "Rita Hart",
+    "claim_date": "8-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Has anyone lost their health care because of the Wellmark and Iowa Farm Bureau Health Plan Bill?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Have complaints been made due to the Wellmark and Iowa Farm Bureau Health Plan Bill?\": Yes",
+        "source_url": "https://web.archive.org/web/20201103105722/https://www.bbb.org/us/ia/west-des-moines/profile/insurance-services-office/farm-bureau-financial-services-0664-101127/complaints",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "The CDC has said over 98,000 people had non-COVID related deaths because of hospitals that were closed down for non-essential services",
+    "label": "Not Enough Evidence",
+    "justification": "The claim mentions specific death figures that were not caused by covid but from lack of hospital availability due to shutdowns, Q&A pair 1 does give a number for what the claim refers to but fails to provide a date for its figures so needs more evidence to show a relation to claim.\nQ&A 2 also shows no date for its details.\nQ&A 3 shows no answer,  so overall more data is needed to make them relevant to the claim.",
+    "speaker": "Miller-Meeks",
+    "claim_date": "8-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Have 98,000 people had non-COVID related deaths because of hospitals that were closed down for non-essential services?\": A July report in the Journal of the American Medical Association found 87,000 excess deaths nationwide from March 1 to April 25, with 45 percent of those, or more than 30,000, not attributed to COVID-19.",
+        "source_url": "https://web.archive.org/web/20210302101747/https://jamanetwork.com/journals/jama/fullarticle/2768086",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Have the CDC reported on this?\": A CDC report posted Tuesday said an estimated 299,028 excess deaths (above the expected baseline) occurred from late January through Oct. 3 in the United States.\n\nAbout 198,000, or two-thirds, were attributed to COVID-19, the CDC said. This leaves about 100,000 excess deaths during that seven-month period that weren\u2019t believed to be because of COVID-19.",
+        "source_url": "https://www.cdc.gov/mmwr/Novel_Coronavirus_Reports.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What does the CDC mean by excess deaths?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "President Trump and I have a plan to improve healthcare and protect pre-existing conditions for every American.",
+    "label": "Not Enough Evidence",
+    "justification": "There's no evidence of the plan being mentioned ",
+    "speaker": "Mike Pence",
+    "claim_date": "7-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What plan is being referred to?\": This is not mentioned.",
+        "source_url": "Metadata",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "Mexico on a \"red alert\" with children being targeted for kidnapping so their organs can be harvested",
+    "label": "Not Enough Evidence",
+    "justification": "It seems that the label refers to non travelling, but says nothing about organs. Therefore the claim is not enough evidence ",
+    "speaker": "Yesenia Rivera",
+    "claim_date": "2-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What is the source for travel advice for US citizens issued for travel to Mexico?\": Mexico travel advisory page by the Travel.state.gov",
+        "source_url": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What does the \"red alert\" refer to?\": DO NOT TRAVEL",
+        "source_url": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What was the advice issued by the Mexico travel advisory page at the time of the claim?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "A picture of a man with UP Chief Minister Yogi Adityanath shared with a claim that he is the father of rape accused Sandeep Thakur in the Hathras case.",
+    "label": "Not Enough Evidence",
+    "justification": "There is only evidence form fact checking sources no first party reports.",
+    "speaker": "Sanju Yaduwanshi Sapa",
+    "claim_date": "2-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Who is the man with Yogi Adityanath in the picture?\": Many sources identify the man, but these are other fact-checking resources and so are not acceptable in this project.",
+        "source_url": "https://www.altnews.in/bjp-leader-accused-in-a-different-rape-case-claimed-to-be-father-of-hathras-accused/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Have other sources investigated this claim?\": Yes",
+        "source_url": "https://www.altnews.in/bjp-leader-accused-in-a-different-rape-case-claimed-to-be-father-of-hathras-accused/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "It makes no sense for oil to be cheaper in Nigeria than in Saudi Arabia.",
+    "label": "Not Enough Evidence",
+    "justification": "I don't think identifying the oil prices interrogates the claim. The claim is about whether it makes sense, so this needs a third question.",
+    "speaker": "Muhammadu Buhari",
+    "claim_date": "1-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What was the price of petrol in Nigeria in Oct 2020?\": Average price paid by consumers for Automotive Gas Oil (diesel) decreased by -0.99% month-on-month\nand by -3.62% year-on-year to N219.68 in September 2020 from to N221.88 in August 2020.",
+        "source_url": "https://www.nigerianstat.gov.ng/pdfuploads/Automotive_Gas_Oil_(Diesel)_Price_Watch_SEPT_2020.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What was the price of petrol in Saudi Arabia in Oct 2020?\": Gasoline 91\u2019s price was set at 0.67 riyals per liter ($0.18), down 48.9 percent from 1.31 riyals per liter in April 2020\n\nGasoline 95\u2019s price was set at 0.82 riyals per liter ($0.22), down 44.2 percent from 1.47 riyals per liter in April.\n\nDiesel\u2019s price was set at 0.47 riyals per liter, Kerosene was set at 0.64 riyals per liter, and liquified petroleum gas (LPG) was set at 0.75 riyals per liter.",
+        "source_url": "https://english.alarabiya.net/business/energy/2020/05/11/Saudi-Arabia-s-Aramco-reduces-fuel-prices-in-May-2020",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "There has been a 60% drop in government revenue in Nigeria.",
+    "label": "Not Enough Evidence",
+    "justification": "It seems that there is not enough information to make the claim label.",
+    "speaker": "Muhammadu Buhari",
+    "claim_date": "1-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"What timeframe was the president of Nigeria referring to?\": No answer could be found.",
+        "source_url": "",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Is it possible to prove the claim without knowing the time scale the president was referring to?\": No, There is not enough information. \nNo answer could be found.",
+        "source_url": "https://tradingeconomics.com/nigeria/government-debt-to-gdp",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  },
+  {
+    "claim": "It makes no sense for oil to be cheaper in Nigeria than in Saudi Arabia.",
+    "label": "Not Enough Evidence",
+    "justification": "All of the evidence presented relates to Nigeria, but there aren't any answers about oil prices in Saudi Arabia.",
+    "speaker": "Muhammadu Buhari",
+    "claim_date": "1-10-2020",
+    "evidence_passages": [
+      {
+        "text": "Regarding \"Why does fuel prices differ across countries?\": Fuel prices can be broken down into these major components.\n- fuel oil cost\n- refining cost\n- distribution cost, wholesale and retail\n- taxes, excise and VAT/sales tax",
+        "source_url": "https://www.globalpetrolprices.com/documents/Global_Fuel_Prices_Primer.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is a purchasing power parity index?\": Indices of purchasing power parity are used to compare real income levels across countries based on a nation's ability to buy goods and services.",
+        "source_url": "https://www150.statcan.gc.ca/n1/pub/11f0027m/2009058/part-partie1-eng.htm",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is a purchasing power parity index?\": Purchasing\tpower\tparity\texchange\trates,\tPPPs,\tare\tinternational\tmultilateral\tprice\tindexes\tthat\tmeasure,\tfor\tthe\tvarious\tcomponents\tof\tGDP,\tthe\tamount\tof\tlocal\tcurrency\trequired\tto\tpurchase\tthe\tsame\treal\tamount\tin\tthat\tcountry\trelative\tto\ta\tnumeraire,\twhich\tis\ttypically\tthe\tUnited\tStates.\tNon-traded\tgoods\tare\ttypically\tcheaper\tin\tpoorer\teconomies,\tso\tthat\tPPPs\tare\ttypically\tlower\tthan\texchange\trates\tfor\tpoor\tcountries,\tand\tare\tmore\tso\tthe\tpoorer\tthe\tcountry",
+        "source_url": "https://www.princeton.edu/~deaton/downloads/Deaton_Aten_Trying_to_understand_ICP_2011_V5.pdf",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"What is a producing power index?\": Indices of producing power parities are also used to compare real estimates across countries. Producing power parity estimates are used to examine production-related phenomenons\u2014differences in countries' ability to produce (as opposed to consume), goods and services.",
+        "source_url": "https://www150.statcan.gc.ca/n1/pub/11f0027m/2009058/part-partie1-eng.htm",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      },
+      {
+        "text": "Regarding \"Where does Nigeria fit into the world Purchasing Power Parity index?\": Nigeria\t\nGDP per capita, Purchasing Power Parity\n Latest value\t4969.22\n Reference\t2021\n Measure\tU.S. dollars\n Source\tThe World Bank\n\nFor that indicator, we provide data for Nigeria from 1990 to 2021. The average value for Nigeria during that period was 4098.47 U.S. dollars with a minimum of 2901.77 U.S. dollars in 1995 and a maximum of 5516.39 U.S. dollars in 2014. The latest value from 2021 is 4969.22 U.S. dollars. For comparison, the world average in 2021 based on 173 countries is 21226.17 U.S. dollars.",
+        "source_url": "https://www.theglobaleconomy.com/Nigeria/gdp_per_capita_ppp/",
+        "source_title": "AVeriTeC Reference Fact-Check"
+      }
+    ]
+  }
+]

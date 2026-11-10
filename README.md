@@ -13,22 +13,48 @@
 
 ---
 
-## 🏆 Benchmark & Ablation Study Results
+## 🏆 Empirical Benchmark & Ablation Study Results
 
-To prove that ProofGraph outperforms standard retrieval-augmented approaches, we conducted an empirical diagnostic evaluation comparing the **ProofGraph Pipeline** against a **Standard Naive RAG Baseline** across real-world factual claims, temporal discrepancies, and context mismatch cases:
+To evaluate ProofGraph rigorously without synthetic bias, we evaluated the system against the standard public **AVeriTeC Dev Benchmark** (NeurIPS 2023, 60 real-world claims fact-checked across 50 international professional fact-checking organizations) as well as an isolated **Diagnostic Sanity Suite** testing specific unit failure modes.
 
-| Metric | Naive RAG Baseline | ProofGraph Engine | Delta (Improvement) |
-| :--- | :---: | :---: | :---: |
-| **Classification Accuracy** | **60.0%** | **100.0%** | **+40.0%** |
-| **False Contradiction Rate (RefNLI Test)** | **100.0%** | **0.0%** | **-100.0% (Eliminated)** |
-| **Source Credibility Weighting** | ❌ (Unweighted Majority Vote) | ✅ (CONFACT SBA-CoT) | **+100%** |
-| **Interactive Provenance Graph** | ❌ (None / Flat Text) | ✅ (W3C PROV-DM) | **+100%** |
-| **First-Class Contradiction Edges** | ❌ (None) | ✅ (Dynamic Red Edges) | **+100%** |
-| **Opinion / Subjectivity Detection** | ❌ (Hallucinates Verdict) | ✅ (Abstains Safely) | **+100%** |
+### 1. Real-World Public Benchmark: AVeriTeC Dev Split (NeurIPS 2023, N=60)
+Evaluated across three balanced target veracity classes (`SUPPORTED`, `CONTRADICTED`, and `INSUFFICIENT_EVIDENCE` / Conflicting):
 
-### Why ProofGraph Wins:
-1. **Elimination of the False Contradiction Trap (RefNLI):** When an irrelevant passage discussing a different person was retrieved (e.g. *"Peter was born in 1995"* vs. *"John was born in 1980"*), the Naive RAG baseline falsely predicted **CONTRADICTED** because 1980 ≠ 1995. ProofGraph's RefNLI alignment gate detected entity and context mismatch ($J < 0.15$), correctly classifying the claim as `INSUFFICIENT_EVIDENCE`.
-2. **Resistance to Rumor & Low-Authority Bias (CONFACT):** When an authoritative source (Britannica, cred: 0.95) contradicted a low-credibility rumor blog (cred: 0.15), standard RAG split or misclassified. ProofGraph's credibility-weighted inference correctly prioritized authoritative evidence to output a high-confidence refutation.
+| System Configuration | Accuracy | Macro-F1 | Precision (Supp) | Precision (Contra) | Precision (Insuff) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **ProofGraph Full Pipeline** | **48.3%** | **0.455** | **0.522** | **0.231** | **0.583** |
+| Ablation: Without RefNLI Alignment Gate | 48.3% | 0.455 | 0.522 | 0.231 | 0.583 |
+| Baseline: Naive Keyword RAG | 33.3% | 0.336 | 0.417 | 0.208 | 0.407 |
+| **Delta vs. Baseline** | **+15.0%** | **+0.119** | **+0.105** | **+0.023** | **+0.176** |
+
+#### Detailed Per-Class Breakdown (ProofGraph Full Pipeline):
+* **SUPPORTED (N=15):** Precision: `0.522` | Recall: `0.800` | **F1: 0.632**
+* **CONTRADICTED (N=15):** Precision: `0.231` | Recall: `0.200` | **F1: 0.214**
+* **INSUFFICIENT EVIDENCE (N=30):** Precision: `0.583` | Recall: `0.467` | **F1: 0.519**
+
+#### 3×3 Confusion Matrix (Rows = Ground Truth, Columns = Predicted):
+```
+                             | Pred: SUPPORTED | Pred: CONTRADICTED | Pred: INSUFFICIENT
+-----------------------------------------------------------------------------------------
+True: SUPPORTED (15)         |       12        |         1          |         2
+True: CONTRADICTED (15)      |        4        |         3          |         8
+True: INSUFFICIENT_EV. (30)  |        7        |         9          |        14
+```
+
+---
+
+### 2. Targeted Diagnostic Sanity Suite (10 Isolated Failure Modes)
+A targeted diagnostic test designed to verify specific boundary conditions and failure modes:
+* **Naive RAG Baseline:** `50.0% Accuracy` | `0.504 Macro-F1`
+* **ProofGraph Engine:** `90.0% Accuracy` | `0.886 Macro-F1`
+
+*(Note: The 10-claim sanity suite is an isolated unit diagnostic for edge cases—temporal conflicts, geographical displacement, reference indeterminacy false contradictions, unproven premises, and subjective opinions. Generalizable performance is measured on the 60-claim public AVeriTeC benchmark above).*
+
+### Key Architectural Takeaways:
+1. **Elimination of the False Contradiction Trap (RefNLI Gate):** In reference indeterminacy cases (e.g., claim attributes a birth year to Peter while retrieved text discusses John), naive RAG falsely outputs `CONTRADICTED`. ProofGraph's alignment gate detects entity and context divergence ($J < 0.12$), safely routing the claim to `INSUFFICIENT_EVIDENCE`.
+2. **Authority-Weighted Conflict Resolution (CONFACT Scorer):** When reputable institutions (e.g., NASA, Britannica, peer-reviewed journals) conflict with low-credibility conspiracy blogs, naive majority voting often splits or misclassifies. ProofGraph's canonical host-normalized credibility weighting gives authoritative sources up to $6.5\times$ greater voting mass.
+3. **Multi-Hop Dynamic Retrieval (FIRE Policy):** Rather than blindly executing a single search, the FIRE iterative loop analyzes entity coverage in retrieved passages, dynamically terminating early when coverage is complete or issuing targeted multi-hop follow-ups when key entities are missing.
+
 
 ---
 
@@ -140,6 +166,9 @@ PYTHONPATH=. pytest tests/ -v
 
 ```
 proofgraph/
+├── data/
+│   └── benchmarks/
+│       └── averitec_dev_sample.json                                # 60 real-world AVeriTeC claims & verdicts
 ├── docs/
 │   ├── assets/
 │   │   └── ProofGraph-An-Exhaustive-Evidence-Linked-Landscape.pdf  # 20-page landscape PDF
@@ -155,17 +184,17 @@ proofgraph/
 │   ├── __init__.py
 │   ├── schemas/         # Pydantic data models (Claims, Evidence, PROV-DM, Verdicts)
 │   ├── decomposer/      # Claimify 4-stage extraction, decontextualization & opinion filter
-│   ├── retriever/       # Hybrid Dense (FastEmbed) + BM25 + FIRE dynamic stopping
-│   ├── verifier/        # 3-way NLI verifier + RefNLI context gate + CONFACT credibility
+│   ├── retriever/       # Hybrid Dense (FastEmbed) + BM25 + FIRE dynamic multi-hop loop
+│   ├── verifier/        # RuleStanceVerifier + RefNLI context gate + CONFACT credibility scorer
 │   ├── graph/           # W3C PROV-DM graph builder with first-class CONTRADICTION edges
 │   ├── reporter/        # Audit report generator with inline citations
 │   ├── pipeline.py      # Unified end-to-end ProofGraph pipeline orchestrator
 │   └── cli.py           # Command line interface
 ├── tests/
-│   └── test_pipeline.py # 100% passing pytest suite
+│   └── test_pipeline.py # 100% passing pytest suite (8 unit & integration tests)
 ├── outputs/             # Generated demo artifacts (graph.html, report.md)
 ├── demo.py              # Live end-to-end showcase script
-├── evaluate.py          # Benchmark & ablation evaluation script
+├── evaluate.py          # Benchmark & ablation evaluation script (AVeriTeC & diagnostic suite)
 ├── requirements.txt     # Lightweight, consolidated dependencies
 ├── .gitignore
 └── README.md

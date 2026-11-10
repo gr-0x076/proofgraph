@@ -98,3 +98,45 @@ def test_end_to_end_pipeline_execution(tmp_path):
     assert os.path.exists(os.path.join(out_dir, "report.md"))
     assert os.path.exists(os.path.join(out_dir, "graph.html"))
     assert res.graph.number_of_nodes() >= 3
+
+def test_domain_spoofing_resistance():
+    scorer = SourceCredibilityScorer()
+    # Legitimate domains and subdomains
+    assert scorer.get_credibility("reuters.com") >= 0.90
+    assert scorer.get_credibility("https://www.reuters.com/world") >= 0.90
+    assert scorer.get_credibility("news.bbc.co.uk") >= 0.90
+    assert scorer.get_credibility("science.nasa.gov") >= 0.95
+
+    # Spoofed domains must NOT receive high authority scores
+    assert scorer.get_credibility("reuters.com.evil.org") == 0.50
+    assert scorer.get_credibility("fake-reuters.com") == 0.50
+    assert scorer.get_credibility("https://nature.com.phishing-site.net/article") == 0.50
+
+def test_fire_iterative_decision_module():
+    from proofgraph.retriever.fire_policy import FIREIterativeDecisionModule
+    fire = FIREIterativeDecisionModule(confidence_threshold=0.85, max_hops=3)
+
+    claim = AtomicClaim(
+        text="James Webb Space Telescope launched in December 2021 from French Guiana.",
+        parent_sentence="",
+        entities=["James Webb Space Telescope", "December 2021", "French Guiana"]
+    )
+    # Evidence only mentions telescope, missing French Guiana and launch date
+    partial_evidence = [
+        EvidencePassage(
+            id="e1",
+            text="The James Webb Space Telescope is an optical space observatory.",
+            relevance_score=0.70
+        )
+    ]
+    should_stop, next_query = fire.evaluate_step(
+        claim=claim,
+        retrieved_pool=partial_evidence,
+        current_hop=1,
+        executed_queries=[claim.text]
+    )
+    # Must NOT stop early; must formulate targeted query containing missing entity
+    assert should_stop is False
+    assert next_query is not None
+    assert any(ent in next_query for ent in ["December 2021", "French Guiana"])
+
