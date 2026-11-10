@@ -67,36 +67,63 @@ class RuleStanceVerifier:
 
     def _has_numeric_conflict(self, text_a: str, text_b: str) -> bool:
         """
-        Detects conflicting numerical quantities or temperatures.
-        Requires shared predicate/event context (e.g. both describe boiling, birth, construction, or patent)
-        to prevent unrelated numbers (e.g. birth year vs award year) from triggering false contradictions.
+        Detects conflicting numerical quantities or dates bound to the same predicate/event.
+        Extracts numbers occurring within a local syntactic window (<= 35 chars) of a shared
+        event predicate (e.g. 'boil', 'born', 'died', 'built', 'launch', 'celsius').
+        Only flags contradiction when both texts bind the SAME predicate to DISJOINT numbers.
         """
         predicates = [
             "boil", "freez", "born", "died", "construct", "built", "open", 
             "land", "discover", "invent", "found", "launch", "elect", "crash",
             "patent", "temperat", "celsius", "fahrenheit", "meter", "foot", "feet"
         ]
-        # Check if any shared event/unit predicate exists between both texts
-        shared_pred = any(p in text_a.lower() and p in text_b.lower() for p in predicates)
-        if not shared_pred:
-            return False
+        
+        def extract_bound_numbers(text: str) -> dict:
+            bindings = {}
+            for p in predicates:
+                pat = rf"\b{p}\w*\b[^.\n]{{0,35}}?(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)[^.\n]{{0,35}}?\b{p}\w*\b"
+                matches = re.findall(pat, text.lower())
+                nums = set()
+                for m in matches:
+                    val = m[0] or m[1]
+                    if val:
+                        nums.add(val)
+                if nums:
+                    bindings[p] = nums
+            return bindings
 
-        nums_a = set(re.findall(r'\b\d+(?:\.\d+)?\b', text_a))
-        nums_b = set(re.findall(r'\b\d+(?:\.\d+)?\b', text_b))
-        if nums_a and nums_b and nums_a.isdisjoint(nums_b):
-            return True
+        bound_a = extract_bound_numbers(text_a)
+        bound_b = extract_bound_numbers(text_b)
+
+        # Check for shared predicates that have conflicting number sets
+        for p in bound_a:
+            if p in bound_b:
+                if bound_a[p].isdisjoint(bound_b[p]):
+                    return True
         return False
 
-
     def _has_named_inventor_conflict(self, text_a: str, text_b: str) -> bool:
-        """Detects if claim attributes invention/discovery to Person A while evidence attributes to Person B."""
+        """
+        Detects if claim attributes an invention/discovery to Person A while evidence
+        attributes the SAME invention/object to Person B.
+        Requires shared object nouns (e.g., 'telephone', 'penicillin') and disjoint names.
+        """
         inventor_markers = ["invent", "discover", "found", "creat", "patent", "award", "pioneer"]
-        if any(m in text_a.lower() for m in inventor_markers) and any(m in text_b.lower() for m in inventor_markers):
-            # Check capitalized proper names
-            names_a = set(re.findall(r'\b[A-Z][a-z]+\b', text_a)) - {"The", "In", "On", "At", "First"}
-            names_b = set(re.findall(r'\b[A-Z][a-z]+\b', text_b)) - {"The", "In", "On", "At", "First", "US"}
-            if names_a and names_b and names_a.isdisjoint(names_b):
-                return True
+        if not (any(m in text_a.lower() for m in inventor_markers) and any(m in text_b.lower() for m in inventor_markers)):
+            return False
+
+        # Exclude common sentence starters and generic words
+        stopwords = {"the", "in", "on", "at", "first", "us", "a", "an", "and", "by", "for", "with", "was", "were"}
+        names_a = set(re.findall(r'\b[A-Z][a-z]+\b', text_a)) - {"The", "In", "On", "At", "First", "US"}
+        names_b = set(re.findall(r'\b[A-Z][a-z]+\b', text_b)) - {"The", "In", "On", "At", "First", "US"}
+
+        # Shared content/object words (e.g. 'telephone', 'penicillin', 'relativity')
+        words_a = set(w for w in re.findall(r'\b[a-z]{4,}\b', text_a.lower()) if w not in stopwords and not any(m in w for m in inventor_markers))
+        words_b = set(w for w in re.findall(r'\b[a-z]{4,}\b', text_b.lower()) if w not in stopwords and not any(m in w for m in inventor_markers))
+        shared_object = words_a.intersection(words_b)
+
+        if shared_object and names_a and names_b and names_a.isdisjoint(names_b):
+            return True
         return False
 
     def _assess_pairwise(self, claim: AtomicClaim, evidence: EvidencePassage) -> Tuple[str, float, str]:

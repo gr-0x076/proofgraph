@@ -24,8 +24,8 @@
   > "ProofGraph solves verification through five principled stages:
   > 
   > 1. **Atomic Proposition Decomposition:** Inspired by Claimify (ACL 2025), it splits multi-assertion text into atomic, decontextualized propositions while filtering out non-verifiable opinions.
-  > 2. **Multi-Stage Hybrid Retrieval:** Combining BM25 lexical search with FastEmbed ONNX dense embeddings via Reciprocal Rank Fusion ($k=60$). Guided by a FIRE-inspired heuristic (NAACL 2025), it evaluates entity coverage in real-time, executing targeted multi-hop follow-up queries when critical entities are missing.
-  > 3. **RefNLI Context Alignment Gate:** Before evaluating stance, a primary-subject overlap gate blocks reference mismatches, preventing false refutations.
+  > 2. **Multi-Stage Hybrid Retrieval & TinyFish Web Agent:** Combining BM25 lexical search with FastEmbed ONNX dense embeddings via Reciprocal Rank Fusion ($k=60$), integrated with TinyFish's live Search and Fetch APIs for open-domain evidence retrieval. Guided by a FIRE-inspired heuristic (NAACL 2025), it evaluates entity coverage in real-time, executing targeted multi-hop queries when critical entities are missing.
+  > 3. **RuleStanceVerifier & RefNLI Context Alignment Gate:** Before evaluating stance, a primary-subject overlap gate inspired by RefNLI blocks reference mismatches. The stance engine uses conservative, predicate-bound numeric and temporal conflict rules to eliminate false refutations.
   > 4. **CONFACT-Inspired Credibility Prior:** Sources aren't treated equally. High-authority institutions like NASA, Reuters, and peer-reviewed journals carry up to $6.5\times$ the voting mass of unverified blogs, protected by canonical hostname spoof-guarding.
   > 5. **W3C PROV-DM Graph Construction:** Exporting auditable knowledge graphs with color-coded nodes and explicit red contradiction physics."
 
@@ -47,24 +47,24 @@
 
 ---
 
-### [02:00 – 02:35] Empirical Validation across 4 Benchmarks
-* **Visual:** Slide showing the AVeriTeC Dev Split confusion matrix, retrieval IR table, and held-out RefNLI evaluation.
+### [02:00 – 02:35] Empirical Validation across 4 Diagnostic Suites
+* **Visual:** Slide showing the AVeriTeC Dev Split confusion matrix, retrieval IR table, and synthetic context-mismatch stress test.
 * **Speaker:**
-  > "We evaluated ProofGraph across four rigorous benchmarks:
+  > "We evaluated ProofGraph across four complementary dimensions:
   >
-  > 1. **Evidence Retrieval Quality (Pooled AVeriTeC, 170 Passages):** On a global index with cross-claim distractors, our hybrid retriever achieved **93.3% Hits@5** and an **MRR of 0.863**.
-  > 2. **Public AVeriTeC Dev Benchmark (NeurIPS 2023, N=60):** Given candidate evidence pools, ProofGraph scored **50.0% Accuracy** and **0.464 Macro-F1**, outperforming the standard unweighted dense similarity baseline (41.7% Accuracy, 0.350 Macro-F1).
-  > 3. **Held-Out RefNLI Evaluation (N=20):** On a held-out test of entity-mismatch distractors, our RefNLI alignment gate achieved **0.0% False Refutations**, compared to 50.0% false refutations when the gate is ablated.
-  > 4. **Diagnostic Unit Sanity Suite:** 90.0% Accuracy across edge cases, backed by 11 unit & integration tests that run 100% offline."
+  > 1. **In-Batch Evidence Retrieval Quality Diagnostic (Pooled AVeriTeC, 170 Passages):** On a global index with cross-claim distractors, our hybrid retriever achieved **93.3% Hits@5** and an **MRR of 0.863**.
+  > 2. **AVeriTeC Dev Split Sample Classification (NeurIPS 2023, N=60 Claims):** Given candidate evidence pools, ProofGraph scored **50.0% Accuracy** and **0.463 Macro-F1**, outperforming the unweighted dense similarity baseline (41.7% Accuracy, 0.350 Macro-F1).
+  > 3. **Synthetic Context-Mismatch Stress Diagnostic (N=20 Hand-Authored Pairs):** Directly targeting the reference indeterminacy failure mode highlighted in RefNLI research, the gate achieved **0/10 false refutations (0.0%)**, compared to 30.0% false refutations when ablated.
+  > 4. **Diagnostic Unit Sanity Suite:** 90.0% Accuracy across edge cases, backed by 15 unit and integration tests including an opt-in live TinySearch API smoke test."
 
 ---
 
 ### [02:35 – 03:00] Impact, Future Roadmap & Conclusion
 * **Visual:** Slide showing GitHub repository, reproducible commands, and team credits.
 * **Speaker:**
-  > "ProofGraph is fully open-source, W3C PROV-DM compliant, runs on CPU in milliseconds via ONNX, and provides complete auditable Markdown reports with inline citations.
+  > "ProofGraph is fully open-source under Apache-2.0, provides reproducible builds via pinned lockfiles, runs on CPU in milliseconds via ONNX, and outputs auditable Markdown reports with inline citations.
   >
-  > We are Team Reinforce SPG, and ProofGraph brings transparency, accountability, and mathematical rigor to automated fact-checking. Thank you!"
+  > We are Team Reinforce SPG, and ProofGraph brings transparency, accountability, and evidence graph intelligence to claim verification. Thank you!"
 
 ---
 
@@ -87,16 +87,17 @@
 * **Points:**
   * 4-Stage Claimify-inspired Decomposition (Propositions + Opinion Filtering).
   * FastEmbed Dense ONNX (`bge-small-en-v1.5`) + BM25Okapi + Reciprocal Rank Fusion ($k=60$).
+  * TinyFish Live Search & Fetch Integration (api.search.tinyfish.ai & api.fetch.tinyfish.ai).
   * FIRE-inspired Dynamic Stopping & Iterative Multi-Hop Querying.
-  * RefNLI Primary-Subject Alignment Gate & Canonical Host Spoof-Hardened Credibility Scorer.
+  * RefNLI Primary-Subject Alignment Gate & RuleStanceVerifier with Predicate-Bound Conflict Guards.
   * W3C PROV-DM Graph Builder with first-class contradiction edges.
 
-### Slide 4: Real-World Public Benchmark & Empirical Validation
+### Slide 4: Diagnostic Validation & Empirical Baselines
 * **Tables:**
   * **Retrieval Quality (Pooled AVeriTeC, N=60, 170 Passages):** Hits@1: 83.3%, Hits@5: 93.3%, MRR: 0.863.
-  * **AVeriTeC Dev Split (N=60 Claims):** ProofGraph (50.0% Acc / 0.464 Macro-F1) vs. Dense Baseline (41.7% Acc / 0.350 Macro-F1).
-  * **Held-Out RefNLI Gate Test (N=20):** ProofGraph 0.0% False Refutations vs. 50.0% when ablated.
-* **Confusion Matrix:** Full 3x3 matrix showing accurate abstention and support recognition.
+  * **AVeriTeC Dev Split Sample (N=60 Claims):** ProofGraph (50.0% Acc / 0.463 Macro-F1) vs. Dense Baseline (41.7% Acc / 0.350 Macro-F1).
+  * **Synthetic Context-Mismatch Stress Diagnostic (N=20):** ProofGraph 0.0% False Refutations (0/10) vs. 30.0% (3/10) when ablated.
+* **Confusion Matrix:** Full 3x3 matrix showing calibrated abstention and support recognition.
 
 ### Slide 5: Interactive Evidence Visualizer & Audit Reports
 * **Visuals:** Side-by-side screenshot of `outputs/graph.html` (interactive nodes & physics) and `outputs/report.md` (audit report with clickable source links).
@@ -104,8 +105,9 @@
 
 ### Slide 6: Engineering Rigor & Deliverables
 * **Checklist:**
-  * 11 Passing Unit & Integration Tests (`tests/test_pipeline.py`) runnable 100% offline.
+  * 15 Passing Unit & Integration Tests (`tests/test_pipeline.py`) with 14 offline unit tests and live TinySearch API testing.
+  * Fully reproducible pinned environment (`requirements-lock.txt`) enforced in GitHub Actions matrix CI.
+  * Full dataset card (`docs/DATA_CARD.md`) with explicit provenance and protocol disclosures.
   * Fully reproducible CLI (`python -m proofgraph.cli --text "..."`).
   * End-to-end live demo script (`python demo.py`).
-  * Standalone ONNX runtime: zero PyTorch dependency, sub-50ms inference.
-  * Open-source repo: [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph).
+  * Open-source repo under Apache-2.0: [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph).

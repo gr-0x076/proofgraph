@@ -44,19 +44,23 @@ To evaluate whether ProofGraph can retrieve relevant evidence amidst real-world 
 
 ### 2. AVeriTeC Dev Sample Verdict Classification (N=60 Claims, Candidate Pools)
 *Setup: Verdict classification given claim-specific candidate evidence pools ($N=60$ development claims).*  
-*Protocol Note: Custom classification protocol (see [docs/DATA_CARD.md](docs/DATA_CARD.md)); does not evaluate full-corpus open-web document retrieval or official Hungarian METEOR overlap.*
+*Protocol Note: Custom classification protocol (see [docs/DATA_CARD.md](docs/DATA_CARD.md)); does not evaluate full-corpus open-web document retrieval or official Hungarian METEOR overlap.*  
+*Offline Evaluation Note: All benchmark runs evaluate candidate evidence pools with `use_live_web_fallback=False` to ensure deterministic offline reproducibility; the TinyFish web agent is evaluated in dedicated live retrieval tests.*
 
 | System Configuration | Accuracy | Macro-F1 | Precision (Supp) | Precision (Contra) | Precision (Insuff) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **ProofGraph Full Pipeline** | **50.0%** | **0.465** | **0.524** | **0.333** | **0.533** |
-| Ablation: Without Alignment Gate | 50.0% | 0.465 | 0.524 | 0.333 | 0.533 |
+| **ProofGraph Full Pipeline** | **50.0%** | **0.463** | **0.500** | **0.375** | **0.533** |
+| Ablation: Without Alignment Gate | 50.0% | 0.463 | 0.500 | 0.375 | 0.533 |
 | Baseline 1: Standard Dense Similarity (No Gate) | 41.7% | 0.350 | 0.375 | 0.167 | 0.524 |
 | Baseline 2: Lexical Heuristic Baseline | 46.7% | 0.398 | 0.448 | 0.167 | 0.588 |
-| **Net Gain vs. Dense Baseline** | **+8.3%** | **+0.115** | **+0.149** | **+0.166** | **+0.009** |
+| **Net Gain vs. Dense Baseline** | **+8.3%** | **+0.113** | **+0.125** | **+0.208** | **+0.009** |
+
+> **Why the Alignment Gate yields identical metrics on the 60 AVeriTeC claims:**  
+> AVeriTeC development splits provide pre-filtered, claim-specific candidate evidence pools that are already topical. In contrast, reference indeterminacy collisions primarily occur across unconstrained corpora or multi-entity distractor pools (where distinct entities share dates, locations, or actions). The gate's value is directly demonstrated in the Synthetic Context-Mismatch Stress Diagnostic below.
 
 #### Detailed Per-Class Breakdown (Standard 3-Way FEVER Mapping):
-* **SUPPORTED (N=15):** Precision: `0.524` | Recall: `0.733` | **F1: 0.611**
-* **CONTRADICTED (N=15):** Precision: `0.333` | Recall: `0.200` | **F1: 0.250**
+* **SUPPORTED (N=15):** Precision: `0.500` | Recall: `0.733` | **F1: 0.595**
+* **CONTRADICTED (N=15):** Precision: `0.375` | Recall: `0.200` | **F1: 0.261**
 * **INSUFFICIENT EVIDENCE (N=30):** Precision: `0.533` | Recall: `0.533` | **F1: 0.533**
 
 #### 3×3 Confusion Matrix (Rows = Ground Truth, Columns = Predicted):
@@ -65,14 +69,14 @@ To evaluate whether ProofGraph can retrieve relevant evidence amidst real-world 
 -----------------------------------------------------------------------------------------
 True: SUPPORTED (15)         |       11        |         0          |         4
 True: CONTRADICTED (15)      |        2        |         3          |        10
-True: INSUFFICIENT_EV. (30)  |        8        |         6          |        16
+True: INSUFFICIENT_EV. (30)  |        9        |         5          |        16
 ```
 
 #### 4-Class Breakdown (Official AVeriTeC Labels vs. Predicted Stance):
 The official AVeriTeC task defines 4 labels. In standard 3-way fact verification (FEVER/NLI format), `Not Enough Evidence` and `Conflicting Evidence/Cherrypicking` are mapped to abstention (`INSUFFICIENT_EVIDENCE`):
 * **Supported (N=15):** 11 predicted `SUPPORTED` (73.3% accuracy), 0 `CONTRADICTED` (safe predicate binding eliminated false refutations on supported claims), 4 `INSUFFICIENT`.
 * **Refuted (N=15):** 3 predicted `CONTRADICTED`, 10 abstained as `INSUFFICIENT` (calibrated abstention on multi-hop natural language refutations without explicit markers), 2 `SUPPORTED`.
-* **Conflicting Evidence (N=15):** 7 abstained as `INSUFFICIENT` (46.7%), 5 `SUPPORTED`, 3 `CONTRADICTED`.
+* **Conflicting Evidence (N=15):** 7 abstained as `INSUFFICIENT` (46.7%), 6 `SUPPORTED`, 2 `CONTRADICTED`.
 * **Not Enough Evidence (N=15):** 9 abstained as `INSUFFICIENT` (60.0%), 3 `SUPPORTED`, 3 `CONTRADICTED`.
 
 ---
@@ -157,7 +161,7 @@ ProofGraph positions itself in dialogue with the leading research systems:
 
 * **GraphCheck (ACL 2025):** Uses knowledge graphs as soft prompts into LLMs for text classification. *Difference:* GraphCheck uses KGs as an internal model input; ProofGraph generates the knowledge graph as an interactive, inspectable user artifact.
 * **KG-CRAFT (EACL 2026):** Builds a KG from claims and associated documents for contrastive verification. *Difference:* KG-CRAFT requires pre-provided reports; ProofGraph integrates open-domain hybrid retrieval and explicit contradiction edges.
-* **FIRE (NAACL 2025):** Introduces iterative retrieval with dynamic stopping decisions, achieving 7.6x LLM cost and 16.5x search cost reductions. *ProofGraph incorporates FIRE's stopping policy.*
+* **FIRE (NAACL 2025):** Introduces iterative retrieval with dynamic stopping decisions, achieving 7.6x LLM cost and 16.5x search cost reductions (reported in the original FIRE paper evaluations). *ProofGraph adapts FIRE's entity-coverage dynamic stopping heuristic.*
 * **WKGFC (arXiv:2603.00267):** Web-enhanced KG retrieval fact-checking using SPARQL and web augmentation.
 * **LOKI (COLING 2025):** 5-step fact-checking tool designed for human-in-the-loop journalists.
 
@@ -206,7 +210,7 @@ python -m proofgraph.cli --text "Apollo 11 landed on the moon on July 20, 1969. 
 ```
 
 ### 4. Run the Pytest Test Suite
-Verify that all 13 unit and integration tests pass cleanly (100% offline portable):
+Verify that all 15 unit and integration tests pass cleanly (14 unit tests run 100% offline; 1 live test verifies TinySearch API if `$TINYFISH_API_KEY` is present):
 ```bash
 PYTHONPATH=. pytest tests/ -v
 ```
@@ -249,7 +253,7 @@ proofgraph/
 │   ├── pipeline.py      # Unified end-to-end ProofGraph pipeline orchestrator
 │   └── cli.py           # Command line interface
 ├── tests/
-│   └── test_pipeline.py # 100% passing pytest suite (13 unit & integration tests)
+│   └── test_pipeline.py # 100% passing pytest suite (15 unit & integration tests)
 ├── outputs/             # Generated demo artifacts (graph.html, report.md)
 ├── demo.py              # Live end-to-end showcase script
 ├── evaluate.py          # Benchmark & ablation evaluation script (AVeriTeC & diagnostic suite)

@@ -97,6 +97,44 @@ def test_nli_verifier_contradiction_detection():
     assert "e_true" in verdict.contradicting_evidence_ids
     assert verdict.confidence > 0.80
 
+def test_adversarial_numeric_and_inventor_conflicts():
+    verifier = NLIVerifier()
+    # 1. Unrelated numbers must NOT falsely contradict (birth year vs award year)
+    claim1 = AtomicClaim(text="Albert Einstein was born in 1879.", parent_sentence="")
+    passage1 = EvidencePassage(
+        text="Albert Einstein published his theory of General Relativity in 1915.",
+        source_title="History of Science"
+    )
+    v1 = verifier.verify_claim(claim1, [passage1])
+    assert v1.label != VeracityLabel.CONTRADICTED
+
+    # 2. Distinct invention objects must NOT falsely contradict
+    claim2 = AtomicClaim(text="Thomas Edison invented the phonograph in 1877.", parent_sentence="")
+    passage2 = EvidencePassage(
+        text="Alexander Graham Bell was awarded the first patent for the electric telephone in 1876.",
+        source_title="Patent History"
+    )
+    v2 = verifier.verify_claim(claim2, [passage2])
+    assert v2.label != VeracityLabel.CONTRADICTED
+
+    # 3. Bound predicate numbers DO contradict (boiling point 50 vs 100)
+    claim3 = AtomicClaim(text="Water boils at 50 degrees Celsius.", parent_sentence="")
+    passage3 = EvidencePassage(
+        text="At standard atmospheric pressure, water boils at 100 degrees Celsius.",
+        source_title="Chemistry Handbook"
+    )
+    v3 = verifier.verify_claim(claim3, [passage3])
+    assert v3.label == VeracityLabel.CONTRADICTED
+
+    # 4. Conflicting inventors for the same object DO contradict (telephone Edison vs Bell)
+    claim4 = AtomicClaim(text="Thomas Edison invented the telephone.", parent_sentence="")
+    passage4 = EvidencePassage(
+        text="Alexander Graham Bell was awarded the patent for inventing the telephone.",
+        source_title="Patent Records"
+    )
+    v4 = verifier.verify_claim(claim4, [passage4])
+    assert v4.label == VeracityLabel.CONTRADICTED
+
 def test_end_to_end_pipeline_execution(tmp_path):
     # Pass prefer_offline=True so pipeline unit tests run in firewalled/offline environments
     offline_retriever = HybridRetriever(prefer_offline=True)
@@ -185,7 +223,7 @@ def test_tinyfish_agent_parsing_and_fallback():
     agent = TinyFishWebAgent(api_key="sk-tinyfish-mock-key")
     assert agent.is_available is True
 
-    # Test structured response parsing
+    # 1. Test structured response parsing from agent payload
     mock_payload = {
         "status": "completed",
         "output": {
@@ -202,12 +240,33 @@ def test_tinyfish_agent_parsing_and_fallback():
     assert len(passages) == 1
     assert "Apollo 11 landed" in passages[0].text
     assert passages[0].source_domain == "www.nasa.gov"
-    assert passages[0].relevance_score == 0.88
+    # Dynamic relevance calculation (no hard-coded static scores)
+    assert 0.70 <= passages[0].relevance_score <= 1.0
 
-    # Unkeyed agent should safely abstain
+    # 2. Test structured TinySearch JSON parsing
+    search_payload = {
+        "query": "Apollo 11 launch date",
+        "results": [
+            {
+                "position": 1,
+                "title": "Apollo 11 Mission Overview",
+                "snippet": "Apollo 11 launched from Cape Kennedy on July 16, 1969.",
+                "url": "https://www.nasa.gov/mission/apollo-11-launch",
+                "site_name": "www.nasa.gov"
+            }
+        ]
+    }
+    search_passages = agent._parse_search_results(search_payload, "Apollo 11 launch date", max_results=1)
+    assert len(search_passages) == 1
+    assert search_passages[0].source_url == "https://www.nasa.gov/mission/apollo-11-launch"
+    assert search_passages[0].metadata["retrieval_method"] == "tinyfish_search"
+    assert search_passages[0].relevance_score > 0.60
+
+    # 3. Unkeyed agent should safely abstain and record status
     unkeyed_agent = TinyFishWebAgent(api_key="")
     assert unkeyed_agent.is_available is False
     assert unkeyed_agent.research_claim_on_web("test claim") == []
+    assert unkeyed_agent.last_status == "unconfigured_key"
 
 def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
     from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
@@ -234,6 +293,19 @@ def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
     tf_direct = retriever.search_tinyfish_live("test query", max_results=2)
     assert len(tf_direct) == 1
     assert tf_direct[0].id == "tf_1"
+
+@pytest.mark.skipif(not os.environ.get("TINYFISH_API_KEY"), reason="Requires live TINYFISH_API_KEY")
+def test_live_tinyfish_search_api_if_keyed():
+    """Live opt-in smoke test: validates real network retrieval against TinySearch API."""
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+    agent = TinyFishWebAgent()
+    assert agent.is_available is True
+    hits = agent.search_web("Neil Armstrong Apollo 11 moon", max_results=2)
+    assert len(hits) >= 1
+    assert hits[0].source_url.startswith("http")
+    assert hits[0].source_domain != ""
+    assert agent.last_status == "success"
+
 
 
 

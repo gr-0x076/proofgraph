@@ -60,3 +60,17 @@ In standard Fact Extraction and VERification (FEVER) and Natural Language Infere
   * 10 Aligned Pairs (Ground Truth: `SUPPORTED`)
   * 10 Reference-Indeterminacy Distractors (Ground Truth: `INSUFFICIENT_EVIDENCE`), where premise and hypothesis share dates, actions, and locations, but describe different named subjects.
 * **Scope & Limitation:** This is a focused, synthetic stress test for the primary subject alignment gate. It is **not** the official RefNLI benchmark dataset (which consists of 1,143 NLI pairs across 4 labels: Entailment, Contradiction, Ambiguous, Neutral).
+
+---
+
+## 3. Live Web Retrieval via TinyFish Platform
+
+* **Provider:** TinyFish Web Infrastructure for AI Agents ([tinyfish.ai](https://www.tinyfish.ai/))
+* **Primary Search API:** `https://api.search.tinyfish.ai?query=...` (TinySearch structured engine results)
+* **Page Content API:** `POST https://api.fetch.tinyfish.ai` (TinyFetch Chromium rendering)
+* **Authentication:** `X-API-Key: $TINYFISH_API_KEY`
+* **Evidence Provenance Guarantee:**
+  * All retrieved passages preserve the exact source URL, HTTP status code, domain name, and ISO retrieval timestamp in `EvidencePassage.metadata`.
+  * Dynamic lexical-semantic relevance scoring is calculated based on query token overlap and ranked search position (no invented URLs or static relevance scores).
+* **Evaluation Decoupling:** All benchmark runs in `evaluate.py` execute with `use_live_web_fallback=False` to ensure 100% deterministic, offline-reproducible benchmark measurements. Live TinyFish retrieval is validated via the opt-in pytest smoke test (`test_live_tinyfish_search_api_if_keyed`) and interactive executions of `demo.py`.
+

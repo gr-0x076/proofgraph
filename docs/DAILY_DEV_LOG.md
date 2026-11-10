@@ -69,8 +69,20 @@
     3. **Full Label Breakdown & Mapping:** Disclosed 3x3 confusion matrix and 4-class official AVeriTeC mapping (`Not Enough Evidence` and `Conflicting Evidence` mapped to calibrated abstention).
     4. **Held-Out RefNLI Evaluation (N=20):** Validated alignment gate on reference-indeterminacy distractors: ProofGraph achieved 0.0% False Refutations vs. 50.0% false refutations when the gate is ablated.
   * Added `DeterministicHashEmbedding` in `HybridRetriever` for 100% offline unit testing in firewalled/network-restricted sandboxes.
-  * Expanded pytest suite to 11 passing unit & integration tests (`pytest tests/ -v` passes in 1.01s).
-  * Removed all machine-specific absolute paths; updated `README.md` and submission pitch deck script.
+### Day 7: November 11, 2026 — TinyFish Web Infrastructure, Safe Relation-Bound Conflict Guardrails, Matrix CI & Lockfile Hardening
+* **Milestone:** Live TinyFish Search Integration, Syntactic Predicate Binding, Reproducible CI & 15 Tests
+* **Activities:**
+  * Re-architected `TinyFishWebAgent` in `proofgraph/retriever/tinyfish_agent.py` to use official TinyFish Web Infrastructure endpoints:
+    * TinySearch API (`https://api.search.tinyfish.ai?query=...`) for real-time structured search results with exact source URLs, page titles, and snippets.
+    * TinyFetch API (`POST https://api.fetch.tinyfish.ai`) for full-text page content extraction.
+    * Removed static relevance scores and invented URLs; implemented dynamic token-overlap and rank-discounted relevance scoring.
+    * Added full error tracking and execution status observability (`last_status`, `last_error_code`, `total_queries_run`).
+  * Hardened `RuleStanceVerifier` in `proofgraph/verifier/nli.py`:
+    * Upgraded numeric conflict detection to require local windowed binding ($\le 35$ chars) between numbers and shared action predicates (`boil`, `born`, `built`, `launch`, etc.), eliminating false contradictions between unrelated numbers.
+    * Upgraded named inventor conflict detection to require shared object overlap (e.g. `telephone`, `penicillin`) before flagging disjoint inventor names.
+  * Added adversarial conflict tests (`test_adversarial_numeric_and_inventor_conflicts`) and live opt-in smoke test (`test_live_tinyfish_search_api_if_keyed`), bringing the test suite to **15 passing tests**.
+  * Enforced reproducible builds in GitHub Actions (`.github/workflows/ci.yml`) by installing from `requirements-lock.txt`.
+  * Updated dataset provenance, protocol disclosures, and synthetic diagnostic boundaries in `docs/DATA_CARD.md`.
 
 ---
 
@@ -79,8 +91,8 @@
 | Benchmark Dimension | Baseline Configuration | ProofGraph Engine | Delta (Net Improvement) |
 | :--- | :---: | :---: | :---: |
 | **Evidence Retrieval Quality (Pooled AVeriTeC, 170 Passages)** | Pure Dense: 81.7% Hits@1 / 0.860 MRR | **83.3% Hits@1 / 93.3% Hits@5 / 0.863 MRR** | **Superior Top-5 Retrieval** |
-| **AVeriTeC Dev Split Classification (N=60 Claims)** | Dense Baseline: 41.7% Acc / 0.350 F1 | **50.0% Acc / 0.464 Macro-F1** | **+8.3% Acc / +0.114 F1** |
-| **Held-Out Reference Indeterminacy Test (N=20 Pairs)** | Ablated (No Gate): 50.0% False Refutations | **0.0% False Refutations (100% Acc)** | **Eliminated False Refutations** |
+| **AVeriTeC Dev Split Classification (N=60 Claims)** | Dense Baseline: 41.7% Acc / 0.350 F1 | **50.0% Acc / 0.463 Macro-F1 / 0.375 Contra Prec** | **+8.3% Acc / +0.113 F1 / 2.2x Contra Prec** |
+| **Synthetic Context-Mismatch Stress Diagnostic (N=20 Pairs)** | Ablated (No Gate): 30.0% False Refutations | **0.0% False Refutations (100% Acc)** | **Eliminated False Refutations** |
 | **Diagnostic Unit Sanity Suite (10 Hand-Authored Cases)** | Lexical Baseline: 50.0% Acc / 0.389 F1 | **90.0% Acc / 0.886 Macro-F1** | **+40.0% Acc / +0.497 F1** |
 | **Domain Spoofing Vulnerability** | Substring Match (Vulnerable) | **100% Canonical Host Filtered** | **Hardened via Label-Bounded Match** |
-| **Pytest Unit & Integration Suite** | N/A | **11/11 Passing (100% Offline Portable)** | **Runs in 1.01s** |
+| **Pytest Unit & Integration Suite** | N/A | **15/15 Passing (14 Offline + 1 Live Keyed)** | **Runs in <4s** |
