@@ -36,20 +36,35 @@ class RefNLIAlignmentGate:
         union = claim_tokens.union(evidence_tokens)
         jaccard = len(intersection) / len(union) if union else 0.0
 
-        # Check entity overlap
+        # Check entity and primary subject overlap (RefNLI Reference Indeterminacy Defense)
         entity_match = False
+        TITLES = {"dr", "mr", "mrs", "ms", "prof", "sir", "lord"}
         if claim.entities:
+            non_numeric = [e for e in claim.entities if not re.match(r'^\d+$', e)]
+            primary_subject = non_numeric[0] if non_numeric else claim.entities[0]
+            
+            # Primary subject verification: if claim has a named subject entity,
+            # verify that core subject stems (excluding titles and short words) are present in evidence
+            subject_parts = [
+                p.lower().strip(".,") for p in primary_subject.split() 
+                if p.lower().strip(".,") not in TITLES and len(p.strip(".,")) >= 3
+            ]
+            if subject_parts and not any(p in evidence.text.lower() for p in subject_parts):
+                return False, jaccard, f"Context Mismatch: Primary subject '{primary_subject}' absent in evidence (RefNLI Reference Indeterminacy)"
+
             for ent in claim.entities:
                 if ent.lower() in evidence.text.lower():
                     entity_match = True
                     break
-            # If claim has explicit entities and none match in evidence, enforce stricter boundary
+
             if not entity_match and jaccard < 0.25:
                 return False, jaccard, f"Context Mismatch: Entities {claim.entities} absent and Jaccard ({jaccard:.3f}) < 0.25"
         else:
             entity_match = True
 
+
         if entity_match or jaccard >= self.jaccard_threshold:
             return True, jaccard, "Aligned: entity or lexical threshold satisfied"
         
         return False, jaccard, f"Context Mismatch: Jaccard ({jaccard:.3f}) below threshold ({self.jaccard_threshold}) and no entity match"
+

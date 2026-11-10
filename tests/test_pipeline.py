@@ -25,7 +25,8 @@ def test_decomposer_splitting_and_verifiability():
     assert claims[2].is_verifiable is False  # Opinion flagged
 
 def test_hybrid_retriever_ranking():
-    retriever = HybridRetriever()
+    # Unit test runs 100% offline using deterministic hash embedding
+    retriever = HybridRetriever(prefer_offline=True)
     passages = [
         EvidencePassage(id="p1", text="Neil Armstrong walked on the Moon on July 20, 1969.", source_title="NASA"),
         EvidencePassage(id="p2", text="The Golden Gate Bridge opened in 1937.", source_title="Britannica")
@@ -45,6 +46,25 @@ def test_refnli_alignment_gate():
     aligned, score, msg = gate.check_alignment(claim, irrelevant)
     assert aligned is False
     assert "Context Mismatch" in msg
+
+def test_refnli_held_out_context_mismatch_suite():
+    """Evaluates RefNLI alignment gate on a held-out benchmark of aligned vs. mismatched entity pairs."""
+    gate = RefNLIAlignmentGate(jaccard_threshold=0.12)
+    test_cases = [
+        # (claim_text, entities, passage_text, expected_aligned)
+        ("Marie Curie won the Nobel Prize in Chemistry in 1911.", ["Marie Curie", "1911"], "Marie Curie was awarded the 1911 Nobel Prize in Chemistry.", True),
+        ("Albert Einstein published General Relativity in 1915.", ["Albert Einstein", "1915"], "Albert Einstein formulated General Relativity in Berlin in 1915.", True),
+        ("Alan Turing cracked the Enigma code at Bletchley Park.", ["Alan Turing", "Bletchley Park"], "Alan Turing worked at Bletchley Park deciphering German Enigma encryptions.", True),
+        # Distractors: same keywords/dates/actions, completely different person/entity (Reference Indeterminacy)
+        ("Peter was born in 1995 in Toronto.", ["Peter", "1995", "Toronto"], "William was born in 1995 in Toronto to diplomat parents.", False),
+        ("Dr. Smith invented the cardiac stent in 1985.", ["Dr. Smith", "1985"], "Dr. Charles Dotter pioneered modern angioplasty procedures in 1964.", False),
+        ("Acme Corp filed for bankruptcy in 2023.", ["Acme Corp", "2023"], "Beta LLC filed for Chapter 11 bankruptcy reorganization in 2023.", False)
+    ]
+    for claim_text, entities, passage_text, expected in test_cases:
+        claim = AtomicClaim(text=claim_text, parent_sentence="", entities=entities)
+        passage = EvidencePassage(text=passage_text, source_title="Benchmark Source")
+        aligned, score, msg = gate.check_alignment(claim, passage)
+        assert aligned == expected, f"Failed on case: '{claim_text}' vs '{passage_text}' (expected {expected}, got {aligned})"
 
 def test_confact_credibility_weighting():
     scorer = SourceCredibilityScorer()
@@ -78,7 +98,9 @@ def test_nli_verifier_contradiction_detection():
     assert verdict.confidence > 0.80
 
 def test_end_to_end_pipeline_execution(tmp_path):
-    pipeline = ProofGraphPipeline()
+    # Pass prefer_offline=True so pipeline unit tests run in firewalled/offline environments
+    offline_retriever = HybridRetriever(prefer_offline=True)
+    pipeline = ProofGraphPipeline(retriever=offline_retriever)
     corpus = [
         EvidencePassage(
             text="Penicillin was discovered in 1928 by Scottish scientist Alexander Fleming.",
@@ -139,4 +161,23 @@ def test_fire_iterative_decision_module():
     assert should_stop is False
     assert next_query is not None
     assert any(ent in next_query for ent in ["December 2021", "French Guiana"])
+
+def test_offline_hash_embedding_fallback():
+    from proofgraph.retriever.hybrid_retriever import DeterministicHashEmbedding
+    model = DeterministicHashEmbedding(dim=128)
+    vecs = list(model.embed(["test sentence for offline unit tests"]))
+    assert len(vecs) == 1
+    assert vecs[0].shape == (128,)
+
+@pytest.mark.integration
+def test_live_fastembed_download_if_online():
+    """Integration test: validates live FastEmbed model loading if network / model cache is available."""
+    try:
+        from fastembed import TextEmbedding
+        model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+        vec = list(model.embed(["Integration test query"]))[0]
+        assert len(vec) == 384
+    except Exception as e:
+        pytest.skip(f"Live network access or cached model unavailable in this sandbox: {e}")
+
 

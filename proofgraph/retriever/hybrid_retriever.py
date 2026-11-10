@@ -11,6 +11,33 @@ from proofgraph.schemas.evidence import EvidencePassage
 from proofgraph.schemas.claim import AtomicClaim
 from proofgraph.retriever.fire_policy import FIREIterativeDecisionModule
 
+import hashlib
+
+class DeterministicHashEmbedding:
+    """
+    Offline fallback embedding model for network-restricted environments and fast unit testing.
+    Produces deterministic 384-dimensional normalized vector embeddings using token hashing.
+    """
+    def __init__(self, dim: int = 384):
+        self.dim = dim
+
+    def embed(self, texts: List[str]):
+        for text in texts:
+            vec = np.zeros(self.dim, dtype=np.float32)
+            words = re.findall(r'\w+', text.lower())
+            if not words:
+                yield vec
+                continue
+            for word in words:
+                h = int(hashlib.sha256(word.encode()).hexdigest(), 16)
+                idx = h % self.dim
+                sign = 1.0 if (h // self.dim) % 2 == 0 else -1.0
+                vec[idx] += sign
+            norm = np.linalg.norm(vec)
+            if norm > 1e-6:
+                vec /= norm
+            yield vec
+
 class HybridRetriever:
     """
     Multi-Stage Hybrid Retriever with FIRE Iterative Loop:
@@ -19,14 +46,32 @@ class HybridRetriever:
     - Reciprocal Rank Fusion (RRF, k=60)
     - FIRE Iterative Retrieval Loop: Dynamic stopping with entity-gap query reformulation
     - Live Wikipedia API fallback for open-domain fact verification
+    - Robust offline fallback when running in firewalled or sandboxed environments
     """
-    def __init__(self, embedding_model_name: str = "BAAI/bge-small-en-v1.5", max_hops: int = 3):
-        self.embed_model = TextEmbedding(model_name=embedding_model_name)
+    def __init__(
+        self,
+        embedding_model=None,
+        embedding_model_name: str = "BAAI/bge-small-en-v1.5",
+        max_hops: int = 3,
+        prefer_offline: bool = False
+    ):
         self.passages: List[EvidencePassage] = []
         self.corpus_tokens: List[List[str]] = []
         self.bm25: Optional[BM25Okapi] = None
         self.dense_embeddings: Optional[np.ndarray] = None
         self.fire_module = FIREIterativeDecisionModule(max_hops=max_hops)
+
+        if embedding_model is not None:
+            self.embed_model = embedding_model
+        elif prefer_offline:
+            self.embed_model = DeterministicHashEmbedding()
+        else:
+            try:
+                self.embed_model = TextEmbedding(model_name=embedding_model_name)
+            except Exception:
+                # Graceful offline fallback: network restricted or model not cached
+                self.embed_model = DeterministicHashEmbedding()
+
 
     def tokenize(self, text: str) -> List[str]:
         return re.findall(r'\w+', text.lower())

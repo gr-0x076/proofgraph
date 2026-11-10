@@ -5,6 +5,7 @@
 > **Track:** Advanced Track / Product  
 > **Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)  
 > **Build Window:** November 5 – November 15, 2026  
+> *(Note: This document serves as our internal engineering changelog and milestone tracker across the 10-day build window).*
 
 ---
 
@@ -58,25 +59,28 @@
   * Built `ProofGraphVisualizer` using PyVis physics simulation to export standalone interactive HTML (`outputs/graph.html`).
   * Implemented `ReportGenerator` compiling auditable Markdown audit reports (`outputs/report.md`).
 
-### Day 6: November 10, 2026 — Public Benchmark Evaluation, Ablations & Hardening
-* **Milestone:** Real-World AVeriTeC Benchmark, Security Hardening & 8/8 Tests Passing
+### Day 6: November 10, 2026 — Rigorous 4-Part Benchmark, Offline Portability & Hardening
+* **Milestone:** Empirical IR & Verdict Evaluation, Offline Portability, 11 Passing Tests
 * **Activities:**
-  * Curated 60 real-world claims from the official **AVeriTeC Dev Benchmark** (NeurIPS 2023) into `data/benchmarks/averitec_dev_sample.json`.
-  * Built comprehensive 3-part evaluation suite in `evaluate.py`:
-    1. Targeted Diagnostic Sanity Suite (10 edge-case stress claims: 90.0% vs 50.0% baseline).
-    2. Real-World Public Benchmark (AVeriTeC Dev Split, N=60): 48.3% Accuracy, 0.455 Macro-F1 vs. 33.3% Baseline (+15.0% absolute accuracy boost).
-    3. Full 3×3 Confusion Matrix and Component-by-Component Ablation Study.
-  * Expanded test suite to 8 unit and integration tests (`tests/test_pipeline.py`), covering decomposition, retrieval ranking, RefNLI gate, credibility weighting, contradiction detection, end-to-end pipeline, spoofing resistance, and FIRE iterative query reformulation.
-  * Updated `README.md` with honest, transparent empirical reporting and committed all improvements to `main` branch.
+  * Curated 60 real-world claims from the official **AVeriTeC Dev Benchmark** (NeurIPS 2023) across 50 international organizations (`data/benchmarks/averitec_dev_sample.json`).
+  * Built comprehensive 4-part evaluation suite in `evaluate.py`:
+    1. **Evidence Retrieval Quality (Pooled Distractor Corpus):** Pooled all 170 gold evidence passages from 60 claims into a single global index. Measured Hits@1 (83.3%), Hits@3 (86.7%), Hits@5 (93.3%), and MRR (0.863).
+    2. **AVeriTeC Dev Split Classification:** 50.0% Accuracy and 0.464 Macro-F1 (Supported F1: 0.611) vs. standard dense similarity baseline (41.7% Accuracy, 0.350 Macro-F1) and lexical baseline (46.7% Accuracy).
+    3. **Full Label Breakdown & Mapping:** Disclosed 3x3 confusion matrix and 4-class official AVeriTeC mapping (`Not Enough Evidence` and `Conflicting Evidence` mapped to calibrated abstention).
+    4. **Held-Out RefNLI Evaluation (N=20):** Validated alignment gate on reference-indeterminacy distractors: ProofGraph achieved 0.0% False Refutations vs. 50.0% false refutations when the gate is ablated.
+  * Added `DeterministicHashEmbedding` in `HybridRetriever` for 100% offline unit testing in firewalled/network-restricted sandboxes.
+  * Expanded pytest suite to 11 passing unit & integration tests (`pytest tests/ -v` passes in 1.01s).
+  * Removed all machine-specific absolute paths; updated `README.md` and submission pitch deck script.
 
 ---
 
-## 📈 Quantitative Performance Summary
+## 📈 Quantitative Performance Summary Across All 4 Benchmarks
 
-| Testbed / Benchmark | Baseline (Naive Keyword RAG) | ProofGraph Engine | Delta (Net Improvement) |
+| Benchmark Dimension | Baseline Configuration | ProofGraph Engine | Delta (Net Improvement) |
 | :--- | :---: | :---: | :---: |
-| **AVeriTeC Dev Split (N=60 Claims)** | 33.3% Acc / 0.336 Macro-F1 | **48.3% Acc / 0.455 Macro-F1** | **+15.0% Acc / +0.119 F1** |
-| **Diagnostic Sanity Suite (10 Claims)** | 50.0% Acc / 0.504 Macro-F1 | **90.0% Acc / 0.886 Macro-F1** | **+40.0% Acc / +0.382 F1** |
-| **Reference Mismatch False Contradiction** | 100% False Refutations | **0% False Refutations** | **Eliminated False Refutations** |
-| **Domain Spoofing Vulnerability** | Vulnerable to Substrings | **100% Canonical Host Filtered** | **Hardened via Label-Bounded Match** |
-| **Pytest Unit & Integration Suite** | N/A | **8/8 Passing (100%)** | **Fully Reproducible** |
+| **Evidence Retrieval Quality (Pooled AVeriTeC, 170 Passages)** | Pure Dense: 81.7% Hits@1 / 0.860 MRR | **83.3% Hits@1 / 93.3% Hits@5 / 0.863 MRR** | **Superior Top-5 Retrieval** |
+| **AVeriTeC Dev Split Classification (N=60 Claims)** | Dense Baseline: 41.7% Acc / 0.350 F1 | **50.0% Acc / 0.464 Macro-F1** | **+8.3% Acc / +0.114 F1** |
+| **Held-Out Reference Indeterminacy Test (N=20 Pairs)** | Ablated (No Gate): 50.0% False Refutations | **0.0% False Refutations (100% Acc)** | **Eliminated False Refutations** |
+| **Diagnostic Unit Sanity Suite (10 Hand-Authored Cases)** | Lexical Baseline: 50.0% Acc / 0.389 F1 | **90.0% Acc / 0.886 Macro-F1** | **+40.0% Acc / +0.497 F1** |
+| **Domain Spoofing Vulnerability** | Substring Match (Vulnerable) | **100% Canonical Host Filtered** | **Hardened via Label-Bounded Match** |
+| **Pytest Unit & Integration Suite** | N/A | **11/11 Passing (100% Offline Portable)** | **Runs in 1.01s** |

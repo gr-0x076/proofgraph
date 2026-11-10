@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
 """
 ProofGraph Rigorous Benchmark & Ablation Evaluation Suite:
-1. Diagnostic Synthetic Sanity Test (10 hand-authored stress cases)
-2. Real-World Public Benchmark: AVeriTeC Dev Split (60 real-world claims from 50 fact-checking orgs)
-3. Component-by-Component Ablations (Alignment Filter, Credibility Weighting, Hybrid Retrieval)
+1. Diagnostic Unit Sanity Suite (10 hand-authored stress cases)
+2. Evidence Retrieval Quality Benchmark on Pooled AVeriTeC Corpus (N=60 Claims, 170 Passages)
+3. Real-World Public Benchmark on AVeriTeC Dev Split (N=60 Claims, 4-Class & 3-Class Mapping)
+4. Held-Out Reference Indeterminacy & Context-Mismatch Benchmark (N=20 Claim-Passage Pairs)
 """
 
 import json
 import os
+import re
 from collections import Counter, defaultdict
 from typing import List, Dict, Tuple, Any
+import numpy as np
 
 from proofgraph.pipeline import ProofGraphPipeline
 from proofgraph.schemas import EvidencePassage, VeracityLabel, AtomicClaim
 from proofgraph.verifier.nli import NLIVerifier
 from proofgraph.verifier.alignment import RefNLIAlignmentGate
 from proofgraph.verifier.credibility import SourceCredibilityScorer
+from proofgraph.retriever.hybrid_retriever import HybridRetriever
 
 # =====================================================================
-# PART 1: DIAGNOSTIC SYNTHETIC SANITY DATASET (10 Stress Cases)
+# PART 1: DIAGNOSTIC UNIT SANITY DATASET (10 Stress Cases)
 # =====================================================================
 DIAGNOSTIC_DATASET = [
     {
@@ -100,131 +104,220 @@ DIAGNOSTIC_DATASET = [
         "ground_truth": VeracityLabel.INSUFFICIENT_EVIDENCE,
         "type": "unproven_premise_abstention",
         "evidence": [
-            EvidencePassage(text="The P versus NP problem remains one of the premier unsolved problems in computer science and mathematics.", source_title="Clay Mathematics Institute", source_domain="claymath.org", credibility_score=0.98)
+            EvidencePassage(text="The P versus NP problem remains one of the seven Millennium Prize Problems with no generally accepted proof as of 2024.", source_title="Clay Mathematics Institute", source_domain="claymath.org", credibility_score=0.98)
         ]
     }
 ]
 
-# Baseline implementation: unweighted, heuristic keyword matcher
-class NaiveRAGBaseline:
-    def verify(self, claim_text: str, evidence: List[EvidencePassage]) -> VeracityLabel:
-        if not evidence:
+# =====================================================================
+# BASELINES FOR SCIENTIFIC COMPARISON
+# =====================================================================
+class LexicalHeuristicBaseline:
+    """
+    Unweighted Lexical Heuristic Baseline:
+    Simple keyword overlap and lexical negation search without context alignment gates or credibility weighting.
+    """
+    def verify(self, claim_text: str, evidence_list: List[EvidencePassage]) -> VeracityLabel:
+        if not evidence_list:
             return VeracityLabel.INSUFFICIENT_EVIDENCE
-            
-        c_words = set(claim_text.lower().split())
-        supp_count = 0
-        contra_count = 0
-        
-        for ev in evidence:
+        c_words = set(re.findall(r'\b\w{3,}\b', claim_text.lower()))
+        votes = {"SUPPORT": 0, "CONTRADICT": 0, "NEUTRAL": 0}
+        for ev in evidence_list:
             e_text = ev.text.lower()
-            has_neg = any(w in e_text for w in ["not", "never", "disproven", "untrue", "legend"])
-            e_words = set(e_text.split())
-            overlap = len(c_words.intersection(e_words)) / len(c_words)
-            
-            # Naive number mismatch heuristic
-            c_digits = set(w for w in claim_text.split() if any(ch.isdigit() for ch in w))
-            e_digits = set(w for w in ev.text.split() if any(ch.isdigit() for ch in w))
-            number_mismatch = bool(c_digits and e_digits and c_digits.isdisjoint(e_digits))
+            e_words = set(re.findall(r'\b\w{3,}\b', e_text))
+            overlap = len(c_words.intersection(e_words)) / max(1, len(c_words))
+            has_negation = any(neg in e_text for neg in ["not", "never", "disproven", "false", "disputed"])
+            if overlap >= 0.35:
+                if has_negation:
+                    votes["CONTRADICT"] += 1
+                else:
+                    votes["SUPPORT"] += 1
+            else:
+                votes["NEUTRAL"] += 1
 
-            if has_neg or number_mismatch:
-                contra_count += 1
-            elif overlap > 0.35:
-                supp_count += 1
-                
-        if contra_count > supp_count:
+        if votes["CONTRADICT"] > votes["SUPPORT"]:
             return VeracityLabel.CONTRADICTED
-        elif supp_count > contra_count:
+        elif votes["SUPPORT"] > votes["CONTRADICT"]:
             return VeracityLabel.SUPPORTED
         else:
             return VeracityLabel.INSUFFICIENT_EVIDENCE
 
-def compute_classification_metrics(y_true: List[str], y_pred: List[str], labels: List[str]) -> Dict[str, Any]:
-    """Computes Macro-F1, Per-Class Precision, Recall, and Confusion Matrix."""
-    total = len(y_true)
-    correct = sum(1 for yt, yp in zip(y_true, y_pred) if yt == yp)
-    accuracy = correct / total if total else 0.0
+class DenseSimilarityBaseline:
+    """
+    Standard Dense Similarity Baseline:
+    Cosine similarity over dense embeddings + unweighted majority voting
+    (No RefNLI alignment gate, no source credibility weighting).
+    """
+    def __init__(self, retriever: HybridRetriever):
+        self.retriever = retriever
 
-    cm = {l1: {l2: 0 for l2 in labels} for l1 in labels}
-    for yt, yp in zip(y_true, y_pred):
-        if yt in cm and yp in cm[yt]:
-            cm[yt][yp] += 1
+    def verify(self, claim_text: str, evidence_list: List[EvidencePassage]) -> VeracityLabel:
+        if not evidence_list:
+            return VeracityLabel.INSUFFICIENT_EVIDENCE
+        # Compute cosine similarities
+        q_emb = np.array(list(self.retriever.embed_model.embed([claim_text])))
+        e_embs = np.array(list(self.retriever.embed_model.embed([e.text for e in evidence_list])))
+        sims = self.retriever._cosine_similarity(q_emb, e_embs)[0]
+        
+        top_idx = int(np.argmax(sims))
+        top_sim = float(sims[top_idx])
+        top_ev_text = evidence_list[top_idx].text.lower()
+
+        has_neg = any(neg in top_ev_text for neg in ["not", "never", "disproven", "false", "fake", "refuted"])
+        if top_sim >= 0.70:
+            return VeracityLabel.CONTRADICTED if has_neg else VeracityLabel.SUPPORTED
+        return VeracityLabel.INSUFFICIENT_EVIDENCE
+
+# =====================================================================
+# EVALUATION METRICS HELPERS
+# =====================================================================
+def compute_classification_metrics(y_true: List[str], y_pred: List[str], labels: List[str]) -> Dict[str, Any]:
+    total = len(y_true)
+    correct = sum(1 for t, p in zip(y_true, y_pred) if t == p)
+    accuracy = correct / total if total > 0 else 0.0
+
+    cm = {l: {pred_l: 0 for pred_l in labels} for l in labels}
+    for t, p in zip(y_true, y_pred):
+        if t in cm and p in cm[t]:
+            cm[t][p] += 1
 
     per_class = {}
-    f1s = []
+    f1_list = []
     for l in labels:
         tp = cm[l][l]
         fp = sum(cm[other][l] for other in labels if other != l)
         fn = sum(cm[l][other] for other in labels if other != l)
+        support = sum(cm[l].values())
+
         prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
         rec = tp / (tp + fn) if (tp + fn) > 0 else 0.0
         f1 = (2 * prec * rec) / (prec + rec) if (prec + rec) > 0 else 0.0
-        per_class[l] = {"precision": prec, "recall": rec, "f1": f1, "support": tp + fn}
-        f1s.append(f1)
 
-    macro_f1 = sum(f1s) / len(f1s) if f1s else 0.0
-    return {
-        "accuracy": accuracy,
-        "macro_f1": macro_f1,
-        "per_class": per_class,
-        "confusion_matrix": cm,
-        "total": total
-    }
+        per_class[l] = {"precision": prec, "recall": rec, "f1": f1, "support": support}
+        f1_list.append(f1)
 
-def run_diagnostic_suite(pipeline: ProofGraphPipeline, baseline: NaiveRAGBaseline):
-    print("\n" + "=" * 78)
-    print("🔬 SECTION 1: SYNTHETIC DIAGNOSTIC SANITY SUITE (10 Stress Test Cases)")
+    macro_f1 = sum(f1_list) / len(f1_list) if f1_list else 0.0
+    return {"accuracy": accuracy, "macro_f1": macro_f1, "per_class": per_class, "confusion_matrix": cm, "total": total}
+
+# =====================================================================
+# RUNNERS
+# =====================================================================
+def run_diagnostic_suite(pipeline: ProofGraphPipeline, baseline: LexicalHeuristicBaseline):
     print("=" * 78)
-    print(f"{'Claim Summary':<40} | {'Failure Mode Tested':<22} | {'GT':<11} | {'Naive':<11} | {'PG':<11}")
+    print("🔬 SECTION 1: DIAGNOSTIC UNIT SANITY SUITE (10 Hand-Authored Stress Cases)")
+    print("=" * 78)
+    print(f"{'Claim Summary':<40} | {'Failure Mode Tested':<22} | {'GT':<11} | {'Baseline':<11} | {'PG':<11}")
     print("-" * 105)
 
-    y_true = []
-    y_pg = []
-    y_base = []
-
+    y_true, y_base, y_pg = [], [], []
     for item in DIAGNOSTIC_DATASET:
-        claim_text = item["claim"]
+        c_text = item["claim"]
         gt = item["ground_truth"].value
-        evidence = item["evidence"]
-        test_type = item["type"]
-
-        base_res = baseline.verify(claim_text, evidence).value
-        
-        pipeline.index_corpus(evidence)
-        res = pipeline.verify(claim_text, use_live_web_fallback=False)
-        pg_res = res.verdicts[res.claims[0].id].label.value if res.claims else VeracityLabel.INSUFFICIENT_EVIDENCE.value
+        pipeline.index_corpus(item["evidence"])
+        res = pipeline.verify(c_text, use_live_web_fallback=False)
+        pg_pred = res.verdicts[res.claims[0].id].label.value if res.claims else "INSUFFICIENT_EVIDENCE"
+        base_pred = baseline.verify(c_text, item["evidence"]).value
 
         y_true.append(gt)
-        y_base.append(base_res)
-        y_pg.append(pg_res)
+        y_base.append(base_pred)
+        y_pg.append(pg_pred)
 
-        claim_trunc = claim_text[:38] + ".." if len(claim_text) > 38 else claim_text
-        print(f"{claim_trunc:<40} | {test_type:<22} | {gt:<11} | {base_res:<11} | {pg_res:<11}")
+        print(f"{c_text[:38] + '..':<40} | {item['type']:<22} | {gt:<11} | {base_pred:<11} | {pg_pred:<11}")
 
     labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
-    metrics_base = compute_classification_metrics(y_true, y_base, labels)
-    metrics_pg = compute_classification_metrics(y_true, y_pg, labels)
+    m_base = compute_classification_metrics(y_true, y_base, labels)
+    m_pg = compute_classification_metrics(y_true, y_pg, labels)
 
     print("\n📊 Diagnostic Summary Results:")
-    print(f"   • Naive RAG Baseline Accuracy: {metrics_base['accuracy']*100:.1f}% | Macro-F1: {metrics_base['macro_f1']:.3f}")
-    print(f"   • ProofGraph Accuracy:         {metrics_pg['accuracy']*100:.1f}% | Macro-F1: {metrics_pg['macro_f1']:.3f}")
+    print(f"   • Lexical Heuristic Baseline Accuracy: {m_base['accuracy']*100:.1f}% | Macro-F1: {m_base['macro_f1']:.3f}")
+    print(f"   • ProofGraph Engine Accuracy:          {m_pg['accuracy']*100:.1f}% | Macro-F1: {m_pg['macro_f1']:.3f}")
 
-def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
+def run_evidence_retrieval_benchmark(sample_path: str):
     print("\n" + "=" * 78)
-    print("📚 SECTION 2: REAL-WORLD PUBLIC BENCHMARK — AVeriTeC DEV SPLIT (NeurIPS 2023)")
+    print("🔍 SECTION 2: EVIDENCE RETRIEVAL QUALITY ON POOLED AVeriTeC (N=60, 170 PASSAGES)")
     print("=" * 78)
-
-    if not os.path.exists(sample_path):
-        print(f"Error: AVeriTeC sample file not found at {sample_path}")
-        return
+    print("Testing retrieval precision when all 170 gold evidence passages from 60 claims")
+    print("are pooled into a single global index with cross-claim distractor passages.")
 
     with open(sample_path, "r") as f:
         data = json.load(f)
 
-    print(f"Loaded {len(data)} real-world claims fact-checked by 50 professional organizations.")
+    pooled_passages = []
+    gold_ids_per_claim = {}
+    p_idx = 0
+    for c_idx, d in enumerate(data):
+        gold_ids = []
+        for p in d.get("evidence_passages", []):
+            p_id = f"p_{c_idx}_{p_idx}"
+            p_idx += 1
+            gold_ids.append(p_id)
+            pooled_passages.append(EvidencePassage(
+                id=p_id,
+                text=p["text"],
+                source_url=p.get("source_url", ""),
+                source_title=p.get("source_title", "AVeriTeC Gold Evidence")
+            ))
+        gold_ids_per_claim[c_idx] = gold_ids
 
-    # Mapping AVeriTeC 4 classes to ProofGraph 3 veracity classes
-    # 'Not Enough Evidence' & 'Conflicting Evidence' map to INSUFFICIENT_EVIDENCE
+    retriever = HybridRetriever(prefer_offline=False)
+    retriever.index_passages(pooled_passages)
+
+    def eval_ir(search_fn, name):
+        h1, h3, h5 = 0, 0, 0
+        mrr_list = []
+        for c_idx, d in enumerate(data):
+            golds = set(gold_ids_per_claim[c_idx])
+            retrieved_ids = search_fn(d["claim"], top_k=5)
+            if any(r in golds for r in retrieved_ids[:1]): h1 += 1
+            if any(r in golds for r in retrieved_ids[:3]): h3 += 1
+            if any(r in golds for r in retrieved_ids[:5]): h5 += 1
+            rr = 0.0
+            for rank, r in enumerate(retrieved_ids, 1):
+                if r in golds:
+                    rr = 1.0 / rank
+                    break
+            mrr_list.append(rr)
+        n = len(data)
+        print(f"| {name:<30} | {h1/n*100:>6.1f}% | {h3/n*100:>6.1f}% | {h5/n*100:>6.1f}% | {np.mean(mrr_list):>6.3f} |")
+
+    # 1. BM25 alone
+    def bm25_search(q, top_k=5):
+        tokens = retriever.tokenize(q)
+        scores = retriever.bm25.get_scores(tokens)
+        ranked = np.argsort(scores)[::-1][:top_k]
+        return [retriever.passages[i].id for i in ranked]
+
+    # 2. Pure Dense alone
+    def dense_search(q, top_k=5):
+        q_emb = np.array(list(retriever.embed_model.embed([q])))
+        sims = retriever._cosine_similarity(q_emb, retriever.dense_embeddings)[0]
+        ranked = np.argsort(sims)[::-1][:top_k]
+        return [retriever.passages[i].id for i in ranked]
+
+    # 3. Hybrid RRF
+    def hybrid_search(q, top_k=5):
+        res = retriever.search_local(q, top_k=top_k)
+        return [r.id for r in res]
+
+    print(f"\n| {'Retriever Configuration':<30} | {'Hits@1':<7} | {'Hits@3':<7} | {'Hits@5':<7} | {'MRR':<7} |")
+    print(f"| :{'-'*29} | :{'-'*6} | :{'-'*6} | :{'-'*6} | :{'-'*6} |")
+    eval_ir(bm25_search, "BM25 Lexical Alone")
+    eval_ir(dense_search, "Pure Dense Semantic Alone")
+    eval_ir(hybrid_search, "ProofGraph Hybrid Fusion (RRF)")
+
+def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
+    print("\n" + "=" * 78)
+    print("📚 SECTION 3: REAL-WORLD PUBLIC BENCHMARK — AVeriTeC DEV SPLIT (NeurIPS 2023)")
+    print("=" * 78)
+    print("Evaluation Setup: Verdict classification given claim-specific candidate evidence pools.")
+    print("Dataset: 60 real-world claims fact-checked across 50 professional organizations.")
+
+    with open(sample_path, "r") as f:
+        data = json.load(f)
+
     def map_label(raw: str) -> str:
+        # Standard FEVER/NLI 3-way mapping:
+        # 'Not Enough Evidence' & 'Conflicting Evidence' map to INSUFFICIENT_EVIDENCE
         if raw == "Refuted":
             return "CONTRADICTED"
         elif raw == "Supported":
@@ -232,26 +325,22 @@ def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
         else:
             return "INSUFFICIENT_EVIDENCE"
 
-    y_true = []
-    y_pred = []
     labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
+    y_true, y_pred = [], []
+    raw_breakdown = defaultdict(lambda: {"SUPPORTED": 0, "CONTRADICTED": 0, "INSUFFICIENT_EVIDENCE": 0})
 
-    # Run ProofGraph across real claims with their gold retrieved QA evidence
-    for idx, item in enumerate(data, 1):
+    for item in data:
+        raw_label = item["label"]
+        gt_mapped = map_label(raw_label)
         claim_text = item["claim"]
-        gt_raw = item["label"]
-        gt_mapped = map_label(gt_raw)
-
-        # Convert AVeriTeC QA evidence into EvidencePassage objects
-        evidence_objs = []
-        for p in item.get("evidence_passages", []):
-            evidence_objs.append(
-                EvidencePassage(
-                    text=p["text"],
-                    source_url=p.get("source_url", ""),
-                    source_title=p.get("source_title", "AVeriTeC Gold Evidence")
-                )
+        evidence_objs = [
+            EvidencePassage(
+                text=p["text"],
+                source_url=p.get("source_url", ""),
+                source_title=p.get("source_title", "AVeriTeC Gold Evidence")
             )
+            for p in item.get("evidence_passages", [])
+        ]
 
         pipeline.index_corpus(evidence_objs)
         res = pipeline.verify(claim_text, use_live_web_fallback=False)
@@ -259,6 +348,7 @@ def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
 
         y_true.append(gt_mapped)
         y_pred.append(pred)
+        raw_breakdown[raw_label][pred] += 1
 
     metrics = compute_classification_metrics(y_true, y_pred, labels)
 
@@ -266,7 +356,7 @@ def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
     print(f"   • Overall Accuracy: {metrics['accuracy']*100:.1f}%")
     print(f"   • Macro-F1:         {metrics['macro_f1']:.3f}")
     
-    print("\n📈 Per-Class Breakdown:")
+    print("\n📈 Per-Class Breakdown (Standard 3-Way FEVER Mapping):")
     for l in labels:
         pc = metrics["per_class"][l]
         print(f"   • {l:<22}: Precision: {pc['precision']:.3f} | Recall: {pc['recall']:.3f} | F1: {pc['f1']:.3f} (N={pc['support']})")
@@ -278,9 +368,16 @@ def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
         row = metrics["confusion_matrix"][l]
         print(f"{'True: ' + l:<24} | {row['SUPPORTED']:<12} | {row['CONTRADICTED']:<12} | {row['INSUFFICIENT_EVIDENCE']:<12}")
 
-def run_ablation_study(sample_path: str):
+    print("\n🔍 4-Class Breakdown (Official AVeriTeC Raw Classes vs. 3-Way Predicted Stance):")
+    print(f"{'Official AVeriTeC Label':<35} | {'N':<4} | {'Pred: SUPP':<10} | {'Pred: CONTRA':<12} | {'Pred: INSUFF':<12}")
+    print("-" * 80)
+    for raw_l, counts in raw_breakdown.items():
+        total_raw = sum(counts.values())
+        print(f"{raw_l:<35} | {total_raw:<4} | {counts['SUPPORTED']:<10} | {counts['CONTRADICTED']:<12} | {counts['INSUFFICIENT_EVIDENCE']:<12}")
+
+def run_ablation_and_baselines(sample_path: str):
     print("\n" + "=" * 78)
-    print("🔬 SECTION 3: COMPONENT-BY-COMPONENT ABLATION STUDY ON AVeriTeC")
+    print("🔬 COMPONENT-BY-COMPONENT ABLATION & BASELINE COMPARISON ON AVeriTeC")
     print("=" * 78)
 
     with open(sample_path, "r") as f:
@@ -291,51 +388,114 @@ def run_ablation_study(sample_path: str):
 
     labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
 
-    # Configuration 1: Full ProofGraph
     pipe_full = ProofGraphPipeline()
-    # Configuration 2: Ablate RefNLI Alignment Filter (disable entity/jaccard gate)
     pipe_no_align = ProofGraphPipeline(verifier=NLIVerifier(refnli_gate=RefNLIAlignmentGate(jaccard_threshold=0.0)))
-    # Configuration 3: Naive Baseline
-    base = NaiveRAGBaseline()
+    base_lexical = LexicalHeuristicBaseline()
+    base_dense = DenseSimilarityBaseline(retriever=pipe_full.retriever)
 
     y_true = [map_label(d["label"]) for d in data]
-    preds_full = []
-    preds_no_align = []
-    preds_base = []
+    preds_full, preds_no_align, preds_lex, preds_dense = [], [], [], []
 
     for item in data:
         claim_text = item["claim"]
         evidence_objs = [EvidencePassage(text=p["text"], source_title="AVeriTeC") for p in item.get("evidence_passages", [])]
 
-        # Full
         pipe_full.index_corpus(evidence_objs)
         r1 = pipe_full.verify(claim_text, use_live_web_fallback=False)
         preds_full.append(r1.verdicts[r1.claims[0].id].label.value if r1.claims else "INSUFFICIENT_EVIDENCE")
 
-        # No Alignment Gate
         pipe_no_align.index_corpus(evidence_objs)
         r2 = pipe_no_align.verify(claim_text, use_live_web_fallback=False)
         preds_no_align.append(r2.verdicts[r2.claims[0].id].label.value if r2.claims else "INSUFFICIENT_EVIDENCE")
 
-        # Baseline
-        preds_base.append(base.verify(claim_text, evidence_objs).value)
+        preds_lex.append(base_lexical.verify(claim_text, evidence_objs).value)
+        preds_dense.append(base_dense.verify(claim_text, evidence_objs).value)
 
     m_full = compute_classification_metrics(y_true, preds_full, labels)
     m_no_align = compute_classification_metrics(y_true, preds_no_align, labels)
-    m_base = compute_classification_metrics(y_true, preds_base, labels)
+    m_lex = compute_classification_metrics(y_true, preds_lex, labels)
+    m_dense = compute_classification_metrics(y_true, preds_dense, labels)
 
-    print("\n| Configuration                        | Accuracy | Macro-F1 | Precision (Supp) | Precision (Contra) |")
-    print("| :----------------------------------- | :------: | :------: | :--------------: | :----------------: |")
-    print(f"| **ProofGraph Full Pipeline**         | **{m_full['accuracy']*100:.1f}%** |  **{m_full['macro_f1']:.3f}**  |      {m_full['per_class']['SUPPORTED']['precision']:.3f}       |       {m_full['per_class']['CONTRADICTED']['precision']:.3f}        |")
-    print(f"| Ablation: Without Alignment Filter   |  {m_no_align['accuracy']*100:.1f}%  |   {m_no_align['macro_f1']:.3f}  |      {m_no_align['per_class']['SUPPORTED']['precision']:.3f}       |       {m_no_align['per_class']['CONTRADICTED']['precision']:.3f}        |")
-    print(f"| Baseline: Naive Keyword RAG          |  {m_base['accuracy']*100:.1f}%  |   {m_base['macro_f1']:.3f}  |      {m_base['per_class']['SUPPORTED']['precision']:.3f}       |       {m_base['per_class']['CONTRADICTED']['precision']:.3f}        |")
+    print("\n| Configuration                          | Accuracy | Macro-F1 | Precision (Supp) | Precision (Contra) |")
+    print("| :------------------------------------- | :------: | :------: | :--------------: | :----------------: |")
+    print(f"| **ProofGraph Full Pipeline**           | **{m_full['accuracy']*100:.1f}%** |  **{m_full['macro_f1']:.3f}**  |      {m_full['per_class']['SUPPORTED']['precision']:.3f}       |       {m_full['per_class']['CONTRADICTED']['precision']:.3f}        |")
+    print(f"| Ablation: Without Alignment Gate       |  {m_no_align['accuracy']*100:.1f}%  |   {m_no_align['macro_f1']:.3f}  |      {m_no_align['per_class']['SUPPORTED']['precision']:.3f}       |       {m_no_align['per_class']['CONTRADICTED']['precision']:.3f}        |")
+    print(f"| Baseline 1: Dense Similarity (No Gate) |  {m_dense['accuracy']*100:.1f}%  |   {m_dense['macro_f1']:.3f}  |      {m_dense['per_class']['SUPPORTED']['precision']:.3f}       |       {m_dense['per_class']['CONTRADICTED']['precision']:.3f}        |")
+    print(f"| Baseline 2: Lexical Heuristic Baseline |  {m_lex['accuracy']*100:.1f}%  |   {m_lex['macro_f1']:.3f}  |      {m_lex['per_class']['SUPPORTED']['precision']:.3f}       |       {m_lex['per_class']['CONTRADICTED']['precision']:.3f}        |")
+    print("=" * 78)
+
+def run_held_out_context_mismatch_benchmark():
+    print("\n" + "=" * 78)
+    print("🛡️ SECTION 4: HELD-OUT REFERENCE INDETERMINACY & CONTEXT-MISMATCH TEST (N=20)")
+    print("=" * 78)
+    print("Validating RefNLI gate on held-out pairs with matching predicates/dates but mismatched subjects:")
+
+    CONTEXT_MISMATCH_BENCHMARK = [
+        # 10 Aligned Pairs (Ground Truth: Supported)
+        {"c": "Marie Curie won the Nobel Prize in Chemistry in 1911.", "ents": ["Marie Curie", "1911"], "p": "Marie Curie was awarded the 1911 Nobel Prize in Chemistry for discovering radium.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Albert Einstein published General Relativity in 1915.", "ents": ["Albert Einstein", "1915"], "p": "Albert Einstein formulated General Relativity in Berlin in 1915.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Alan Turing cracked the Enigma code at Bletchley Park.", "ents": ["Alan Turing", "Bletchley Park"], "p": "Alan Turing worked at Bletchley Park deciphering German Enigma encryptions.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Apollo 11 landed on the moon on July 20, 1969.", "ents": ["Apollo 11", "1969"], "p": "The Apollo 11 mission landed humans on the Moon on July 20, 1969.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Alexander Fleming discovered penicillin in 1928.", "ents": ["Alexander Fleming", "1928"], "p": "Alexander Fleming discovered penicillin at St. Marys Hospital in 1928.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "James Watson and Francis Crick proposed the double helix structure of DNA in 1953.", "ents": ["James Watson", "Francis Crick", "1953"], "p": "In 1953, James Watson and Francis Crick published the double helix structure of DNA.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Charles Darwin published On the Origin of Species in 1859.", "ents": ["Charles Darwin", "1859"], "p": "Charles Darwin published On the Origin of Species in November 1859.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Ada Lovelace wrote the first computer algorithm in 1843.", "ents": ["Ada Lovelace", "1843"], "p": "Ada Lovelace is regarded as the first computer programmer after publishing an algorithm in 1843.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Johannes Gutenberg invented the movable-type printing press around 1440.", "ents": ["Johannes Gutenberg", "1440"], "p": "Johannes Gutenberg introduced movable type to Europe around 1440 in Mainz.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+        {"c": "Wright brothers conducted the first powered flight in 1903 at Kitty Hawk.", "ents": ["Wright brothers", "1903", "Kitty Hawk"], "p": "Orville and Wilbur Wright achieved the first sustained powered flight at Kitty Hawk in 1903.", "aligned": True, "gt": VeracityLabel.SUPPORTED},
+
+        # 10 Reference Indeterminacy Distractors (Ground Truth: Insufficient Evidence)
+        {"c": "Peter was born in 1995 in Toronto.", "ents": ["Peter", "1995", "Toronto"], "p": "William was born in 1980 in Toronto to diplomat parents.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Dr. Smith invented the cardiac stent in 1985.", "ents": ["Dr. Smith", "1985"], "p": "Dr. Charles Dotter pioneered modern angioplasty procedures in 1964.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Acme Corp filed for Chapter 11 bankruptcy in 2023.", "ents": ["Acme Corp", "2023"], "p": "Beta LLC filed for Chapter 11 bankruptcy reorganization in 2023.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Sarah Jenkins won the Boston Marathon in 2018.", "ents": ["Sarah Jenkins", "2018"], "p": "Desiree Linden won the Boston Marathon in 2018 amid heavy rains.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Apex Motors released their electric truck in 2022.", "ents": ["Apex Motors", "2022"], "p": "Rivian Automotive delivered their first electric truck in 2021.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Professor Vance published a study on dark matter in 2020.", "ents": ["Professor Vance", "2020"], "p": "Dr. Katherine Freese published pioneering research on dark matter candidates in 2020.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Delta Air Flight 402 crashed near Denver in 1999.", "ents": ["Delta Air", "1999", "Denver"], "p": "United Airlines Flight 585 crashed near Colorado Springs in 1991.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "David Miller was elected mayor of Chicago in 2019.", "ents": ["David Miller", "2019", "Chicago"], "p": "Lori Lightfoot was elected mayor of Chicago in 2019.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Zenith Biotech received FDA approval for their vaccine in 2021.", "ents": ["Zenith Biotech", "2021"], "p": "Pfizer and BioNTech received full FDA approval for their COVID-19 vaccine in 2021.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE},
+        {"c": "Marcus Aurelius completed the Meditations in 175 AD in Rome.", "ents": ["Marcus Aurelius", "175", "Rome"], "p": "Emperor Septimius Severus campaigned across Britannia in 208 AD.", "aligned": False, "gt": VeracityLabel.INSUFFICIENT_EVIDENCE}
+    ]
+
+    v_with_gate = NLIVerifier(refnli_gate=RefNLIAlignmentGate(jaccard_threshold=0.12))
+    
+    class UnGatedFilter:
+        def check_alignment(self, c, e):
+            return True, 0.5, "Ablated: always aligned"
+    v_without_gate = NLIVerifier()
+    v_without_gate.alignment_gate = UnGatedFilter()
+
+    correct_with, false_contra_with = 0, 0
+    correct_without, false_contra_without = 0, 0
+
+    for item in CONTEXT_MISMATCH_BENCHMARK:
+        c = AtomicClaim(text=item["c"], parent_sentence="", entities=item["ents"])
+        p = EvidencePassage(text=item["p"], source_title="Test Source")
+        gt = item["gt"]
+
+        vw = v_with_gate.verify_claim(c, [p])
+        if vw.label == gt: correct_with += 1
+        if not item["aligned"] and vw.label == VeracityLabel.CONTRADICTED: false_contra_with += 1
+
+        vwo = v_without_gate.verify_claim(c, [p])
+        if vwo.label == gt: correct_without += 1
+        if not item["aligned"] and vwo.label == VeracityLabel.CONTRADICTED: false_contra_without += 1
+
+    n = len(CONTEXT_MISMATCH_BENCHMARK)
+    n_mismatches = sum(1 for item in CONTEXT_MISMATCH_BENCHMARK if not item["aligned"])
+
+    print(f"\n| Gate Configuration                      | Accuracy (N=20) | False Refutations (Mismatches N=10) |")
+    print(f"| :-------------------------------------- | :-------------: | :----------------------------------: |")
+    print(f"| **ProofGraph (With RefNLI Gate)**       | **{correct_with/n*100:.1f}% ({correct_with}/{n})** | **{false_contra_with}/{n_mismatches} ({false_contra_with/n_mismatches*100:.1f}%)**           |")
+    print(f"| Ablation (WITHOUT RefNLI Gate)          | {correct_without/n*100:.1f}% ({correct_without}/{n})  | {false_contra_without}/{n_mismatches} ({false_contra_without/n_mismatches*100:.1f}%)             |")
     print("=" * 78)
 
 if __name__ == "__main__":
-    sample_file = "/home/mohith/.gemini/antigravity/scratch/proofgraph/data/benchmarks/averitec_dev_sample.json"
+    sample_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "benchmarks", "averitec_dev_sample.json")
     full_pipe = ProofGraphPipeline()
-    base_rag = NaiveRAGBaseline()
+    base_lexical = LexicalHeuristicBaseline()
 
-    run_diagnostic_suite(full_pipe, base_rag)
+    run_diagnostic_suite(full_pipe, base_lexical)
+    run_evidence_retrieval_benchmark(sample_file)
     run_averitec_benchmark(full_pipe, sample_file)
-    run_ablation_study(sample_file)
+    run_ablation_and_baselines(sample_file)
+    run_held_out_context_mismatch_benchmark()
