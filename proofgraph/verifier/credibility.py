@@ -89,3 +89,6 @@ class SourceCredibilityScorer:
 
         # Default unclassified domain credibility
         return 0.50
+
+    # Backwards-compatible alias
+    score_url = get_credibility

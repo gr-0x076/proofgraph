@@ -5,7 +5,7 @@ from proofgraph.schemas.claim import AtomicClaim
 
 class FIREIterativeDecisionModule:
     """
-    Implements FIRE-style (NAACL 2025) iterative retrieval and dynamic stopping:
+    Implements a lightweight FIRE-inspired iterative retrieval heuristic:
     - Analyzes current evidence coverage against claim entities and predicates.
     - Emits a binary decision: (should_terminate: bool, next_query: Optional[str])
     - If evidence is insufficient or missing key entities, generates a targeted follow-up query.

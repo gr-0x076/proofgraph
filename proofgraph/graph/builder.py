@@ -6,7 +6,7 @@ from proofgraph.schemas.verdict import ClaimVerdict, VeracityLabel
 
 class ProofGraphBuilder:
     """
-    Constructs an auditable W3C PROV-DM knowledge graph using NetworkX.
+    Constructs a NetworkX provenance graph using PROV-DM-inspired entity/activity relations.
     Highlights first-class CONTRADICTION and DISAGREEMENT edges.
     """
     def __init__(self):

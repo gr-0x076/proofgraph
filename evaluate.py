@@ -15,9 +15,11 @@ from collections import Counter, defaultdict
 from typing import List, Dict, Tuple, Any
 import numpy as np
 
+import argparse
 from proofgraph.pipeline import ProofGraphPipeline
 from proofgraph.schemas import EvidencePassage, VeracityLabel, AtomicClaim
-from proofgraph.verifier.nli import NLIVerifier
+from proofgraph.verifier.nli import NLIVerifier, RuleStanceVerifier, HybridNLIVerifier, create_verifier
+from proofgraph.verifier.neural_nli import DebertaNLIVerifier
 from proofgraph.verifier.alignment import RefNLIAlignmentGate
 from proofgraph.verifier.credibility import SourceCredibilityScorer
 from proofgraph.retriever.hybrid_retriever import HybridRetriever
@@ -391,21 +393,26 @@ def run_ablation_and_baselines(sample_path: str):
 
     labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
 
-    pipe_full = ProofGraphPipeline()
+    pipe_rules = ProofGraphPipeline(verifier_backend="rules")
+    pipe_hybrid = ProofGraphPipeline(verifier_backend="hybrid")
     pipe_no_align = ProofGraphPipeline(verifier=NLIVerifier(refnli_gate=RefNLIAlignmentGate(jaccard_threshold=0.0)))
     base_lexical = LexicalHeuristicBaseline()
-    base_dense = DenseSimilarityBaseline(retriever=pipe_full.retriever)
+    base_dense = DenseSimilarityBaseline(retriever=pipe_rules.retriever)
 
     y_true = [map_label(d["label"]) for d in data]
-    preds_full, preds_no_align, preds_lex, preds_dense = [], [], [], []
+    preds_rules, preds_hybrid, preds_no_align, preds_lex, preds_dense = [], [], [], [], []
 
     for item in data:
         claim_text = item["claim"]
         evidence_objs = [EvidencePassage(text=p["text"], source_title="AVeriTeC") for p in item.get("evidence_passages", [])]
 
-        pipe_full.index_corpus(evidence_objs)
-        r1 = pipe_full.verify(claim_text, use_live_web_fallback=False)
-        preds_full.append(r1.verdicts[r1.claims[0].id].label.value if r1.claims else "INSUFFICIENT_EVIDENCE")
+        pipe_rules.index_corpus(evidence_objs)
+        r1 = pipe_rules.verify(claim_text, use_live_web_fallback=False)
+        preds_rules.append(r1.verdicts[r1.claims[0].id].label.value if r1.claims else "INSUFFICIENT_EVIDENCE")
+
+        pipe_hybrid.index_corpus(evidence_objs)
+        r_hyb = pipe_hybrid.verify(claim_text, use_live_web_fallback=False)
+        preds_hybrid.append(r_hyb.verdicts[r_hyb.claims[0].id].label.value if r_hyb.claims else "INSUFFICIENT_EVIDENCE")
 
         pipe_no_align.index_corpus(evidence_objs)
         r2 = pipe_no_align.verify(claim_text, use_live_web_fallback=False)
@@ -414,17 +421,19 @@ def run_ablation_and_baselines(sample_path: str):
         preds_lex.append(base_lexical.verify(claim_text, evidence_objs).value)
         preds_dense.append(base_dense.verify(claim_text, evidence_objs).value)
 
-    m_full = compute_classification_metrics(y_true, preds_full, labels)
+    m_rules = compute_classification_metrics(y_true, preds_rules, labels)
+    m_hybrid = compute_classification_metrics(y_true, preds_hybrid, labels)
     m_no_align = compute_classification_metrics(y_true, preds_no_align, labels)
     m_lex = compute_classification_metrics(y_true, preds_lex, labels)
     m_dense = compute_classification_metrics(y_true, preds_dense, labels)
 
-    print("\n| Configuration                          | Accuracy | Macro-F1 | Precision (Supp) | Precision (Contra) |")
-    print("| :------------------------------------- | :------: | :------: | :--------------: | :----------------: |")
-    print(f"| **ProofGraph Full Pipeline**           | **{m_full['accuracy']*100:.1f}%** |  **{m_full['macro_f1']:.3f}**  |      {m_full['per_class']['SUPPORTED']['precision']:.3f}       |       {m_full['per_class']['CONTRADICTED']['precision']:.3f}        |")
-    print(f"| Ablation: Without Alignment Gate       |  {m_no_align['accuracy']*100:.1f}%  |   {m_no_align['macro_f1']:.3f}  |      {m_no_align['per_class']['SUPPORTED']['precision']:.3f}       |       {m_no_align['per_class']['CONTRADICTED']['precision']:.3f}        |")
-    print(f"| Baseline 1: Dense Similarity (No Gate) |  {m_dense['accuracy']*100:.1f}%  |   {m_dense['macro_f1']:.3f}  |      {m_dense['per_class']['SUPPORTED']['precision']:.3f}       |       {m_dense['per_class']['CONTRADICTED']['precision']:.3f}        |")
-    print(f"| Baseline 2: Lexical Heuristic Baseline |  {m_lex['accuracy']*100:.1f}%  |   {m_lex['macro_f1']:.3f}  |      {m_lex['per_class']['SUPPORTED']['precision']:.3f}       |       {m_lex['per_class']['CONTRADICTED']['precision']:.3f}        |")
+    print("\n| Configuration                          | Accuracy | Macro-F1 | Prec (Supp) | Prec (Contra) | Rec (Contra) |")
+    print("| :------------------------------------- | :------: | :------: | :---------: | :-----------: | :----------: |")
+    print(f"| **ProofGraph Hybrid (Rules + Neural)** | **{m_hybrid['accuracy']*100:.1f}%** |  **{m_hybrid['macro_f1']:.3f}**  |    {m_hybrid['per_class']['SUPPORTED']['precision']:.3f}    |     {m_hybrid['per_class']['CONTRADICTED']['precision']:.3f}     |    **{m_hybrid['per_class']['CONTRADICTED']['recall']:.3f}**   |")
+    print(f"| ProofGraph Rules Alone                 |  {m_rules['accuracy']*100:.1f}%  |   {m_rules['macro_f1']:.3f}  |    {m_rules['per_class']['SUPPORTED']['precision']:.3f}    |     {m_rules['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_rules['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Ablation: Without Alignment Gate       |  {m_no_align['accuracy']*100:.1f}%  |   {m_no_align['macro_f1']:.3f}  |    {m_no_align['per_class']['SUPPORTED']['precision']:.3f}    |     {m_no_align['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_no_align['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Baseline 1: Dense Similarity (No Gate) |  {m_dense['accuracy']*100:.1f}%  |   {m_dense['macro_f1']:.3f}  |    {m_dense['per_class']['SUPPORTED']['precision']:.3f}    |     {m_dense['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_dense['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Baseline 2: Lexical Heuristic Baseline |  {m_lex['accuracy']*100:.1f}%  |   {m_lex['macro_f1']:.3f}  |    {m_lex['per_class']['SUPPORTED']['precision']:.3f}    |     {m_lex['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_lex['per_class']['CONTRADICTED']['recall']:.3f}   |")
     print("=" * 78)
 
 def run_held_out_context_mismatch_benchmark():
@@ -433,7 +442,7 @@ def run_held_out_context_mismatch_benchmark():
     print("=" * 78)
     print("Unit diagnostic inspired by RefNLI reference indeterminacy failure modes (N=20 pairs).")
     print("Disclosure: This is a synthetic stress test, not the full 1,143-pair RefNLI corpus (see docs/DATA_CARD.md).")
-    print("Validating RefNLI gate on held-out pairs with matching predicates/dates but mismatched subjects:")
+    print("Evaluating the alignment gate on this hand-authored synthetic suite (not held out or RefNLI):")
 
     CONTEXT_MISMATCH_BENCHMARK = [
         # 10 Aligned Pairs (Ground Truth: Supported)
@@ -495,12 +504,18 @@ def run_held_out_context_mismatch_benchmark():
     print("=" * 78)
 
 if __name__ == "__main__":
-    sample_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "benchmarks", "averitec_dev_sample.json")
-    full_pipe = ProofGraphPipeline()
+    parser = argparse.ArgumentParser(description="ProofGraph Benchmark & Diagnostic Evaluation Suite")
+    parser.add_argument("--backend", choices=["rules", "hybrid", "neural", "all"], default="all", help="Verifier backend to evaluate")
+    parser.add_argument("--sample-file", default=None, help="Path to AVeriTeC sample JSON")
+    args = parser.parse_args()
+
+    sample_file = args.sample_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "benchmarks", "averitec_dev_sample.json")
+    selected_backend = "hybrid" if args.backend in ("hybrid", "all") else args.backend
+    eval_pipe = ProofGraphPipeline(verifier_backend=selected_backend)
     base_lexical = LexicalHeuristicBaseline()
 
-    run_diagnostic_suite(full_pipe, base_lexical)
+    run_diagnostic_suite(eval_pipe, base_lexical)
     run_evidence_retrieval_benchmark(sample_file)
-    run_averitec_benchmark(full_pipe, sample_file)
+    run_averitec_benchmark(eval_pipe, sample_file)
     run_ablation_and_baselines(sample_file)
     run_held_out_context_mismatch_benchmark()

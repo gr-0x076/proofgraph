@@ -40,3 +40,8 @@ data/cache/
 # Sensitive environment variables
 .env
 .env.local
+
+# Pytest & Coverage
+.coverage
+.pytest_cache/
+htmlcov/

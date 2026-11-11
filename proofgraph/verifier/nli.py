@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Optional, Dict, Any
 from proofgraph.schemas.claim import AtomicClaim
 from proofgraph.schemas.evidence import EvidencePassage
 from proofgraph.schemas.verdict import VeracityLabel, ClaimVerdict
@@ -22,10 +22,11 @@ class RuleStanceVerifier:
 
     # Negation and refutation keywords
     REFUTATION_MARKERS = [
-
-        r"\b(?:not|never|neither|nor|falsely|incorrectly|debunked|denied|refuted|untrue|fake)\b",
-        r"\b(?:failed to|did not|was not|were not|is not|are not|no evidence)\b",
-        r"\b(?:contrary to|disproven|disputed|misleading|hoax|myth)\b"
+        r"\b(?:not|never|neither|nor|falsely|incorrectly|wrongly|debunked|denied|refuted|untrue|fake)\b",
+        r"\b(?:failed to|did not|was not|were not|is not|are not|no evidence|no proof)\b",
+        r"\b(?:contrary to|disproven|disputed|misleading|hoax|myth|satire|satirical|parody)\b",
+        r"\b(?:imaginary|fictional|fictitious|fabricated|unfounded|baseless|unsubstantiated)\b",
+        r"\b(?:misattributed|out of context)\b"
     ]
 
     # Hedging / speculation markers (reduces entailment confidence)
@@ -181,8 +182,8 @@ class RuleStanceVerifier:
 
     def verify_claim(self, claim: AtomicClaim, evidence_list: List[EvidencePassage]) -> ClaimVerdict:
         """
-        Aggregates evidence for a single atomic claim, applying source credibility weights
-        and RefNLI gates to produce a definitive calibrated ClaimVerdict.
+        Aggregates evidence for a single atomic claim using lexical rules, an alignment
+        filter, and a static source prior. Returned scores are not calibrated probabilities.
         """
         if not claim.is_verifiable:
             return ClaimVerdict(
@@ -215,7 +216,7 @@ class RuleStanceVerifier:
             stance, raw_conf, reason = self._assess_pairwise(claim, ev)
             reasons.append(f"[{ev.source_title}]: {stance} (cred: {cred:.2f}) - {reason}")
             
-            # CONFACT Weighted Vote: confidence * source_credibility * retrieval_relevance
+            # Heuristic weighted vote: rule score * static source prior * retrieval signal.
             weighted_score = raw_conf * cred * max(0.4, ev.relevance_score)
             
             if stance == "SUPPORT":
@@ -257,3 +258,69 @@ class RuleStanceVerifier:
 # Backward-compatibility alias
 NLIVerifier = RuleStanceVerifier
 
+class HybridNLIVerifier:
+    """
+    Ensemble Hybrid Verifier:
+    1. Evaluates deterministic high-precision rule guardrails (numeric, geographical, entity, negation).
+    2. If rule verifier establishes a decisive verdict (SUPPORTED or CONTRADICTED), it is retained.
+    3. If rule verifier abstains (INSUFFICIENT_EVIDENCE), queries the ONNX Neural Cross-Encoder
+       (DeBERTa-v3) to perform deep semantic inference, significantly boosting contradiction recall.
+    4. Falls back to RuleStanceVerifier if neural model weights are not initialized or in offline mode.
+    """
+    def __init__(
+        self,
+        refnli_gate: Optional[RefNLIAlignmentGate] = None,
+        credibility_scorer: Optional[SourceCredibilityScorer] = None,
+        prefer_offline: bool = False
+    ):
+        self.alignment_gate = refnli_gate or RefNLIAlignmentGate()
+        self.credibility_scorer = credibility_scorer or SourceCredibilityScorer()
+        self.rule_verifier = RuleStanceVerifier(
+            refnli_gate=self.alignment_gate,
+            credibility_scorer=self.credibility_scorer
+        )
+        self.prefer_offline = prefer_offline
+        self._neural_verifier = None
+
+    @property
+    def neural_verifier(self):
+        if self._neural_verifier is None and not self.prefer_offline:
+            try:
+                from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+                self._neural_verifier = DebertaNLIVerifier(
+                    refnli_gate=self.alignment_gate,
+                    credibility_scorer=self.credibility_scorer
+                )
+            except Exception:
+                self._neural_verifier = None
+        return self._neural_verifier
+
+    def verify_claim(self, claim: AtomicClaim, evidence_passages: List[EvidencePassage]) -> ClaimVerdict:
+        # 1. First run deterministic rule-based verification
+        rule_verdict = self.rule_verifier.verify_claim(claim, evidence_passages)
+
+        if rule_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED):
+            return rule_verdict
+
+        # 2. If rules abstained, consult neural cross-encoder if available
+        if self.neural_verifier and self.neural_verifier.is_available:
+            neural_verdict = self.neural_verifier.verify_claim(claim, evidence_passages)
+            if neural_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED):
+                return neural_verdict
+
+        return rule_verdict
+
+def create_verifier(backend: str = "rules", **kwargs):
+    """
+    Factory function for instantiating an NLI Verifier:
+    - 'rules' (default): 100% offline deterministic rule-based verifier.
+    - 'neural': Trained DeBERTa-v3 cross-encoder running via ONNX Runtime.
+    - 'hybrid': High-precision rules with neural fallback on abstention.
+    """
+    backend = (backend or "rules").lower()
+    if backend == "neural":
+        from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+        return DebertaNLIVerifier(**kwargs)
+    elif backend == "hybrid":
+        return HybridNLIVerifier(**kwargs)
+    return RuleStanceVerifier(**kwargs)

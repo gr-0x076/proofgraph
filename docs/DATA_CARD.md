@@ -72,5 +72,35 @@ In standard Fact Extraction and VERification (FEVER) and Natural Language Infere
 * **Evidence Provenance Guarantee:**
   * All retrieved passages preserve the exact source URL, HTTP status code, domain name, and ISO retrieval timestamp in `EvidencePassage.metadata`.
   * Dynamic lexical-semantic relevance scoring is calculated based on query token overlap and ranked search position (no invented URLs or static relevance scores).
-* **Evaluation Decoupling:** All benchmark runs in `evaluate.py` execute with `use_live_web_fallback=False` to ensure 100% deterministic, offline-reproducible benchmark measurements. Live TinyFish retrieval is validated via the opt-in pytest smoke test (`test_live_tinyfish_search_api_if_keyed`) and interactive executions of `demo.py`.
+* **Evaluation Decoupling:** All benchmark runs in `evaluate.py` execute with `use_live_web_fallback=False` to ensure 100% deterministic, offline-reproducible benchmark measurements. Live TinyFish retrieval is validated separately via the dedicated live evaluation suite (`evaluate_live.py`) and the opt-in pytest smoke test (`test_live_tinyfish_search_api_if_keyed`).
+
+---
+
+## 4. Neural Cross-Encoder Model Card: `DebertaNLIVerifier`
+
+### 4.1 Architecture & Runtime
+* **Base Model:** `Xenova/nli-deberta-v3-xsmall` (HuggingFace Hub)
+* **Underlying Architecture:** DeBERTa-v3 cross-encoder fine-tuned for Natural Language Inference (MNLI / SNLI).
+* **Format & Execution Engine:** Quantized ONNX (`model.onnx`, 83.3 MB) executed via `onnxruntime` and Rust-backed `tokenizers`.
+* **Zero-PyTorch Guarantee:** Runs on standard CPU architectures without PyTorch, torch-vision, CUDA, or heavy C++ build toolchains.
+* **Inference Latency:** Sub-10ms per premise-hypothesis pair on modern 4-core CPUs.
+* **Stance Output:** 3-way softmax distribution over `[CONTRADICTION, ENTAILMENT, NEUTRAL]`.
+
+### 4.2 Guardrails & Pre-Filtering
+* **Context Alignment Gate (`RefNLIAlignmentGate`):** Evaluated strictly *prior* to neural cross-encoder execution. Unaligned premise-hypothesis pairs (e.g., distinct named individuals sharing dates or verbs) are intercepted and marked `Context Mismatch`, bypassing neural inference to prevent reference-indeterminacy false refutations.
+* **Domain Credibility Prior Fusion (`SourceCredibilityScorer`):** Softmax probabilities are modulated by static domain authority priors ($[0.0, 1.0]$) and normalized retrieval relevance ($[0.0, 1.0]$).
+
+---
+
+## 5. Dedicated Live TinyFish Benchmark Suite (`evaluate_live.py`)
+
+### 5.1 Purpose & Methodology
+To rigorously evaluate the live TinySearch $\rightarrow$ TinyFetch pipeline independently of synthetic or offline corpora, `evaluate_live.py` executes 10 diverse real-world claims against live endpoints (`api.search.tinyfish.ai` and `api.fetch.tinyfish.ai`).
+
+### 5.2 Metrics Measured
+* **Retrieval Coverage:** Proportion of claims for which live search returns $\ge 1$ relevant URL.
+* **Page Fetch Success Rate:** Proportion of target URLs successfully rendered into markdown via Chromium.
+* **Latency Profile:** Individual breakdown of query dispatch, search round-trip, and page fetch durations.
+* **Source Quality:** Canonical domain credibility scores and content excerpt lengths.
+* **Output Artifact:** Persisted as a self-contained, auditable Markdown report at [`outputs/tinyfish_live_evaluation.md`](../outputs/tinyfish_live_evaluation.md).
 

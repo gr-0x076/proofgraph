@@ -1,9 +1,15 @@
 from proofgraph.verifier.alignment import RefNLIAlignmentGate
 from proofgraph.verifier.credibility import SourceCredibilityScorer
-from proofgraph.verifier.nli import NLIVerifier
+from proofgraph.verifier.nli import NLIVerifier, RuleStanceVerifier, HybridNLIVerifier, create_verifier
+from proofgraph.verifier.neural_nli import DebertaNLIVerifier
 
-# Explicit alias for transparent component naming
-RuleStanceVerifier = NLIVerifier
-
-__all__ = ["RefNLIAlignmentGate", "SourceCredibilityScorer", "NLIVerifier", "RuleStanceVerifier"]
+__all__ = [
+    "RefNLIAlignmentGate",
+    "SourceCredibilityScorer",
+    "NLIVerifier",
+    "RuleStanceVerifier",
+    "DebertaNLIVerifier",
+    "HybridNLIVerifier",
+    "create_verifier"
+]
 

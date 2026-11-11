@@ -4,7 +4,7 @@ from proofgraph.schemas.claim import AtomicClaim
 
 class ClaimDecomposer:
     """
-    Implements a Claimify-style 4-stage proposition extractor:
+    Implements a lightweight Claimify-inspired heuristic proposition splitter:
     1. Sentence segmentation with abbreviation protection
     2. Verifiability filtering
     3. Referential ambiguity detection

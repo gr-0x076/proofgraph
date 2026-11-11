@@ -5,7 +5,7 @@ from proofgraph.pipeline import ProofGraphPipeline
 
 def main():
     parser = argparse.ArgumentParser(
-        description="ProofGraph: Autonomous AI Evidence Intelligence & Claim Verification Engine"
+        description="ProofGraph: evidence-backed claim review prototype"
     )
     parser.add_argument(
         "--text", "-t",
@@ -60,8 +60,11 @@ def main():
     for idx, c in enumerate(result.claims, 1):
         v = result.verdicts.get(c.id)
         label = v.label.value if v else "UNVERIFIED"
-        conf = f"{v.confidence * 100:.1f}%" if v else "N/A"
+        conf = f"{v.confidence * 100:.1f}% (uncalibrated rule score)" if v else "N/A"
         print(f"     [{idx}] [{label}] ({conf}) {c.text}")
+        for passage in result.evidence_map.get(c.id, []):
+            method = passage.metadata.get("retrieval_method", "local")
+            print(f"         Evidence: {passage.source_title} | via {method} | {passage.source_url or '(no URL)'}")
 
     print(f"\n📁 Outputs saved to '{os.path.abspath(args.output)}':")
     print(f"   • Audit Report: {os.path.abspath(os.path.join(args.output, 'report.md'))}")

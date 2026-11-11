@@ -1,8 +1,10 @@
 import os
 import re
 import json
+import ipaddress
 import urllib.request
 import urllib.parse
+import time
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 
@@ -10,18 +12,16 @@ from proofgraph.schemas.evidence import EvidencePassage
 
 class TinyFishWebAgent:
     """
-    Production TinyFish Web Infrastructure & Agent Integration:
-    Connects to the TinyFish Platform (https://tinyfish.ai):
+    TinyFish Search and Fetch integration:
     - TinySearch API (api.search.tinyfish.ai): Real-time structured search results.
     - TinyFetch API (api.fetch.tinyfish.ai): Chromium page rendering and clean markdown extraction.
-    - TinyAgent API (agent.tinyfish.ai): Multi-step workflow automation.
     
-    Provides transparent error tracking, actual source URLs, verified domains,
-    and dynamic relevance scoring (eliminating invented URLs or static relevance scores).
+    Searches for candidate pages, fetches their rendered content, and preserves
+    the source URL/title returned by TinyFish. The relevance value is a lexical
+    retrieval proxy, not a calibrated probability or semantic relevance model.
     """
     SEARCH_ENDPOINT = "https://api.search.tinyfish.ai"
     FETCH_ENDPOINT = "https://api.fetch.tinyfish.ai"
-    AGENT_ENDPOINT = "https://agent.tinyfish.ai/v1/automation/run"
 
     def __init__(self, api_key: Optional[str] = None, timeout_seconds: int = 15):
         self.api_key = api_key if api_key is not None else os.environ.get("TINYFISH_API_KEY")
@@ -37,15 +37,109 @@ class TinyFishWebAgent:
         return bool(self.api_key and self.api_key.startswith("sk-tinyfish"))
 
     def _calculate_lexical_relevance(self, query: str, text: str, rank_pos: int = 0) -> float:
-        """Computes a dynamic relevance score in [0.40, 0.95] based on token overlap and rank."""
-        q_tokens = set(re.findall(r'\w+', query.lower()))
-        t_tokens = set(re.findall(r'\w+', text.lower()))
+        """Return a transparent lexical-overlap/rank proxy in [0, 1], not confidence."""
+        q_tokens = {t for t in re.findall(r'\w+', query.lower()) if len(t) > 2}
+        t_tokens = {t for t in re.findall(r'\w+', text.lower()) if len(t) > 2}
         if not q_tokens or not t_tokens:
-            return 0.50
+            return 0.0
         overlap = len(q_tokens.intersection(t_tokens)) / float(len(q_tokens))
-        rank_discount = 1.0 / (1.0 + 0.1 * rank_pos)
-        score = 0.40 + 0.55 * (0.7 * overlap + 0.3 * rank_discount)
-        return round(float(min(0.98, max(0.40, score))), 3)
+        rank_signal = 1.0 / (1.0 + max(0, rank_pos))
+        score = 0.8 * overlap + 0.2 * rank_signal
+        return round(float(min(1.0, max(0.0, score))), 3)
+
+    @staticmethod
+    def _valid_public_http_url(url: str) -> bool:
+        """Reject malformed, credential-bearing, localhost, and literal private URLs."""
+        try:
+            parsed = urllib.parse.urlsplit(url)
+            if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password:
+                return False
+            host = parsed.hostname.rstrip(".").lower()
+            if host == "localhost" or host.endswith((".localhost", ".local", ".internal")):
+                return False
+            try:
+                addr = ipaddress.ip_address(host)
+            except ValueError:
+                return True
+            return addr.is_global
+        except (TypeError, ValueError):
+            return False
+
+    def _post_fetch(self, urls: List[str]) -> Dict[str, Any]:
+        """Fetch a bounded URL batch, retaining per-URL API errors in status metadata."""
+        urls = [u for u in urls[:10] if self._valid_public_http_url(u)]
+        if not urls:
+            self.last_status = "invalid_or_empty_urls"
+            self.last_error_message = "No valid public HTTP(S) URLs to fetch"
+            return {"results": [], "errors": []}
+        headers = {
+            "X-API-Key": self.api_key,
+            "Content-Type": "application/json",
+            "User-Agent": "ProofGraph-FactChecker/1.0",
+        }
+        payload = {"urls": urls, "format": "markdown", "ttl": 0}
+        try:
+            req = urllib.request.Request(
+                self.FETCH_ENDPOINT,
+                headers=headers,
+                data=json.dumps(payload).encode("utf-8"),
+                method="POST",
+            )
+            with self._open_with_retry(req) as resp:
+                self.last_error_code = resp.status
+                data = json.loads(resp.read().decode("utf-8"))
+            if not isinstance(data, dict) or not isinstance(data.get("results", []), list):
+                self.last_status = "invalid_response"
+                self.last_error_message = "TinyFetch returned an unexpected response shape"
+                return {"results": [], "errors": []}
+            errors = data.get("errors", [])
+            self.last_status = "partial_fetch_errors" if errors else "success"
+            self.last_error_message = f"TinyFetch reported {len(errors)} per-URL error(s)" if errors else None
+            return data
+        except urllib.error.HTTPError as exc:
+            self.last_status = f"http_error_{exc.code}"
+            self.last_error_code = exc.code
+            self.last_error_message = f"TinyFetch returned HTTP {exc.code}"
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            self.last_status = "network_exception"
+            self.last_error_message = str(exc)
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
+            self.last_status = "invalid_response"
+            self.last_error_message = str(exc)
+        except Exception as exc:
+            self.last_status = "request_exception"
+            self.last_error_message = str(exc)
+        return {"results": [], "errors": []}
+
+    def _open_with_retry(self, request):
+        """Retry only transient 429/503 responses, with a short bounded backoff."""
+        for attempt in range(3):
+            try:
+                return urllib.request.urlopen(request, timeout=self.timeout)
+            except urllib.error.HTTPError as exc:
+                if exc.code not in {429, 503} or attempt == 2:
+                    raise
+                try:
+                    delay = float((exc.headers or {}).get("Retry-After", 0))
+                except (AttributeError, TypeError, ValueError):
+                    delay = 0.25 * (2 ** attempt)
+                time.sleep(min(max(delay, 0.0), 2.0))
+        raise RuntimeError("TinyFish request retry loop exhausted")
+
+    @staticmethod
+    def _best_excerpt(text: str, query: str, max_chars: int = 1600) -> str:
+        """Select a verbatim paragraph with the best query-term coverage."""
+        paragraphs = [p.strip() for p in re.split(r"\n\s*\n", text or "") if len(p.strip()) >= 15]
+        if not paragraphs:
+            return ""
+        terms = {t for t in re.findall(r"\w+", query.lower()) if len(t) > 2}
+        if terms:
+            paragraphs.sort(
+                key=lambda p: len(terms.intersection(re.findall(r"\w+", p.lower()))) / len(terms),
+                reverse=True,
+            )
+        excerpt = paragraphs[0]
+        return excerpt[:max_chars].strip()
 
     def search_web(self, query: str, max_results: int = 3) -> List[EvidencePassage]:
         """
@@ -66,12 +160,16 @@ class TinyFishWebAgent:
 
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            with self._open_with_retry(req) as resp:
                 self.last_error_code = resp.status
                 if resp.status == 200:
                     data = json.loads(resp.read().decode("utf-8"))
                     self.last_status = "success"
                     self.last_error_message = None
+                    if not isinstance(data, dict) or not isinstance(data.get("results", []), list):
+                        self.last_status = "invalid_response"
+                        self.last_error_message = "TinySearch returned an unexpected response shape"
+                        return []
                     return self._parse_search_results(data, query, max_results)
                 else:
                     self.last_status = f"http_error_{resp.status}"
@@ -82,8 +180,16 @@ class TinyFishWebAgent:
             self.last_error_code = e.code
             self.last_error_message = str(e)
             return []
-        except Exception as e:
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
             self.last_status = "network_exception"
+            self.last_error_message = str(e)
+            return []
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError, TypeError) as e:
+            self.last_status = "invalid_response"
+            self.last_error_message = str(e)
+            return []
+        except Exception as e:
+            self.last_status = "request_exception"
             self.last_error_message = str(e)
             return []
 
@@ -101,10 +207,11 @@ class TinyFishWebAgent:
                 continue
 
             # Validate real HTTP/HTTPS URL
-            if not (src_url.startswith("http://") or src_url.startswith("https://")):
+            if not self._valid_public_http_url(src_url):
                 continue
 
-            domain = urllib.parse.urlparse(src_url).netloc
+            # Official TinySearch API provides results[].domain
+            domain = item.get("domain") or item.get("site_name") or urllib.parse.urlparse(src_url).netloc
             relevance = self._calculate_lexical_relevance(query, f"{title} {snippet}", rank_pos=idx)
 
             passages.append(
@@ -117,7 +224,9 @@ class TinyFishWebAgent:
                     relevance_score=relevance,
                     metadata={
                         "retrieval_method": "tinyfish_search",
+                        "relevance_method": "lexical_overlap_and_search_rank_proxy",
                         "position": item.get("position", idx + 1),
+                        "domain": domain,
                         "site_name": item.get("site_name", domain),
                         "timestamp": datetime.now(timezone.utc).isoformat()
                     }
@@ -129,28 +238,11 @@ class TinyFishWebAgent:
     def fetch_page_content(self, url: str) -> Optional[str]:
         """Fetches and renders full clean text from a URL using TinyFetch API."""
         if not self.is_available:
+            self.last_status = "unconfigured_key"
             return None
-        headers = {
-            "X-API-Key": self.api_key,
-            "Content-Type": "application/json",
-            "User-Agent": "ProofGraph-FactChecker/1.0"
-        }
-        payload = {"urls": [url]}
-        try:
-            req = urllib.request.Request(
-                self.FETCH_ENDPOINT,
-                headers=headers,
-                data=json.dumps(payload).encode("utf-8")
-            )
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                if resp.status == 200:
-                    data = json.loads(resp.read().decode("utf-8"))
-                    results = data.get("results", [])
-                    if results:
-                        return results[0].get("text")
-        except Exception:
-            pass
-        return None
+        data = self._post_fetch([url])
+        results = data.get("results", [])
+        return results[0].get("text") if results and isinstance(results[0], dict) else None
 
     def research_claim_on_web(
         self,
@@ -169,67 +261,50 @@ class TinyFishWebAgent:
             return []
 
         if target_url:
-            content = self.fetch_page_content(target_url)
-            if content:
-                domain = urllib.parse.urlparse(target_url).netloc
-                excerpt = content[:500].strip()
-                relevance = self._calculate_lexical_relevance(claim_text, excerpt)
-                return [
-                    EvidencePassage(
-                        id="tinyfish_fetch_1",
-                        text=excerpt,
-                        source_url=target_url,
-                        source_domain=domain,
-                        source_title=f"TinyFetch: {domain}",
-                        relevance_score=relevance,
-                        metadata={"retrieval_method": "tinyfish_fetch"}
-                    )
-                ]
+            data = self._post_fetch([target_url])
+            fetched = self._passages_from_fetch(data, claim_text)
+            if fetched:
+                return fetched
+            return []
 
-        # Use TinySearch to discover candidate pages
-        return self.search_web(claim_text, max_results=max_evidence)
+        # Search, then fetch the discovered pages so the verifier receives page text,
+        # not only search snippets. Keep snippets as an explicit fallback on fetch failure.
+        search_hits = self.search_web(claim_text, max_results=min(max_evidence, 10))
+        if not search_hits:
+            return []
+        fetched_data = self._post_fetch([p.source_url for p in search_hits if p.source_url])
+        fetched = self._passages_from_fetch(fetched_data, claim_text)
+        if fetched:
+            return fetched[:max_evidence]
+        if self.last_status in {"success", "partial_fetch_errors"}:
+            self.last_status = "fetch_no_extractable_content"
+            self.last_error_message = "TinyFetch returned no usable page text; returning TinySearch snippets"
+        return search_hits[:max_evidence]
 
-    def _parse_agent_response(
-        self,
-        response_data: Dict[str, Any],
-        claim_text: str,
-        fallback_url: str = ""
-    ) -> List[EvidencePassage]:
-        """Parses structured JSON output returned by TinyFish Agent or mock payloads into EvidencePassages."""
+    def _passages_from_fetch(self, data: Dict[str, Any], query: str) -> List[EvidencePassage]:
         passages: List[EvidencePassage] = []
-        result = response_data.get("result") or response_data.get("output") or {}
-
-        items = result.get("evidence", []) if isinstance(result, dict) else []
-        if isinstance(result, str) and result.strip():
-            items = [{"text": result.strip(), "source_title": "TinyFish Web Finding"}]
-
-        for idx, item in enumerate(items[:5]):
-            text = item.get("text") if isinstance(item, dict) else str(item)
-            if not text or len(text.strip()) < 15:
+        for idx, item in enumerate(data.get("results", [])[:10]):
+            if not isinstance(item, dict):
                 continue
-
-            src_url = item.get("url", fallback_url) if isinstance(item, dict) else fallback_url
-            src_title = item.get("source_title", "TinyFish Research") if isinstance(item, dict) else "TinyFish Research"
-            
-            domain = ""
-            if src_url:
-                try:
-                    domain = urllib.parse.urlparse(src_url).netloc
-                except Exception:
-                    pass
-
-            relevance = self._calculate_lexical_relevance(claim_text, text, rank_pos=idx)
-
-            passages.append(
-                EvidencePassage(
-                    id=f"tinyfish_{idx+1}",
-                    text=text.strip(),
-                    source_url=src_url,
-                    source_domain=domain,
-                    source_title=src_title,
-                    relevance_score=relevance,
-                    metadata={"retrieval_method": "tinyfish_agent"}
-                )
-            )
-
+            text = self._best_excerpt(item.get("text", ""), query)
+            source_url = item.get("final_url") or item.get("url") or ""
+            if len(text) < 15 or not self._valid_public_http_url(source_url):
+                continue
+            domain = urllib.parse.urlsplit(source_url).hostname or "unknown"
+            title = item.get("title") or domain
+            passages.append(EvidencePassage(
+                id=f"tinyfish_fetch_{idx + 1}",
+                text=text,
+                source_url=source_url,
+                source_domain=domain,
+                source_title=title,
+                relevance_score=self._calculate_lexical_relevance(query, text, idx),
+                metadata={
+                    "retrieval_method": "tinyfish_fetch",
+                    "requested_url": item.get("url"),
+                    "final_url": item.get("final_url"),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "relevance_method": "lexical_overlap_and_search_rank_proxy",
+                },
+            ))
         return passages

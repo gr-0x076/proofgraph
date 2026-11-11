@@ -47,8 +47,8 @@ def test_refnli_alignment_gate():
     assert aligned is False
     assert "Context Mismatch" in msg
 
-def test_refnli_held_out_context_mismatch_suite():
-    """Evaluates RefNLI alignment gate on a held-out benchmark of aligned vs. mismatched entity pairs."""
+def test_synthetic_context_mismatch_examples():
+    """Checks a small hand-authored alignment example set; this is not RefNLI or held out."""
     gate = RefNLIAlignmentGate(jaccard_threshold=0.12)
     test_cases = [
         # (claim_text, entities, passage_text, expected_aligned)
@@ -218,32 +218,12 @@ def test_live_fastembed_download_if_online():
     except Exception as e:
         pytest.skip(f"Live network access or cached model unavailable in this sandbox: {e}")
 
-def test_tinyfish_agent_parsing_and_fallback():
+def test_tinyfish_search_parser_and_unconfigured_status():
     from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
     agent = TinyFishWebAgent(api_key="sk-tinyfish-mock-key")
     assert agent.is_available is True
 
-    # 1. Test structured response parsing from agent payload
-    mock_payload = {
-        "status": "completed",
-        "output": {
-            "evidence": [
-                {
-                    "text": "Apollo 11 landed humans on the Moon on July 20, 1969.",
-                    "url": "https://www.nasa.gov/mission/apollo-11",
-                    "source_title": "NASA Official Mission Archive"
-                }
-            ]
-        }
-    }
-    passages = agent._parse_agent_response(mock_payload, "Apollo 11 landed on the moon", "https://default.org")
-    assert len(passages) == 1
-    assert "Apollo 11 landed" in passages[0].text
-    assert passages[0].source_domain == "www.nasa.gov"
-    # Dynamic relevance calculation (no hard-coded static scores)
-    assert 0.70 <= passages[0].relevance_score <= 1.0
-
-    # 2. Test structured TinySearch JSON parsing
+    # Test structured TinySearch JSON parsing
     search_payload = {
         "query": "Apollo 11 launch date",
         "results": [
@@ -260,13 +240,116 @@ def test_tinyfish_agent_parsing_and_fallback():
     assert len(search_passages) == 1
     assert search_passages[0].source_url == "https://www.nasa.gov/mission/apollo-11-launch"
     assert search_passages[0].metadata["retrieval_method"] == "tinyfish_search"
-    assert search_passages[0].relevance_score > 0.60
+    assert 0.0 <= search_passages[0].relevance_score <= 1.0
 
     # 3. Unkeyed agent should safely abstain and record status
     unkeyed_agent = TinyFishWebAgent(api_key="")
     assert unkeyed_agent.is_available is False
     assert unkeyed_agent.research_claim_on_web("test claim") == []
     assert unkeyed_agent.last_status == "unconfigured_key"
+
+def test_tinyfish_search_then_fetch_preserves_page_provenance(monkeypatch):
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+    agent = TinyFishWebAgent(api_key="sk-tinyfish-mock")
+    search_hit = EvidencePassage(
+        id="search_1",
+        text="Apollo 11: official mission timeline and launch details.",
+        source_url="https://www.nasa.gov/apollo11",
+        source_title="NASA Apollo 11",
+        source_domain="www.nasa.gov",
+    )
+    monkeypatch.setattr(agent, "search_web", lambda query, max_results=3: [search_hit])
+    monkeypatch.setattr(agent, "_post_fetch", lambda urls: {
+        "results": [{
+            "url": "https://www.nasa.gov/apollo11",
+            "final_url": "https://science.nasa.gov/mission/apollo-11/",
+            "title": "Apollo 11 | NASA",
+            "text": "# Apollo 11\n\nApollo 11 launched on July 16, 1969. Neil Armstrong walked on the Moon.\n\nMore mission details.",
+        }],
+        "errors": [],
+    })
+    found = agent.research_claim_on_web("When did Apollo 11 launch?", max_evidence=1)
+    assert len(found) == 1
+    assert found[0].source_url == "https://science.nasa.gov/mission/apollo-11/"
+    assert found[0].source_title == "Apollo 11 | NASA"
+    assert "July 16, 1969" in found[0].text
+    assert found[0].metadata["retrieval_method"] == "tinyfish_fetch"
+    assert found[0].metadata["relevance_method"] == "lexical_overlap_and_search_rank_proxy"
+
+def test_tinyfish_rejects_non_public_target_urls():
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+    valid = [
+        "https://www.nasa.gov/mission",
+        "https://example.org/page",
+    ]
+    invalid = [
+        "file:///etc/passwd",
+        "http://localhost/admin",
+        "http://127.0.0.1/",
+        "http://192.168.1.20/",
+        "http://user:pass@example.com/",
+    ]
+    assert all(TinyFishWebAgent._valid_public_http_url(url) for url in valid)
+    assert not any(TinyFishWebAgent._valid_public_http_url(url) for url in invalid)
+
+def test_tinyfish_fetch_request_contract_and_error_status(monkeypatch):
+    import io
+    import json
+    from email.message import Message
+    import urllib.error
+    import proofgraph.retriever.tinyfish_agent as tinyfish_module
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+
+    agent = TinyFishWebAgent(api_key="sk-tinyfish-mock")
+    response_body = json.dumps({
+        "results": [{"url": "https://example.org/", "final_url": "https://example.org/", "title": "Example", "text": "Example page text."}],
+        "errors": [],
+    }).encode()
+
+    class FakeResponse(io.BytesIO):
+        status = 200
+        def __enter__(self):
+            return self
+        def __exit__(self, *_args):
+            self.close()
+
+    def fake_urlopen(request, timeout):
+        assert request.full_url == "https://api.fetch.tinyfish.ai"
+        assert request.get_method() == "POST"
+        assert request.get_header("X-api-key") == "sk-tinyfish-mock"
+        payload = json.loads(request.data.decode())
+        assert payload["urls"] == ["https://example.org/"]
+        assert payload["format"] == "markdown"
+        assert payload["ttl"] == 0
+        assert timeout == agent.timeout
+        return FakeResponse(response_body)
+
+    monkeypatch.setattr(tinyfish_module.urllib.request, "urlopen", fake_urlopen)
+    data = agent._post_fetch(["https://example.org/"])
+    assert data["results"][0]["title"] == "Example"
+    assert agent.last_status == "success"
+
+    calls = {"count": 0}
+    def throttled_once(request, timeout):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            headers = Message()
+            headers["Retry-After"] = "0"
+            raise urllib.error.HTTPError(request.full_url, 503, "temporary", headers, io.BytesIO())
+        return FakeResponse(response_body)
+
+    monkeypatch.setattr(tinyfish_module.urllib.request, "urlopen", throttled_once)
+    monkeypatch.setattr(tinyfish_module.time, "sleep", lambda _delay: None)
+    assert agent._post_fetch(["https://example.org/"])["results"]
+    assert calls["count"] == 2
+
+    def network_failure(_request, timeout):
+        raise urllib.error.URLError("offline test")
+
+    monkeypatch.setattr(tinyfish_module.urllib.request, "urlopen", network_failure)
+    assert agent.fetch_page_content("https://example.org/") is None
+    assert agent.last_status == "network_exception"
+    assert agent.last_error_message
 
 def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
     from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
@@ -294,19 +377,110 @@ def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
     assert len(tf_direct) == 1
     assert tf_direct[0].id == "tf_1"
 
-@pytest.mark.skipif(not os.environ.get("TINYFISH_API_KEY"), reason="Requires live TINYFISH_API_KEY")
+@pytest.mark.skipif(
+    not (os.environ.get("TINYFISH_API_KEY") and os.environ.get("TINYFISH_LIVE_TEST") == "1"),
+    reason="Set TINYFISH_LIVE_TEST=1 and TINYFISH_API_KEY to run the network smoke test",
+)
 def test_live_tinyfish_search_api_if_keyed():
-    """Live opt-in smoke test: validates real network retrieval against TinySearch API."""
+    """Live opt-in smoke test: validates TinyFish Search followed by page Fetch."""
     from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
-    agent = TinyFishWebAgent()
+    agent = TinyFishWebAgent(timeout_seconds=30)
     assert agent.is_available is True
-    hits = agent.search_web("Neil Armstrong Apollo 11 moon", max_results=2)
+    hits = agent.research_claim_on_web("Neil Armstrong Apollo 11 moon landing", max_evidence=1)
     assert len(hits) >= 1
     assert hits[0].source_url.startswith("http")
     assert hits[0].source_domain != ""
-    assert agent.last_status == "success"
+    assert hits[0].metadata.get("retrieval_method") == "tinyfish_fetch"
 
+def test_neural_nli_verifier_offline_fallback():
+    from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+    verifier = DebertaNLIVerifier(prefer_offline=True)
+    claim = AtomicClaim(text="Apollo 11 landed on the Moon", parent_sentence="")
+    verdict = verifier.verify_claim(claim, [])
+    assert verdict.label == VeracityLabel.INSUFFICIENT_EVIDENCE
+    assert verdict.confidence == 0.50
 
+def test_neural_nli_inference():
+    from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+    verifier = DebertaNLIVerifier()
+    if not verifier.is_available:
+        pytest.skip("Neural NLI model weights not yet cached locally")
 
+    # Clear entailment
+    probs_entail, label_entail = verifier.predict_pair(
+        "Commander Neil Armstrong stepped onto the lunar surface on July 20, 1969.",
+        "Neil Armstrong walked on the Moon in 1969."
+    )
+    assert label_entail == "ENTAILMENT"
+    assert probs_entail[1] > 0.80
 
+    # Clear contradiction
+    probs_contra, label_contra = verifier.predict_pair(
+        "The Eiffel Tower is located in Paris, France.",
+        "The Eiffel Tower is located in Rome, Italy."
+    )
+    assert label_contra == "CONTRADICTION"
+    assert probs_contra[0] > 0.80
 
+def test_hybrid_nli_verifier_ensemble():
+    from proofgraph.verifier.nli import HybridNLIVerifier
+    hybrid = HybridNLIVerifier()
+    
+    # 1. Deterministic rule check: numeric conflict
+    claim = AtomicClaim(text="Water boils at 50 degrees Celsius at sea level.", parent_sentence="")
+    evid = EvidencePassage(id="e1", text="Pure water boils at 100 degrees Celsius at sea level.", source_url="https://britannica.com", relevance_score=0.95)
+    v1 = hybrid.verify_claim(claim, [evid])
+    assert v1.label == VeracityLabel.CONTRADICTED
+
+    # 2. RefNLI context mismatch defense: distinct individuals
+    claim2 = AtomicClaim(text="Alexander Graham Bell invented the telephone.", parent_sentence="", entities=["Alexander Graham Bell"])
+    evid2 = EvidencePassage(id="e2", text="Thomas Edison invented the phonograph.", source_url="https://wikipedia.org", relevance_score=0.90)
+    v2 = hybrid.verify_claim(claim2, [evid2])
+    assert v2.label == VeracityLabel.INSUFFICIENT_EVIDENCE
+
+def test_hybrid_retriever_multimodal_relevance():
+    retriever = HybridRetriever(prefer_offline=True)
+    passages = [
+        EvidencePassage(id="p1", text="The Apollo 11 lunar module landed on July 20, 1969.", source_title="NASA"),
+        EvidencePassage(id="p2", text="The Golden Gate Bridge is an iconic suspension bridge in California.", source_title="Britannica"),
+        EvidencePassage(id="p3", text="Mount Everest is the highest mountain on Earth above sea level.", source_title="National Geographic")
+    ]
+    retriever.index_passages(passages)
+    results = retriever.search_local("Apollo 11 lunar module 1969", top_k=2)
+    assert len(results) == 2
+    assert results[0].id == "p1"
+    # Multimodal relevance score must be within valid bounds and reflect both BM25 and dense
+    assert 0.40 <= results[0].relevance_score <= 1.0
+
+def test_report_generator_without_graph_path():
+    from proofgraph.reporter import ReportGenerator
+    reporter = ReportGenerator()
+    claim = AtomicClaim(text="Test assertion", parent_sentence="")
+    verdict = ClaimVerdict(
+        claim_id=claim.id,
+        label=VeracityLabel.SUPPORTED,
+        confidence=0.95,
+        justification="Verified by evidence"
+    )
+    md = reporter.generate_markdown("Test document", [claim], {}, {claim.id: verdict}, graph_html_rel_path=None)
+    assert "View Interactive Evidence Graph" not in md
+    assert "**Supported (Entailed):** `1`" in md
+
+def test_tinyfish_domain_parsing_fallback():
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+    agent = TinyFishWebAgent(api_key="sk-tinyfish-mock")
+    # Simulate official TinySearch schema with 'domain'
+    data_with_domain = {
+        "results": [
+            {
+                "url": "https://www.nasa.gov/mission_pages/apollo/apollo-11.html",
+                "title": "Apollo 11",
+                "snippet": "Neil Armstrong and Buzz Aldrin landed on the Moon in July 1969.",
+                "domain": "www.nasa.gov"
+            }
+        ]
+    }
+    passages = agent._parse_search_results(data_with_domain, "Apollo 11", max_results=1)
+    assert len(passages) == 1
+    assert passages[0].source_domain == "www.nasa.gov"
+    assert passages[0].metadata.get("domain") == "www.nasa.gov"

@@ -5,7 +5,7 @@ from proofgraph.schemas.evidence import EvidencePassage
 
 class RefNLIAlignmentGate:
     """
-    Implements the RefNLI (arXiv:2502.05793) reference determinacy filter:
+    Applies a lexical context-mismatch filter inspired by RefNLI research:
     Prevents false contradictions caused by NLI models assuming premise and hypothesis
     discuss the same entity when retrieved evidence actually refers to a different context.
     """
@@ -67,4 +67,3 @@ class RefNLIAlignmentGate:
             return True, jaccard, "Aligned: entity or lexical threshold satisfied"
         
         return False, jaccard, f"Context Mismatch: Jaccard ({jaccard:.3f}) below threshold ({self.jaccard_threshold}) and no entity match"
-

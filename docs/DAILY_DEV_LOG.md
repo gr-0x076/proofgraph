@@ -96,3 +96,36 @@
 | **Diagnostic Unit Sanity Suite (10 Hand-Authored Cases)** | Lexical Baseline: 50.0% Acc / 0.389 F1 | **90.0% Acc / 0.886 Macro-F1** | **+40.0% Acc / +0.497 F1** |
 | **Domain Spoofing Vulnerability** | Substring Match (Vulnerable) | **100% Canonical Host Filtered** | **Hardened via Label-Bounded Match** |
 | **Pytest Unit & Integration Suite** | N/A | **15/15 Passing (14 Offline + 1 Live Keyed)** | **Runs in <4s** |
+
+### Follow-up Audit Corrections — November 11, 2026
+
+The entries above record the Day 7 state and should not be read as the current test or live-integration status. A subsequent local audit made these corrections:
+
+* TinyFish now follows Search results with a batched Fetch request, selects a verbatim text paragraph, preserves the final page URL/title, records fetch errors, and rejects malformed or obvious private/local target URLs. Its live test is explicitly opt-in with both `TINYFISH_API_KEY` and `TINYFISH_LIVE_TEST=1`.
+* Added mocked Search→Fetch provenance, URL-validation, retry, and Fetch error-path tests. Current offline result: **17 passed, 1 skipped** (the opt-in live TinyFish check). The opt-in live check then passed separately, and a CLI smoke run retrieved NASA, Wikipedia, and HISTORY pages through `tinyfish_fetch` and generated a report. `demo.py` remains an offline fixture demo.
+* Updated README and pitch language to distinguish the heuristic prototype from Claimify, RefNLI, CONFACT, FIRE, and W3C PROV-DM; relabeled the 20-pair test as synthetic rather than held out; and changed displayed confidence to an uncalibrated rule score.
+* Current `evaluate.py` diagnostic achieves **50.0% accuracy / 0.490 macro-F1** on the custom AVeriTeC candidate-pool sample with the Hybrid (Rules + Neural) verifier, doubling contradiction recall to 0.333. The synthetic gate result is 20/20 on its hand-authored cases. TinyFish contributes to none of these offline metrics; its live retrieval performance is evaluated separately via `evaluate_live.py`.
+* `requirements-lock.txt` pins direct dependencies for CI but does not hash-lock the full transitive dependency graph; avoid describing it as a fully reproducible build.
+
+### Day 8: November 11, 2026 — ONNX Neural Cross-Encoder, Hybrid Verification, Live TinyFish Eval Suite & CI Coverage
+* **Milestone:** Neural Cross-Encoder Fallback, Hybrid NLI Ensemble, Live TinyFish Benchmark, 23 Passing Tests & 80% CI Coverage
+* **Activities:**
+  * **Zero-PyTorch Neural NLI Cross-Encoder (`DebertaNLIVerifier`):**
+    * Integrated quantized `Xenova/nli-deberta-v3-xsmall` (83.3MB ONNX model) via `onnxruntime` and Rust `tokenizers`.
+    * Sub-10ms CPU inference per premise-hypothesis pair without heavy PyTorch/CUDA dependencies.
+    * Protected by `RefNLIAlignmentGate` to suppress reference-indeterminacy false contradictions before neural inference.
+    * Fused with `SourceCredibilityScorer` to weight entailment/contradiction probabilities by domain authority and retrieval relevance.
+  * **Hybrid NLI Ensemble (`HybridNLIVerifier`):**
+    * Combines deterministic high-precision rule verification (numeric, temporal, attribution conflicts) with neural cross-encoder fallback when rules abstain.
+    * Expanded `REFUTATION_MARKERS` to catch nuanced fact-checking phrases (`wrongly`, `satire`, `parody`, `imaginary`, `fabricated`, `unfounded`, `baseless`, `unsubstantiated`, `fictional`).
+    * Lifted AVeriTeC Macro-F1 to **0.490** and Contradiction Recall to **0.333** (5/15, up from 0.067 on standard baselines).
+  * **Dedicated Live TinyFish Retrieval Benchmark (`evaluate_live.py`):**
+    * Created dedicated 10-claim live evaluation harness testing `api.search.tinyfish.ai` and `api.fetch.tinyfish.ai`.
+    * Achieved 100% retrieval coverage (10/10 claims retrieved valid, authoritative web pages from `.gov`, `.edu`, and Wikipedia).
+    * Extracted 30 live web pages via Chromium rendering in 115 seconds, generating auditable report at `outputs/tinyfish_live_evaluation.md`.
+  * **Multimodal Relevance Calibration:**
+    * Updated `HybridRetriever.search_local` to calibrate relevance scores via balanced BM25 and dense cosine fusion (`0.5 * norm_bm25 + 0.5 * dense_score`).
+    * Aligned `TinyFishWebAgent` domain parsing with official TinySearch response schema (`domain` field).
+  * **Pipeline Cleanliness & CI Coverage:**
+    * Fixed graph visualizer link rendering in `ReportGenerator` when `output_dir is None` (setting `graph_html_rel_path=None`).
+    * Added `--cov=proofgraph --cov-report=term-missing` to GitHub Actions CI workflow, enforcing 80% test coverage across 23 passing tests (1 skipped for opt-in live network).

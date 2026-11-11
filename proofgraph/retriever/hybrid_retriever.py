@@ -121,13 +121,19 @@ class HybridRetriever:
 
         # Sort by final RRF score
         top_indices = np.argsort(rrf_scores)[::-1][:top_k]
-        
+
+        # Compute normalized BM25 and dense scores to provide balanced multimodal relevance
+        max_bm25 = float(np.max(bm25_scores)) if len(bm25_scores) > 0 and np.max(bm25_scores) > 0 else 1.0
+
         results: List[EvidencePassage] = []
         for idx in top_indices:
             p = self.passages[idx]
-            relevance = float(dense_sims[idx])
+            norm_bm25 = max(0.0, float(bm25_scores[idx]) / max_bm25)
+            dense_score = max(0.0, float(dense_sims[idx]))
+            # Multimodal hybrid relevance fusing lexical keyword match with semantic similarity
+            relevance = 0.5 * norm_bm25 + 0.5 * dense_score
             res_passage = p.model_copy()
-            res_passage.relevance_score = max(0.0, min(1.0, relevance))
+            res_passage.relevance_score = max(0.0, min(1.0, float(relevance)))
             results.append(res_passage)
 
         return results

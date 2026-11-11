@@ -12,7 +12,7 @@ import os
 
 def run_demo():
     print("=" * 70)
-    print("🛡️  PROOFGRAPH: AUTONOMOUS AI EVIDENCE INTELLIGENCE ENGINE — LIVE DEMO")
+    print("🛡️  PROOFGRAPH: EVIDENCE-BACKED CLAIM REVIEW — OFFLINE FIXTURE DEMO")
     print("=" * 70)
 
     # 1. Initialize Pipeline
@@ -82,7 +82,7 @@ def run_demo():
         verdict = result.verdicts.get(claim.id)
         label = verdict.label.value if verdict else "UNVERIFIED"
         status_badge = "🟢 SUPPORTED" if label == "SUPPORTED" else ("🔴 CONTRADICTED" if label == "CONTRADICTED" else "🟡 INSUFFICIENT EVIDENCE")
-        print(f"\n[Claim {idx}] {status_badge} (Confidence: {verdict.confidence * 100:.1f}%)")
+        print(f"\n[Claim {idx}] {status_badge} (Rule score, uncalibrated: {verdict.confidence * 100:.1f}%)")
         print(f"  • Assertion: \"{claim.text}\"")
         print(f"  • Verifiable: {claim.is_verifiable}")
         print(f"  • Justification: {verdict.justification}")

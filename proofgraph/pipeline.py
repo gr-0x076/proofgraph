@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 import os
 
 from proofgraph.schemas.claim import AtomicClaim
@@ -31,23 +31,26 @@ class ProofGraphResult:
         self.graph_html_path = graph_html_path
 
 class ProofGraphPipeline:
-    """
-    End-to-End Autonomous AI Evidence Intelligence Engine:
-    Ingestion -> Claimify Decomposition -> Hybrid Retrieval -> RefNLI & CONFACT Verification
-    -> W3C PROV-DM Graph with Contradiction Edges -> Interactive Visualization & Audit Report
-    """
+    """Claim-review pipeline using heuristic decomposition and rule-based verification."""
     def __init__(
         self,
         decomposer: Optional[ClaimDecomposer] = None,
         retriever: Optional[HybridRetriever] = None,
-        verifier: Optional[NLIVerifier] = None,
+        verifier: Optional[Any] = None,
         graph_builder: Optional[ProofGraphBuilder] = None,
         visualizer: Optional[ProofGraphVisualizer] = None,
-        reporter: Optional[ReportGenerator] = None
+        reporter: Optional[ReportGenerator] = None,
+        verifier_backend: Optional[str] = None
     ):
         self.decomposer = decomposer or ClaimDecomposer()
         self.retriever = retriever or HybridRetriever()
-        self.verifier = verifier or NLIVerifier()
+        if verifier is not None:
+            self.verifier = verifier
+        elif verifier_backend is not None:
+            from proofgraph.verifier.nli import create_verifier
+            self.verifier = create_verifier(backend=verifier_backend)
+        else:
+            self.verifier = NLIVerifier()
         self.graph_builder = graph_builder or ProofGraphBuilder()
         self.visualizer = visualizer or ProofGraphVisualizer()
         self.reporter = reporter or ReportGenerator()
@@ -79,13 +82,13 @@ class ProofGraphPipeline:
             )
             evidence_map[claim.id] = ev_list
 
-        # 3. Verify each Claim using RefNLI + Credibility Weighted NLI
+        # 3. Apply lexical alignment, rule-based stance checks, and a static source prior.
         verdicts: Dict[str, ClaimVerdict] = {}
         for claim in claims:
             verdict = self.verifier.verify_claim(claim, evidence_map.get(claim.id, []))
             verdicts[claim.id] = verdict
 
-        # 4. Construct W3C PROV-DM Knowledge Graph with Contradiction Edges
+        # 4. Construct a PROV-DM-inspired graph with evidence and contradiction edges.
         graph = self.graph_builder.build_graph(claims, evidence_map, verdicts)
 
         # 5. Export Visualizer & Generate Report
@@ -102,7 +105,7 @@ class ProofGraphPipeline:
                 f.write(report_md)
         else:
             report_md = self.reporter.generate_markdown(
-                document_text, claims, evidence_map, verdicts, graph_html_rel_path="graph.html"
+                document_text, claims, evidence_map, verdicts, graph_html_rel_path=None
             )
 
         return ProofGraphResult(
