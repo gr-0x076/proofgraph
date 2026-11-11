@@ -17,7 +17,7 @@ class DebertaNLIVerifier:
     - Sub-15ms CPU inference with zero heavy PyTorch or CUDA requirements.
     - Pre-filtered by RefNLIAlignmentGate to eliminate Context Mismatch traps
       before neural inference (as established in RefNLI research).
-    - Softmax outputs calibrated probabilities across:
+    - Softmax outputs uncalibrated model scores across:
         0: CONTRADICTION
         1: ENTAILMENT (SUPPORTED)
         2: NEUTRAL (INSUFFICIENT_EVIDENCE)

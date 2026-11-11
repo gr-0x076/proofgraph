@@ -204,6 +204,88 @@ def compute_classification_metrics(y_true: List[str], y_pred: List[str], labels:
     macro_f1 = sum(f1_list) / len(f1_list) if f1_list else 0.0
     return {"accuracy": accuracy, "macro_f1": macro_f1, "per_class": per_class, "confusion_matrix": cm, "total": total}
 
+def compute_bootstrap_confidence_intervals(
+    y_true: List[str],
+    y_pred: List[str],
+    labels: List[str],
+    n_bootstraps: int = 1000,
+    alpha: float = 0.05,
+    seed: int = 42,
+) -> Dict[str, Any]:
+    """
+    Non-parametric bootstrap confidence intervals (default 95% CI, 1000 resamples).
+    Directly addresses small-sample statistical uncertainty on accuracy and macro-F1.
+    """
+    rng = np.random.RandomState(seed)
+    n = len(y_true)
+    if n == 0:
+        return {}
+
+    acc_samples = []
+    macro_f1_samples = []
+    contra_rec_samples = []
+    contra_prec_samples = []
+
+    y_true_arr = np.array(y_true)
+    y_pred_arr = np.array(y_pred)
+
+    for _ in range(n_bootstraps):
+        indices = rng.choice(n, size=n, replace=True)
+        sample_true = y_true_arr[indices].tolist()
+        sample_pred = y_pred_arr[indices].tolist()
+
+        m = compute_classification_metrics(sample_true, sample_pred, labels)
+        acc_samples.append(m["accuracy"])
+        macro_f1_samples.append(m["macro_f1"])
+        contra_rec_samples.append(m["per_class"]["CONTRADICTED"]["recall"])
+        contra_prec_samples.append(m["per_class"]["CONTRADICTED"]["precision"])
+
+    lower_p = (alpha / 2.0) * 100.0
+    upper_p = (1.0 - alpha / 2.0) * 100.0
+
+    return {
+        "n_bootstraps": n_bootstraps,
+        "confidence_level": 1.0 - alpha,
+        "accuracy_ci_95": [
+            round(float(np.percentile(acc_samples, lower_p)), 3),
+            round(float(np.percentile(acc_samples, upper_p)), 3),
+        ],
+        "macro_f1_ci_95": [
+            round(float(np.percentile(macro_f1_samples, lower_p)), 3),
+            round(float(np.percentile(macro_f1_samples, upper_p)), 3),
+        ],
+        "contra_recall_ci_95": [
+            round(float(np.percentile(contra_rec_samples, lower_p)), 3),
+            round(float(np.percentile(contra_rec_samples, upper_p)), 3),
+        ],
+        "contra_precision_ci_95": [
+            round(float(np.percentile(contra_prec_samples, lower_p)), 3),
+            round(float(np.percentile(contra_prec_samples, upper_p)), 3),
+        ],
+    }
+
+def get_stratified_dev_test_split(
+    data: List[Dict[str, Any]], dev_per_class: int = 10, test_per_class: int = 5
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """
+    Partitions the 60 AVeriTeC sample into 40 Dev claims (10 per class) and 20 Held-Out
+    Test claims (5 per class). Hyperparameter threshold sweeping is performed exclusively
+    on Dev; the frozen threshold is evaluated once on the untouched Test set.
+    """
+    groups = defaultdict(list)
+    for idx, item in enumerate(data):
+        item_copy = dict(item)
+        item_copy["global_index"] = idx
+        groups[item["label"]].append(item_copy)
+
+    dev_data = []
+    test_data = []
+    for label, items in groups.items():
+        dev_data.extend(items[:dev_per_class])
+        test_data.extend(items[dev_per_class : dev_per_class + test_per_class])
+
+    return dev_data, test_data
+
 # =====================================================================
 # RUNNERS
 # =====================================================================
@@ -399,30 +481,145 @@ def run_ablation_and_baselines(sample_path: str):
 
     labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
 
+    # 1. Stratified Dev/Test Partition: 40 Dev (10 per class) / 20 Held-Out Test (5 per class)
+    dev_data, test_data = get_stratified_dev_test_split(data, dev_per_class=10, test_per_class=5)
+    print(f"\n📊 Stratified Partition: Dev Set = {len(dev_data)} claims (10/class) | Held-Out Test Set = {len(test_data)} claims (5/class)")
+
+    # 2. Hyperparameter Threshold Sweep EXCLUSIVELY on 40 Dev Claims
+    print("\n" + "-" * 78)
+    print("🛠️ STEP 1: HYPERPARAMETER THRESHOLD SWEEP ON 40 DEV CLAIMS (Zero Test Leakage)")
+    print("-" * 78)
+    candidate_thresholds = [0.50, 0.60, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+    sweep_results = []
+    best_thresh = 0.90
+    best_dev_f1 = -1.0
+
+    y_dev_true = [map_label(d["label"]) for d in dev_data]
+    print(f"| {'Threshold':<11} | {'Dev Accuracy':<14} | {'Dev Macro-F1':<14} | {'Dev Contra Rec':<16} | {'Status':<16} |")
+    print(f"| :{'-'*10} | :{'-'*13} | :{'-'*13} | :{'-'*15} | :{'-'*15} |")
+
+    for t in candidate_thresholds:
+        pipe_sweep = ProofGraphPipeline(verifier=HybridNLIVerifier(neural_fallback_threshold=t))
+        dev_preds = []
+        for d in dev_data:
+            evs = [EvidencePassage(text=p["text"], source_title="AVeriTeC") for p in d.get("evidence_passages", [])]
+            dev_preds.append(verify_claim_against_pool(pipe_sweep, d["claim"], evs))
+
+        m_sweep = compute_classification_metrics(y_dev_true, dev_preds, labels)
+        is_best = m_sweep["macro_f1"] > best_dev_f1
+        if is_best:
+            best_dev_f1 = m_sweep["macro_f1"]
+            best_thresh = t
+
+        status_str = "⭐ Current Best" if is_best else "Evaluated"
+        sweep_results.append({
+            "threshold": t,
+            "accuracy": m_sweep["accuracy"],
+            "macro_f1": m_sweep["macro_f1"],
+            "contra_recall": m_sweep["per_class"]["CONTRADICTED"]["recall"],
+            "contra_precision": m_sweep["per_class"]["CONTRADICTED"]["precision"],
+        })
+        print(f"| {t:<11.2f} | {m_sweep['accuracy']*100:>12.1f}% | {m_sweep['macro_f1']:>14.3f} | {m_sweep['per_class']['CONTRADICTED']['recall']:>16.3f} | {status_str:<16} |")
+
+    print(f"\n✅ Frozen Optimal Fallback Threshold Selected on Dev Split: {best_thresh:.2f} (Dev Macro-F1 = {best_dev_f1:.3f})")
+
+    # 3. Evaluation on 20 HELD-OUT TEST CLAIMS with Selected Threshold
+    print("\n" + "-" * 78)
+    print(f"🎯 STEP 2: INDEPENDENT EVALUATION ON 20 HELD-OUT TEST CLAIMS (Frozen Threshold={best_thresh:.2f})")
+    print("-" * 78)
+
     pipe_rules = ProofGraphPipeline(verifier_backend="rules")
-    pipe_hybrid = ProofGraphPipeline(verifier_backend="hybrid")
+    pipe_hybrid_frozen = ProofGraphPipeline(verifier=HybridNLIVerifier(neural_fallback_threshold=best_thresh))
     pipe_neural = ProofGraphPipeline(verifier_backend="neural")
     pipe_no_align = ProofGraphPipeline(verifier=NLIVerifier(refnli_gate=RefNLIAlignmentGate(jaccard_threshold=0.0)))
     base_lexical = LexicalHeuristicBaseline()
     base_dense = DenseSimilarityBaseline(retriever=pipe_rules.retriever)
 
-    y_true = [map_label(d["label"]) for d in data]
+    y_test_true = [map_label(d["label"]) for d in test_data]
+    test_preds_rules, test_preds_hybrid, test_preds_neural = [], [], []
+    test_preds_no_align, test_preds_lex, test_preds_dense = [], [], []
+    test_per_claim_results = []
+
+    for item in test_data:
+        claim_text = item["claim"]
+        evidence_objs = [EvidencePassage(text=p["text"], source_title="AVeriTeC") for p in item.get("evidence_passages", [])]
+
+        test_preds_rules.append(verify_claim_against_pool(pipe_rules, claim_text, evidence_objs))
+        test_preds_hybrid.append(verify_claim_against_pool(pipe_hybrid_frozen, claim_text, evidence_objs))
+        test_preds_neural.append(verify_claim_against_pool(pipe_neural, claim_text, evidence_objs))
+        test_preds_no_align.append(verify_claim_against_pool(pipe_no_align, claim_text, evidence_objs))
+        test_preds_lex.append(base_lexical.verify(claim_text, evidence_objs).value)
+        test_preds_dense.append(base_dense.verify(claim_text, evidence_objs).value)
+
+        diag = dict(getattr(pipe_hybrid_frozen.verifier, "last_diagnostics", {}))
+        test_per_claim_results.append({
+            "global_index": item.get("global_index"),
+            "split": "held_out_test",
+            "claim_sha256": hashlib.sha256(claim_text.encode("utf-8")).hexdigest(),
+            "ground_truth": map_label(item["label"]),
+            "predictions": {
+                "rules": test_preds_rules[-1],
+                "hybrid": test_preds_hybrid[-1],
+                "neural": test_preds_neural[-1],
+                "without_alignment_gate": test_preds_no_align[-1],
+                "dense_baseline": test_preds_dense[-1],
+                "lexical_baseline": test_preds_lex[-1],
+            },
+            "diagnostics": diag,
+        })
+
+    m_test_rules = compute_classification_metrics(y_test_true, test_preds_rules, labels)
+    m_test_hybrid = compute_classification_metrics(y_test_true, test_preds_hybrid, labels)
+    m_test_neural = compute_classification_metrics(y_test_true, test_preds_neural, labels)
+    m_test_no_align = compute_classification_metrics(y_test_true, test_preds_no_align, labels)
+    m_test_lex = compute_classification_metrics(y_test_true, test_preds_lex, labels)
+    m_test_dense = compute_classification_metrics(y_test_true, test_preds_dense, labels)
+
+    ci_test_hybrid = compute_bootstrap_confidence_intervals(y_test_true, test_preds_hybrid, labels)
+    ci_test_rules = compute_bootstrap_confidence_intervals(y_test_true, test_preds_rules, labels)
+    ci_test_neural = compute_bootstrap_confidence_intervals(y_test_true, test_preds_neural, labels)
+    ci_test_no_align = compute_bootstrap_confidence_intervals(y_test_true, test_preds_no_align, labels)
+    ci_test_dense = compute_bootstrap_confidence_intervals(y_test_true, test_preds_dense, labels)
+    ci_test_lex = compute_bootstrap_confidence_intervals(y_test_true, test_preds_lex, labels)
+
+    m_test_hybrid["bootstrap_ci_95"] = ci_test_hybrid
+    m_test_rules["bootstrap_ci_95"] = ci_test_rules
+    m_test_neural["bootstrap_ci_95"] = ci_test_neural
+    m_test_no_align["bootstrap_ci_95"] = ci_test_no_align
+    m_test_dense["bootstrap_ci_95"] = ci_test_dense
+    m_test_lex["bootstrap_ci_95"] = ci_test_lex
+
+    print("\n| Configuration (Held-Out Test N=20)    | Accuracy (95% CI)     | Macro-F1 (95% CI)   | Prec (Contra) | Rec (Contra) |")
+    print("| :------------------------------------ | :--------------------: | :------------------: | :-----------: | :----------: |")
+    print(f"| **ProofGraph Hybrid (Threshold={best_thresh:.2f})** | **{m_test_hybrid['accuracy']*100:.1f}%** [{ci_test_hybrid['accuracy_ci_95'][0]*100:.0f}–{ci_test_hybrid['accuracy_ci_95'][1]*100:.0f}%] | **{m_test_hybrid['macro_f1']:.3f}** [{ci_test_hybrid['macro_f1_ci_95'][0]:.2f}–{ci_test_hybrid['macro_f1_ci_95'][1]:.2f}] |     {m_test_hybrid['per_class']['CONTRADICTED']['precision']:.3f}     |    **{m_test_hybrid['per_class']['CONTRADICTED']['recall']:.3f}**   |")
+    print(f"| ProofGraph Rules Alone                |  {m_test_rules['accuracy']*100:.1f}% [{ci_test_rules['accuracy_ci_95'][0]*100:.0f}–{ci_test_rules['accuracy_ci_95'][1]*100:.0f}%]  |   {m_test_rules['macro_f1']:.3f} [{ci_test_rules['macro_f1_ci_95'][0]:.2f}–{ci_test_rules['macro_f1_ci_95'][1]:.2f}]  |     {m_test_rules['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_test_rules['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| ProofGraph Neural Alone                |  {m_test_neural['accuracy']*100:.1f}% [{ci_test_neural['accuracy_ci_95'][0]*100:.0f}–{ci_test_neural['accuracy_ci_95'][1]*100:.0f}%]  |   {m_test_neural['macro_f1']:.3f} [{ci_test_neural['macro_f1_ci_95'][0]:.2f}–{ci_test_neural['macro_f1_ci_95'][1]:.2f}]  |     {m_test_neural['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_test_neural['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Ablation: Without Alignment Gate      |  {m_test_no_align['accuracy']*100:.1f}% [{ci_test_no_align['accuracy_ci_95'][0]*100:.0f}–{ci_test_no_align['accuracy_ci_95'][1]*100:.0f}%]  |   {m_test_no_align['macro_f1']:.3f} [{ci_test_no_align['macro_f1_ci_95'][0]:.2f}–{ci_test_no_align['macro_f1_ci_95'][1]:.2f}]  |     {m_test_no_align['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_test_no_align['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Baseline 1: Dense Similarity (No Gate)|  {m_test_dense['accuracy']*100:.1f}% [{ci_test_dense['accuracy_ci_95'][0]*100:.0f}–{ci_test_dense['accuracy_ci_95'][1]*100:.0f}%]  |   {m_test_dense['macro_f1']:.3f} [{ci_test_dense['macro_f1_ci_95'][0]:.2f}–{ci_test_dense['macro_f1_ci_95'][1]:.2f}]  |     {m_test_dense['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_test_dense['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Baseline 2: Lexical Heuristic Baseline|  {m_test_lex['accuracy']*100:.1f}% [{ci_test_lex['accuracy_ci_95'][0]*100:.0f}–{ci_test_lex['accuracy_ci_95'][1]*100:.0f}%]  |   {m_test_lex['macro_f1']:.3f} [{ci_test_lex['macro_f1_ci_95'][0]:.2f}–{ci_test_lex['macro_f1_ci_95'][1]:.2f}]  |     {m_test_lex['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_test_lex['per_class']['CONTRADICTED']['recall']:.3f}   |")
+
+    # 4. Full 60-Claim Descriptive Evaluation (with Bootstrap CIs)
+    print("\n" + "-" * 78)
+    print("📈 STEP 3: FULL 60-CLAIM DESCRIPTIVE SAMPLE BENCHMARK (With Bootstrap CIs)")
+    print("-" * 78)
+
+    y_full_true = [map_label(d["label"]) for d in data]
     preds_rules, preds_hybrid, preds_neural, preds_no_align, preds_lex, preds_dense = [], [], [], [], [], []
-    per_claim_results = []
+    full_per_claim_results = []
 
     for item_index, item in enumerate(data):
         claim_text = item["claim"]
         evidence_objs = [EvidencePassage(text=p["text"], source_title="AVeriTeC") for p in item.get("evidence_passages", [])]
 
         preds_rules.append(verify_claim_against_pool(pipe_rules, claim_text, evidence_objs))
-        preds_hybrid.append(verify_claim_against_pool(pipe_hybrid, claim_text, evidence_objs))
+        preds_hybrid.append(verify_claim_against_pool(pipe_hybrid_frozen, claim_text, evidence_objs))
         preds_neural.append(verify_claim_against_pool(pipe_neural, claim_text, evidence_objs))
         preds_no_align.append(verify_claim_against_pool(pipe_no_align, claim_text, evidence_objs))
-
         preds_lex.append(base_lexical.verify(claim_text, evidence_objs).value)
         preds_dense.append(base_dense.verify(claim_text, evidence_objs).value)
 
-        per_claim_results.append({
+        diag = dict(getattr(pipe_hybrid_frozen.verifier, "last_diagnostics", {}))
+        full_per_claim_results.append({
             "sample_index": item_index,
             "claim_sha256": hashlib.sha256(claim_text.encode("utf-8")).hexdigest(),
             "ground_truth": map_label(item["label"]),
@@ -434,23 +631,38 @@ def run_ablation_and_baselines(sample_path: str):
                 "dense_baseline": preds_dense[-1],
                 "lexical_baseline": preds_lex[-1],
             },
+            "diagnostics": diag,
         })
 
-    m_rules = compute_classification_metrics(y_true, preds_rules, labels)
-    m_hybrid = compute_classification_metrics(y_true, preds_hybrid, labels)
-    m_neural = compute_classification_metrics(y_true, preds_neural, labels)
-    m_no_align = compute_classification_metrics(y_true, preds_no_align, labels)
-    m_lex = compute_classification_metrics(y_true, preds_lex, labels)
-    m_dense = compute_classification_metrics(y_true, preds_dense, labels)
+    m_full_rules = compute_classification_metrics(y_full_true, preds_rules, labels)
+    m_full_hybrid = compute_classification_metrics(y_full_true, preds_hybrid, labels)
+    m_full_neural = compute_classification_metrics(y_full_true, preds_neural, labels)
+    m_full_no_align = compute_classification_metrics(y_full_true, preds_no_align, labels)
+    m_full_lex = compute_classification_metrics(y_full_true, preds_lex, labels)
+    m_full_dense = compute_classification_metrics(y_full_true, preds_dense, labels)
 
-    print("\n| Configuration                          | Accuracy | Macro-F1 | Prec (Supp) | Prec (Contra) | Rec (Contra) |")
-    print("| :------------------------------------- | :------: | :------: | :---------: | :-----------: | :----------: |")
-    print(f"| **ProofGraph Hybrid (Rules + Neural)** | **{m_hybrid['accuracy']*100:.1f}%** |  **{m_hybrid['macro_f1']:.3f}**  |    {m_hybrid['per_class']['SUPPORTED']['precision']:.3f}    |     {m_hybrid['per_class']['CONTRADICTED']['precision']:.3f}     |    **{m_hybrid['per_class']['CONTRADICTED']['recall']:.3f}**   |")
-    print(f"| ProofGraph Rules Alone                 |  {m_rules['accuracy']*100:.1f}%  |   {m_rules['macro_f1']:.3f}  |    {m_rules['per_class']['SUPPORTED']['precision']:.3f}    |     {m_rules['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_rules['per_class']['CONTRADICTED']['recall']:.3f}   |")
-    print(f"| ProofGraph Neural Alone                 |  {m_neural['accuracy']*100:.1f}%  |   {m_neural['macro_f1']:.3f}  |    {m_neural['per_class']['SUPPORTED']['precision']:.3f}    |     {m_neural['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_neural['per_class']['CONTRADICTED']['recall']:.3f}   |")
-    print(f"| Ablation: Without Alignment Gate       |  {m_no_align['accuracy']*100:.1f}%  |   {m_no_align['macro_f1']:.3f}  |    {m_no_align['per_class']['SUPPORTED']['precision']:.3f}    |     {m_no_align['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_no_align['per_class']['CONTRADICTED']['recall']:.3f}   |")
-    print(f"| Baseline 1: Dense Similarity (No Gate) |  {m_dense['accuracy']*100:.1f}%  |   {m_dense['macro_f1']:.3f}  |    {m_dense['per_class']['SUPPORTED']['precision']:.3f}    |     {m_dense['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_dense['per_class']['CONTRADICTED']['recall']:.3f}   |")
-    print(f"| Baseline 2: Lexical Heuristic Baseline |  {m_lex['accuracy']*100:.1f}%  |   {m_lex['macro_f1']:.3f}  |    {m_lex['per_class']['SUPPORTED']['precision']:.3f}    |     {m_lex['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_lex['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    ci_full_hybrid = compute_bootstrap_confidence_intervals(y_full_true, preds_hybrid, labels)
+    ci_full_rules = compute_bootstrap_confidence_intervals(y_full_true, preds_rules, labels)
+    ci_full_neural = compute_bootstrap_confidence_intervals(y_full_true, preds_neural, labels)
+    ci_full_no_align = compute_bootstrap_confidence_intervals(y_full_true, preds_no_align, labels)
+    ci_full_dense = compute_bootstrap_confidence_intervals(y_full_true, preds_dense, labels)
+    ci_full_lex = compute_bootstrap_confidence_intervals(y_full_true, preds_lex, labels)
+
+    m_full_hybrid["bootstrap_ci_95"] = ci_full_hybrid
+    m_full_rules["bootstrap_ci_95"] = ci_full_rules
+    m_full_neural["bootstrap_ci_95"] = ci_full_neural
+    m_full_no_align["bootstrap_ci_95"] = ci_full_no_align
+    m_full_dense["bootstrap_ci_95"] = ci_full_dense
+    m_full_lex["bootstrap_ci_95"] = ci_full_lex
+
+    print("\n| Configuration (Full Sample N=60)      | Accuracy (95% CI)     | Macro-F1 (95% CI)   | Prec (Contra) | Rec (Contra) |")
+    print("| :------------------------------------ | :--------------------: | :------------------: | :-----------: | :----------: |")
+    print(f"| **ProofGraph Hybrid (Threshold={best_thresh:.2f})** | **{m_full_hybrid['accuracy']*100:.1f}%** [{ci_full_hybrid['accuracy_ci_95'][0]*100:.0f}–{ci_full_hybrid['accuracy_ci_95'][1]*100:.0f}%] | **{m_full_hybrid['macro_f1']:.3f}** [{ci_full_hybrid['macro_f1_ci_95'][0]:.2f}–{ci_full_hybrid['macro_f1_ci_95'][1]:.2f}] |     {m_full_hybrid['per_class']['CONTRADICTED']['precision']:.3f}     |    **{m_full_hybrid['per_class']['CONTRADICTED']['recall']:.3f}**   |")
+    print(f"| ProofGraph Rules Alone                |  {m_full_rules['accuracy']*100:.1f}% [{ci_full_rules['accuracy_ci_95'][0]*100:.0f}–{ci_full_rules['accuracy_ci_95'][1]*100:.0f}%]  |   {m_full_rules['macro_f1']:.3f} [{ci_full_rules['macro_f1_ci_95'][0]:.2f}–{ci_full_rules['macro_f1_ci_95'][1]:.2f}]  |     {m_full_rules['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_full_rules['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| ProofGraph Neural Alone                |  {m_full_neural['accuracy']*100:.1f}% [{ci_full_neural['accuracy_ci_95'][0]*100:.0f}–{ci_full_neural['accuracy_ci_95'][1]*100:.0f}%]  |   {m_full_neural['macro_f1']:.3f} [{ci_full_neural['macro_f1_ci_95'][0]:.2f}–{ci_full_neural['macro_f1_ci_95'][1]:.2f}]  |     {m_full_neural['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_full_neural['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Ablation: Without Alignment Gate      |  {m_full_no_align['accuracy']*100:.1f}% [{ci_full_no_align['accuracy_ci_95'][0]*100:.0f}–{ci_full_no_align['accuracy_ci_95'][1]*100:.0f}%]  |   {m_full_no_align['macro_f1']:.3f} [{ci_full_no_align['macro_f1_ci_95'][0]:.2f}–{ci_full_no_align['macro_f1_ci_95'][1]:.2f}]  |     {m_full_no_align['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_full_no_align['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Baseline 1: Dense Similarity (No Gate)|  {m_full_dense['accuracy']*100:.1f}% [{ci_full_dense['accuracy_ci_95'][0]*100:.0f}–{ci_full_dense['accuracy_ci_95'][1]*100:.0f}%]  |   {m_full_dense['macro_f1']:.3f} [{ci_full_dense['macro_f1_ci_95'][0]:.2f}–{ci_full_dense['macro_f1_ci_95'][1]:.2f}]  |     {m_full_dense['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_full_dense['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| Baseline 2: Lexical Heuristic Baseline|  {m_full_lex['accuracy']*100:.1f}% [{ci_full_lex['accuracy_ci_95'][0]*100:.0f}–{ci_full_lex['accuracy_ci_95'][1]*100:.0f}%]  |   {m_full_lex['macro_f1']:.3f} [{ci_full_lex['macro_f1_ci_95'][0]:.2f}–{ci_full_lex['macro_f1_ci_95'][1]:.2f}]  |     {m_full_lex['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_full_lex['per_class']['CONTRADICTED']['recall']:.3f}   |")
     print("=" * 78)
 
     def sha256_file(path: str) -> str:
@@ -461,40 +673,64 @@ def run_ablation_and_baselines(sample_path: str):
         return digest.hexdigest()
 
     neural_verifier = pipe_neural.verifier
-    hybrid_neural_active = pipe_hybrid.verifier.neural_active
+    hybrid_neural_active = pipe_hybrid_frozen.verifier.neural_active
     results = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "dataset": os.path.relpath(sample_path, os.path.dirname(os.path.abspath(__file__))),
         "dataset_sha256": sha256_file(sample_path),
-        "sample_size": len(data),
+        "total_sample_size": len(data),
         "label_mapping": {
             "Supported": "SUPPORTED",
             "Refuted": "CONTRADICTED",
             "Conflicting Evidence/Cherrypicking": "INSUFFICIENT_EVIDENCE",
             "Not Enough Evidence": "INSUFFICIENT_EVIDENCE",
         },
-        "protocol": "Direct verifier on each claim's provided evidence pool; no open-web retrieval.",
+        "protocol": "Stratified 40-Dev / 20-Held-Out-Test Split (Zero Hyperparameter Snooping) with 1000-resample non-parametric bootstrap 95% CIs.",
+        "evaluation_status": {
+            "type": "stratified_dev_tuning_and_held_out_test_evaluation",
+            "threshold_selection": f"neural_fallback_threshold={best_thresh:.2f} was selected solely on the 40-claim Dev split, then evaluated once on the 20-claim held-out test split",
+            "independent_test_estimate": True,
+            "bootstrap_ci_method": "Non-parametric percentile bootstrap (n=1000, alpha=0.05)",
+        },
+        "dev_sweep": {
+            "dev_sample_size": len(dev_data),
+            "selection_criterion": "Maximizes Macro-F1 on the 40-claim development split",
+            "selected_threshold": best_thresh,
+            "threshold_evaluations": sweep_results,
+        },
+        "held_out_test_metrics": {
+            "test_sample_size": len(test_data),
+            "rules": m_test_rules,
+            "hybrid": m_test_hybrid,
+            "neural": m_test_neural,
+            "without_alignment_gate": m_test_no_align,
+            "dense_baseline": m_test_dense,
+            "lexical_baseline": m_test_lex,
+        },
+        "full_sample_descriptive_metrics": {
+            "full_sample_size": len(data),
+            "rules": m_full_rules,
+            "hybrid": m_full_hybrid,
+            "neural": m_full_neural,
+            "without_alignment_gate": m_full_no_align,
+            "dense_baseline": m_full_dense,
+            "lexical_baseline": m_full_lex,
+        },
         "neural_status": {
             "hybrid_fallback_active": hybrid_neural_active,
             "neural_only_active": bool(neural_verifier.is_available),
         },
-        "metrics": {
-            "rules": m_rules,
-            "hybrid": m_hybrid,
-            "neural": m_neural,
-            "without_alignment_gate": m_no_align,
-            "dense_baseline": m_dense,
-            "lexical_baseline": m_lex,
+        "predictions": {
+            "held_out_test": test_per_claim_results,
+            "full_sample": full_per_claim_results,
         },
-        "predictions": per_claim_results,
     }
     artifact_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "outputs", "benchmark_results.json")
     os.makedirs(os.path.dirname(artifact_path), exist_ok=True)
     with open(artifact_path, "w", encoding="utf-8") as artifact:
         json.dump(results, artifact, indent=2)
-        artifact.write("\n")
-    print(f"\nWrote claim-level predictions, metrics, and dataset hash to {artifact_path}")
+    print(f"\nWrote stratified dev/test evaluation, sweep results, bootstrap CIs, and dataset hash to {artifact_path}")
 
 def run_held_out_context_mismatch_benchmark():
     print("\n" + "=" * 78)

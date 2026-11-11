@@ -15,7 +15,7 @@ class RuleStanceVerifier:
     1. Lexical-entity context alignment filtering (RefNLI-inspired gate)
     2. Canonical domain authority prior (CONFACT-inspired source weighting)
     3. Predicate-bound numerical, temporal, and entity contradiction checks
-    4. Calibrated abstention for ambiguous, speculative, or unaligned evidence
+    4. Conservative abstention for ambiguous, speculative, or unaligned evidence
     """
     def __init__(self, refnli_gate: RefNLIAlignmentGate = None, credibility_scorer: SourceCredibilityScorer = None):
         self.alignment_gate = refnli_gate or RefNLIAlignmentGate()
@@ -284,6 +284,7 @@ class HybridNLIVerifier:
         self.prefer_offline = prefer_offline
         self.neural_fallback_threshold = neural_fallback_threshold
         self._neural_verifier = None
+        self.last_diagnostics: Dict[str, Any] = {}
 
     @property
     def neural_verifier(self):
@@ -309,20 +310,42 @@ class HybridNLIVerifier:
         return bool(self.neural_verifier and self.neural_verifier.is_available)
 
     def verify_claim(self, claim: AtomicClaim, evidence_passages: List[EvidencePassage]) -> ClaimVerdict:
-        # 1. First run deterministic rule-based verification
+        # 1. Run deterministic rule-based verification
         rule_verdict = self.rule_verifier.verify_claim(claim, evidence_passages)
 
-        if rule_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED):
-            return rule_verdict
+        diagnostics: Dict[str, Any] = {
+            "claim_id": claim.id,
+            "rule_label": rule_verdict.label.value,
+            "rule_confidence": rule_verdict.confidence,
+            "neural_evaluated": False,
+            "neural_label": None,
+            "neural_confidence": None,
+            "agreement": None,
+            "overturned_abstention": False,
+        }
 
-        # 2. If rules abstained, consult neural cross-encoder if available with calibrated confidence threshold
+        # 2. If neural is active, evaluate stance for cross-model agreement and fallback
         if self.neural_active:
+            diagnostics["neural_evaluated"] = True
             neural_verdict = self.neural_verifier.verify_claim(claim, evidence_passages)
+            diagnostics["neural_label"] = neural_verdict.label.value
+            diagnostics["neural_confidence"] = neural_verdict.confidence
+
+            if rule_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED):
+                diagnostics["agreement"] = bool(rule_verdict.label == neural_verdict.label)
+                self.last_diagnostics = diagnostics
+                return rule_verdict
+
+            # Rules abstained (INSUFFICIENT_EVIDENCE): check if neural confidence meets fallback gate
             if (
                 neural_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED)
                 and neural_verdict.confidence >= self.neural_fallback_threshold
             ):
+                diagnostics["overturned_abstention"] = True
+                self.last_diagnostics = diagnostics
                 return neural_verdict
+
+        self.last_diagnostics = diagnostics
         return rule_verdict
 
 def create_verifier(backend: str = "rules", **kwargs):

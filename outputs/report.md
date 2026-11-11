@@ -1,5 +1,5 @@
 # ProofGraph: Evidence-Backed Claim Review Report
-*Generated on: 2026-11-11 10:48:19 UTC*
+*Generated on: 2026-11-11 11:34:46 UTC*
 
 ## 📊 Executive Summary
 - **Total Atomic Claims Analyzed:** `3`
@@ -37,7 +37,7 @@
   > "The Eiffel Tower is a wrought-iron lattice tower located on the Champ de Mars in Paris, France. Constructed from 1887 to 1889 by Gustave Eiffel's company."
 - **⚪ MENTIONS** via [Conspiracy Chronicle](https://infowars.com/fake-eiffel-rome) *(Retrieval: `local` | Ranking signal: 0.80 (retriever ranking signal) | Source prior: 0.15)*
   > "Some modern architectural historians argue that a replica of the Eiffel Tower was secretly designed in Rome in 1950."
-- **⚪ MENTIONS** via [NASA Historical Archive](https://www.nasa.gov/mission/apollo-11/) *(Retrieval: `local` | Ranking signal: 0.78 (retriever ranking signal) | Source prior: 0.98)*
+- **⚪ MENTIONS** via [NASA Historical Archive](https://www.nasa.gov/mission/apollo-11/) *(Retrieval: `local` | Ranking signal: 0.75 (retriever ranking signal) | Source prior: 0.98)*
   > "The Apollo 11 mission landed humans on the Moon on July 20, 1969, with commander Neil Armstrong and lunar module pilot Buzz Aldrin."
 
 ---

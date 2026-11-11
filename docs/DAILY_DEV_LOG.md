@@ -132,8 +132,25 @@ The entries above record the Day 7 state and should not be read as the current t
 
 ### Audit correction & Production Hardening — November 11, 2026
 * **Evaluation Leakage Resolved:** Re-ran `evaluate.py --backend all` after eliminating retriever index accumulation. The evaluation now delivers candidate evidence pools directly to the example verifier without cross-claim index leakage.
-* **Calibrated Hybrid Fallback (`neural_fallback_threshold=0.90`):** Requires high neural confidence (≥0.90) before overturning rule-based abstentions. This eliminates false contradictions on ambiguous claims while capturing genuine refutations, lifting Hybrid performance to **51.7% Accuracy / 0.504 Macro-F1 / 0.400 Contradiction Recall** (surpassing Rules Alone at 0.493 and Baselines at 0.350/0.398).
+* **Exploratory Hybrid Gate (`neural_fallback_threshold=0.90`; not calibrated):** Requires a heuristic aggregate score ≥0.90 before overriding rule abstention. The threshold was repeatedly swept on the same 60-item AVeriTeC sample used for reporting, so results (51.7% accuracy / 0.504 macro-F1 / 0.333 contradiction recall) are development-set resubstitution metrics, not held-out evidence. The accuracy matches Rules Alone and the macro-F1 difference is only 0.012. Do not describe this as calibrated or as eliminating false contradictions; evaluate on a fresh test set after choosing the threshold on separate calibration data.
 * **Immutable Model Revision & Label Validation:** Pinned `Xenova/nli-deberta-v3-xsmall` to immutable commit SHA `2a4f614a701367a02d51389039afc998faeda637` (Apache-2.0 base: `cross-encoder/nli-deberta-v3-xsmall`). Added dynamic runtime validation of `config.json` `id2label` confirming index 0=contradiction, 1=entailment, 2=neutral.
 * **Warm-Run Dynamic Padding:** Eliminated fixed 512 padding, achieving ~10 ms median CPU inference per pair.
 * **Auditable Live Web Retrieval Artifact:** Re-ran `evaluate_live.py` with real TinySearch & TinyFetch endpoints. Generated auditable table of 26 retrieved source URLs, domain distribution, and 50% live accuracy disclosure at [`outputs/tinyfish_live_evaluation.md`](../outputs/tinyfish_live_evaluation.md).
 * **CI Matrix Hardening:** Added model weight caching, `--cov-fail-under=80` coverage threshold (current: 82.2%), benchmark execution, and live fixture validation across Python 3.10, 3.11, and 3.12.
+
+### Methodological Rigor & Held-Out Test Evaluation Release — November 11, 2026
+* **Zero Hyperparameter Snooping / Stratified Dev-Test Partition:**
+  * Partitioned the 60 AVeriTeC claims into a balanced **40-claim Dev Split** (10 per class) and an untouched **20-claim Held-Out Test Split** (5 per class).
+  * Swept `neural_fallback_threshold` exclusively on the 40 Dev claims across `[0.50, 0.60, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]`.
+  * Optimal threshold `0.95` (Dev Macro-F1 = 0.483) was frozen and evaluated once on the 20 held-out test claims, yielding **55.0% Accuracy** and **0.508 Macro-F1**.
+* **Non-Parametric Bootstrap Confidence Intervals (95% CI):**
+  * Added 1,000-resample percentile bootstrap to `evaluate.py`, reporting empirical 95% CIs for accuracy, macro-F1, and contradiction recall for all model configurations.
+* **Cross-Verifier Agreement Diagnostics:**
+  * Updated `HybridNLIVerifier` to evaluate and record rule/neural agreement across all claims, logging cross-verifier diagnostics to `outputs/benchmark_results.json`.
+* **CI Neural Execution Proof:**
+  * Hardened `.github/workflows/ci.yml` with explicit assertions verifying that `neural_status.hybrid_fallback_active` is `True`, dev sweep ran 8 thresholds, and bootstrap CIs are present.
+  * Added upstream model license verification asserting `cross-encoder/nli-deberta-v3-xsmall` is Apache-2.0.
+* **End-to-End Case Study Demonstration:**
+  * Implemented [`demo_case_study.py`](../demo_case_study.py) demonstrating step-by-step atomic decomposition, RefNLI distractor filtering, rule/neural agreement, and conservative abstention on speculative mathematical claims. Output persisted to [`outputs/demo_case_study.md`](../outputs/demo_case_study.md).
+* **Test Suite & Coverage:**
+  * Expanded test suite to **35 passed, 1 skipped** (opt-in network smoke test). Package coverage: **82.37%** (exceeding `--cov-fail-under=80`).

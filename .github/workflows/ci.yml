@@ -37,13 +37,20 @@ jobs:
       run: |
         python -c "from huggingface_hub import hf_hub_download; repo='Xenova/nli-deberta-v3-xsmall'; rev='2a4f614a701367a02d51389039afc998faeda637'; hf_hub_download(repo_id=repo, filename='onnx/model_quantized.onnx', revision=rev); hf_hub_download(repo_id=repo, filename='tokenizer.json', revision=rev); hf_hub_download(repo_id=repo, filename='config.json', revision=rev)"
 
+    - name: Verify Upstream Base Model License
+      run: |
+        python -c "import json, urllib.request; req = urllib.request.Request('https://huggingface.co/api/models/cross-encoder/nli-deberta-v3-xsmall', headers={'User-Agent': 'CI'}); data = json.loads(urllib.request.urlopen(req, timeout=10).read().decode()); assert 'apache-2.0' in str(data).lower(), 'Base model not Apache-2.0'; print('✅ Upstream base model verified as Apache-2.0')"
+
     - name: Run test suite with coverage
       run: |
         PYTHONPATH=. pytest tests/ -v --cov=proofgraph --cov-report=term-missing --cov-fail-under=80
 
-    - name: Verify benchmark and evaluation artifacts
+    - name: Verify benchmark, neural execution, and evaluation artifacts
       run: |
         python evaluate.py --backend all
         test -f outputs/benchmark_results.json
-        python evaluate_live.py
-        test -f outputs/tinyfish_live_evaluation.md
+        python -c "import json; d=json.load(open('outputs/benchmark_results.json')); assert d['neural_status']['hybrid_fallback_active'] is True, 'Neural fallback inactive'; assert d['neural_status']['neural_only_active'] is True, 'Neural verifier inactive'; assert len(d['dev_sweep']['threshold_evaluations']) == 8, 'Dev sweep incomplete'; assert 'bootstrap_ci_95' in d['held_out_test_metrics']['hybrid'], 'Bootstrap CI missing'; print('✅ Verified Neural NLI, dev sweep, and bootstrap CIs active!')"
+        python evaluate_live.py --verify-fixture
+        test -f outputs/tinyfish_fixture_evaluation.md
+        python demo_case_study.py
+        test -f outputs/demo_case_study.md

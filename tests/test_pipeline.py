@@ -650,3 +650,51 @@ def test_neural_nli_runtime_label_schema_verification():
     assert verifier.label_mapping[1] == "ENTAILMENT"
     assert verifier.label_mapping[2] == "NEUTRAL"
     assert verifier.MODEL_REVISION == "2a4f614a701367a02d51389039afc998faeda637"
+
+def test_get_stratified_dev_test_split_proportions():
+    from evaluate import get_stratified_dev_test_split
+    sample_data = [
+        {"claim": f"claim_r_{i}", "label": "Refuted"} for i in range(15)
+    ] + [
+        {"claim": f"claim_s_{i}", "label": "Supported"} for i in range(15)
+    ] + [
+        {"claim": f"claim_c_{i}", "label": "Conflicting Evidence/Cherrypicking"} for i in range(15)
+    ] + [
+        {"claim": f"claim_n_{i}", "label": "Not Enough Evidence"} for i in range(15)
+    ]
+    dev, test = get_stratified_dev_test_split(sample_data, dev_per_class=10, test_per_class=5)
+    assert len(dev) == 40
+    assert len(test) == 20
+    # Check that each class has exactly 10 in dev and 5 in test
+    for label in ["Refuted", "Supported", "Conflicting Evidence/Cherrypicking", "Not Enough Evidence"]:
+        assert sum(1 for d in dev if d["label"] == label) == 10
+        assert sum(1 for d in test if d["label"] == label) == 5
+
+def test_compute_bootstrap_confidence_intervals_bounds():
+    from evaluate import compute_bootstrap_confidence_intervals
+    y_true = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"] * 10
+    y_pred = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"] * 10
+    labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
+    ci = compute_bootstrap_confidence_intervals(y_true, y_pred, labels, n_bootstraps=100)
+    assert "accuracy_ci_95" in ci
+    assert "macro_f1_ci_95" in ci
+    assert ci["accuracy_ci_95"][0] <= 1.0 <= ci["accuracy_ci_95"][1]
+
+def test_hybrid_cross_verifier_diagnostics():
+    from proofgraph.verifier.nli import HybridNLIVerifier
+    hybrid = HybridNLIVerifier(prefer_offline=True)
+    claim = AtomicClaim(text="Water boils at 100 degrees Celsius.", parent_sentence="")
+    evidence = EvidencePassage(id="e1", text="Water boils at 100 degrees Celsius at sea level.", relevance_score=0.95)
+    hybrid.verify_claim(claim, [evidence])
+    assert hasattr(hybrid, "last_diagnostics")
+    assert "rule_label" in hybrid.last_diagnostics
+
+def test_demo_case_study_execution(tmp_path):
+    from demo_case_study import run_case_study
+    out_file = str(tmp_path / "test_case_study.md")
+    res = run_case_study(output_path=out_file)
+    assert os.path.exists(res)
+    with open(res, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "Eiffel Tower" in content
+    assert "RefNLI Context Alignment Gating" in content
