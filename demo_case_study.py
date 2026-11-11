@@ -1,5 +1,5 @@
 """
-ProofGraph: End-to-End Claim Verification Case Study & Trace Demonstration
+ProofGraph: Verifier Case Study with Curated Evidence Fixtures
 ==========================================================================
 Demonstrates the full verification pipeline on concrete claims, providing
 step-by-step transparency across:
@@ -29,7 +29,7 @@ from proofgraph.reporter.report_generator import ReportGenerator
 
 def run_case_study(output_path: str = "outputs/demo_case_study.md") -> str:
     print("=" * 80)
-    print("🔎 PROOFGRAPH: END-TO-END CLAIM VERIFICATION CASE STUDY & TRACE")
+    print("🔎 PROOFGRAPH: VERIFIER CASE STUDY WITH CURATED EVIDENCE")
     print("=" * 80)
 
     decomposer = ClaimDecomposer()
@@ -69,22 +69,21 @@ def run_case_study(output_path: str = "outputs/demo_case_study.md") -> str:
         credibility_score=0.96,
     )
     ev_distractor = EvidencePassage(
-        id="ev_rome_colosseum",
-        text="The Colosseum in Rome, Italy, was completed in 80 AD under Titus and remains an iconic symbol of Imperial Rome.",
-        source_url="https://www.history.com/topics/ancient-history/colosseum",
-        source_domain="history.com",
-        source_title="Colosseum - History.com",
-        relevance_score=0.72,
-        credibility_score=0.85,
+        id="ev_unrelated_biography",
+        text="William was born in 1980 in Toronto to diplomat parents.",
+        source_title="Synthetic unrelated biography distractor",
+        relevance_score=0.10,
+        credibility_score=0.50,
     )
 
+    # The third passage is an intentionally synthetic unrelated distractor, not a live source.
     evidence_pool = [ev_paris, ev_gustave, ev_distractor]
     print(f"\n  Step 2: Ingested {len(evidence_pool)} Candidate Passages:")
     for ev in evidence_pool:
         print(f"    • [{ev.id}] {ev.source_domain} (Relevance: {ev.relevance_score:.2f}, Credibility: {ev.credibility_score:.2f})")
 
     # Step 3: Alignment Gating
-    print(f"\n  Step 3: RefNLI Context Alignment Gate:")
+    print(f"\n  Step 3: Lexical Context Alignment Heuristic:")
     step3_trace = []
     for sc in subclaims:
         for ev in evidence_pool:
@@ -106,7 +105,7 @@ def run_case_study(output_path: str = "outputs/demo_case_study.md") -> str:
         v = verifier.verify_claim(sc, evidence_pool)
         diag = getattr(verifier, "last_diagnostics", {})
         verdicts.append((sc, v, diag))
-        print(f"    • [{sc.id}] Verdict: {v.label.value} (Confidence: {v.confidence*100:.1f}%)")
+        print(f"    • [{sc.id}] Verdict: {v.label.value} (uncalibrated heuristic score: {v.confidence*100:.1f}%)")
         print(f"      Justification: {v.justification[:90]}...")
         if diag.get("neural_evaluated"):
             print(f"      Cross-Verifier Diagnostic: Rule={diag.get('rule_label')}, Neural={diag.get('neural_label')} (Conf: {diag.get('neural_confidence')})")
@@ -125,14 +124,14 @@ def run_case_study(output_path: str = "outputs/demo_case_study.md") -> str:
         credibility_score=0.98,
     )
     v2 = verifier.verify_claim(sc2, [ev_claymath])
-    print(f"  Step 4: Verdict: {v2.label.value} (Confidence: {v2.confidence*100:.1f}%)")
+    print(f"  Step 4: Verdict: {v2.label.value} (uncalibrated heuristic score: {v2.confidence*100:.1f}%)")
     print(f"  Reason: Correctly abstained from asserting false support on unresolved mathematical open problem.")
 
     # Generate Markdown Case Study Report
     md = [
-        "# ProofGraph: End-to-End Claim Verification Case Study & Trace Report",
+        "# ProofGraph: Verifier Case Study with Curated Evidence Fixtures",
         f"**Generated:** `{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}`  ",
-        "**Purpose:** Demonstrates exact step-by-step pipeline execution, RefNLI distractor filtering, rule/neural cooperation, and honest abstention handling on real claims.\n",
+        "**Purpose:** Demonstrates decomposition, alignment filtering, and verifier behavior on selected claims. Evidence below is hard-coded fixture input; this script does not perform live TinyFish search or fetch.\n",
         "---",
         "## 🔬 Case Study 1: Multi-Predicate Compound Claim",
         f"**Target Input Claim:**\n> \"{claim_1}\"\n",
@@ -149,8 +148,8 @@ def run_case_study(output_path: str = "outputs/demo_case_study.md") -> str:
     for ev in evidence_pool:
         md.append(f"| `{ev.id}` | `{ev.source_domain}` | {ev.credibility_score:.2f} | {ev.relevance_score:.2f} | \"{ev.text[:80]}...\" |")
 
-    md.append("\n### Step 3: RefNLI Context Alignment Gating")
-    md.append("Before inference, each pair is filtered by the RefNLI alignment gate to prevent reference-indeterminacy hallucinations:")
+    md.append("\n### Step 3: Lexical Context Alignment Heuristic")
+    md.append("This lightweight heuristic is inspired by reference-indeterminacy research; it is not the RefNLI model. The synthetic unrelated distractor should be rejected:")
     md.append("| Subclaim | Evidence | Status | Jaccard | Gate Decision |")
     md.append("| :--- | :--- | :---: | :---: | :--- |")
     for t in step3_trace:
@@ -161,7 +160,7 @@ def run_case_study(output_path: str = "outputs/demo_case_study.md") -> str:
     for sc, v, diag in verdicts:
         badge = "🔴 CONTRADICTED" if v.label == VeracityLabel.CONTRADICTED else ("🟢 SUPPORTED" if v.label == VeracityLabel.SUPPORTED else "⚪ INSUFFICIENT_EVIDENCE")
         md.append(f"#### Subclaim `{sc.id}`: \"{sc.text}\"")
-        md.append(f"- **Final Verdict:** `{badge}` ({v.confidence*100:.1f}% confidence)")
+        md.append(f"- **Final Verdict:** `{badge}` (uncalibrated heuristic score: {v.confidence*100:.1f}%)")
         md.append(f"- **Justification:** {v.justification}")
         if diag.get("neural_evaluated"):
             md.append(f"- **Cross-Model Diagnostics:** Rule Stance=`{diag.get('rule_label')}` | Neural Cross-Encoder=`{diag.get('neural_label')}` (Neural Conf: `{diag.get('neural_confidence')}`)")
@@ -170,7 +169,7 @@ def run_case_study(output_path: str = "outputs/demo_case_study.md") -> str:
     md.append("## 🛡️ Case Study 2: Conservative Abstention on Unresolved Claims")
     md.append(f"**Target Claim:**\n> \"{claim_2}\"\n")
     md.append(f"- **Evidence:** Clay Mathematics Institute statement on P vs NP.")
-    md.append(f"- **Engine Verdict:** `{v2.label.value}` ({v2.confidence*100:.1f}% confidence)")
+    md.append(f"- **Engine Verdict:** `{v2.label.value}` (uncalibrated heuristic score: {v2.confidence*100:.1f}%)")
     md.append(f"- **Analysis:** The engine refuses to hallucinate refutation or support when evidence confirms the problem remains open, demonstrating conservative abstention behavior.")
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

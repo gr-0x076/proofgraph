@@ -21,6 +21,18 @@ class RefNLIAlignmentGate:
         tokens = set(re.findall(r'\b[a-z0-9]+\b', text.lower()))
         return tokens - stopwords
 
+    NATIONALITIES = {
+        "american", "french", "german", "british", "russian", "chinese",
+        "pakistani", "indian", "japanese", "korean", "italian", "spanish",
+        "canadian", "australian"
+    }
+
+    TITLES = {"dr", "mr", "mrs", "ms", "prof", "sir", "lord"}
+    SUBJECT_STOPWORDS = TITLES | {
+        "the", "a", "an", "and", "or", "in", "on", "at", "to", "for", "of",
+        "with", "by", "as", "is", "was", "are", "were", "it", "its"
+    }
+
     def check_alignment(self, claim: AtomicClaim, evidence: EvidencePassage) -> Tuple[bool, float, str]:
         """
         Evaluates whether evidence is contextually aligned with the claim.
@@ -38,7 +50,6 @@ class RefNLIAlignmentGate:
 
         # Check entity and primary subject overlap (RefNLI Reference Indeterminacy Defense)
         entity_match = False
-        TITLES = {"dr", "mr", "mrs", "ms", "prof", "sir", "lord"}
         if claim.entities:
             non_numeric = [e for e in claim.entities if not re.match(r'^\d+$', e)]
             primary_subject = non_numeric[0] if non_numeric else claim.entities[0]
@@ -47,23 +58,37 @@ class RefNLIAlignmentGate:
             # verify that core subject stems (excluding titles and short words) are present in evidence
             subject_parts = [
                 p.lower().strip(".,") for p in primary_subject.split() 
-                if p.lower().strip(".,") not in TITLES and len(p.strip(".,")) >= 3
+                if p.lower().strip(".,") not in self.SUBJECT_STOPWORDS and len(p.strip(".,")) >= 3
             ]
-            if subject_parts and not any(p in evidence.text.lower() for p in subject_parts):
-                return False, jaccard, f"Context Mismatch: Primary subject '{primary_subject}' absent in evidence (RefNLI Reference Indeterminacy)"
 
-            for ent in claim.entities:
-                if ent.lower() in evidence.text.lower():
+            has_primary = bool(subject_parts) and any(
+                p in evidence.text.lower() for p in subject_parts
+            )
+
+            other_entity_match = any(
+                e.lower() in evidence.text.lower()
+                for e in non_numeric[1:]
+                if len(e.strip()) >= 3 and e.lower().strip() not in self.SUBJECT_STOPWORDS
+            )
+
+            is_attr_or_nationality = primary_subject.lower() in self.NATIONALITIES
+
+            if subject_parts and not has_primary:
+                # If primary subject is an adjective/nationality (e.g. French in 'French embassy')
+                # and another substantive entity matches (e.g. Sudan): allow alignment
+                if is_attr_or_nationality and other_entity_match:
                     entity_match = True
-                    break
-
-            if not entity_match and jaccard < 0.25:
-                return False, jaccard, f"Context Mismatch: Entities {claim.entities} absent and Jaccard ({jaccard:.3f}) < 0.25"
+                else:
+                    return False, jaccard, f"Context Mismatch: Primary subject '{primary_subject}' absent in evidence (RefNLI Reference Indeterminacy)"
+            else:
+                entity_match = has_primary or other_entity_match
         else:
-            entity_match = True
+            entity_match = False
 
+        claim_coverage = len(intersection) / len(claim_tokens)
+        lexical_match = jaccard >= self.jaccard_threshold or (not claim.entities and claim_coverage >= 0.20)
 
-        if entity_match or jaccard >= self.jaccard_threshold:
-            return True, jaccard, "Aligned: entity or lexical threshold satisfied"
+        if entity_match or lexical_match:
+            return True, jaccard, "Aligned: primary subject or lexical overlap threshold satisfied"
         
-        return False, jaccard, f"Context Mismatch: Jaccard ({jaccard:.3f}) below threshold ({self.jaccard_threshold}) and no entity match"
+        return False, jaccard, f"Context Mismatch: Jaccard ({jaccard:.3f}) below threshold ({self.jaccard_threshold}) and no primary-subject match"

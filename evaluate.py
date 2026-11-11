@@ -213,8 +213,9 @@ def compute_bootstrap_confidence_intervals(
     seed: int = 42,
 ) -> Dict[str, Any]:
     """
-    Non-parametric bootstrap confidence intervals (default 95% CI, 1000 resamples).
-    Directly addresses small-sample statistical uncertainty on accuracy and macro-F1.
+    Stratified non-parametric percentile bootstrap intervals (default 95%, 1000 resamples).
+    Resamples within each gold-label class to preserve the designed class balance. These
+    describe conditional sampling variability; they do not repair historical data reuse.
     """
     rng = np.random.RandomState(seed)
     n = len(y_true)
@@ -229,8 +230,19 @@ def compute_bootstrap_confidence_intervals(
     y_true_arr = np.array(y_true)
     y_pred_arr = np.array(y_pred)
 
+    class_indices = {
+        label: np.flatnonzero(y_true_arr == label)
+        for label in labels
+        if np.any(y_true_arr == label)
+    }
+
     for _ in range(n_bootstraps):
-        indices = rng.choice(n, size=n, replace=True)
+        # Preserve the class counts of the balanced evaluation design. Resample paired
+        # (gold, prediction) rows within each class so every replicate has every label.
+        indices = np.concatenate([
+            rng.choice(class_idx, size=len(class_idx), replace=True)
+            for class_idx in class_indices.values()
+        ])
         sample_true = y_true_arr[indices].tolist()
         sample_pred = y_pred_arr[indices].tolist()
 
@@ -268,9 +280,10 @@ def get_stratified_dev_test_split(
     data: List[Dict[str, Any]], dev_per_class: int = 10, test_per_class: int = 5
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
-    Partitions the 60 AVeriTeC sample into 40 Dev claims (10 per class) and 20 Held-Out
-    Test claims (5 per class). Hyperparameter threshold sweeping is performed exclusively
-    on Dev; the frozen threshold is evaluated once on the untouched Test set.
+    Creates a deterministic 40/20 class-stratified partition for a retrospective
+    development diagnostic. Earlier threshold sweeps included the full 60-item sample,
+    so the 20-item partition is historically exposed and must not be called independent,
+    untouched, or held out for final performance claims.
     """
     groups = defaultdict(list)
     for idx, item in enumerate(data):
@@ -481,13 +494,13 @@ def run_ablation_and_baselines(sample_path: str):
 
     labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
 
-    # 1. Stratified Dev/Test Partition: 40 Dev (10 per class) / 20 Held-Out Test (5 per class)
+    # 1. Retrospective class-stratified partition: prior sweeps used all 60 examples.
     dev_data, test_data = get_stratified_dev_test_split(data, dev_per_class=10, test_per_class=5)
-    print(f"\n📊 Stratified Partition: Dev Set = {len(dev_data)} claims (10/class) | Held-Out Test Set = {len(test_data)} claims (5/class)")
+    print(f"\n📊 Retrospective Partition: Dev = {len(dev_data)} claims | Diagnostic subset = {len(test_data)} claims (not an independent test)")
 
     # 2. Hyperparameter Threshold Sweep EXCLUSIVELY on 40 Dev Claims
     print("\n" + "-" * 78)
-    print("🛠️ STEP 1: HYPERPARAMETER THRESHOLD SWEEP ON 40 DEV CLAIMS (Zero Test Leakage)")
+    print("🛠️ STEP 1: CURRENT-RUN THRESHOLD SWEEP ON 40-CLAIM DEVELOPMENT PARTITION")
     print("-" * 78)
     candidate_thresholds = [0.50, 0.60, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
     sweep_results = []
@@ -523,9 +536,9 @@ def run_ablation_and_baselines(sample_path: str):
 
     print(f"\n✅ Frozen Optimal Fallback Threshold Selected on Dev Split: {best_thresh:.2f} (Dev Macro-F1 = {best_dev_f1:.3f})")
 
-    # 3. Evaluation on 20 HELD-OUT TEST CLAIMS with Selected Threshold
+    # 3. Retrospective 20-claim subset diagnostic. This subset was seen in prior sweeps.
     print("\n" + "-" * 78)
-    print(f"🎯 STEP 2: INDEPENDENT EVALUATION ON 20 HELD-OUT TEST CLAIMS (Frozen Threshold={best_thresh:.2f})")
+    print(f"🎯 STEP 2: RETROSPECTIVE 20-CLAIM SUBSET DIAGNOSTIC (NOT INDEPENDENT; Threshold={best_thresh:.2f})")
     print("-" * 78)
 
     pipe_rules = ProofGraphPipeline(verifier_backend="rules")
@@ -554,7 +567,7 @@ def run_ablation_and_baselines(sample_path: str):
         diag = dict(getattr(pipe_hybrid_frozen.verifier, "last_diagnostics", {}))
         test_per_claim_results.append({
             "global_index": item.get("global_index"),
-            "split": "held_out_test",
+            "split": "retrospective_test_partition",
             "claim_sha256": hashlib.sha256(claim_text.encode("utf-8")).hexdigest(),
             "ground_truth": map_label(item["label"]),
             "predictions": {
@@ -589,7 +602,7 @@ def run_ablation_and_baselines(sample_path: str):
     m_test_dense["bootstrap_ci_95"] = ci_test_dense
     m_test_lex["bootstrap_ci_95"] = ci_test_lex
 
-    print("\n| Configuration (Held-Out Test N=20)    | Accuracy (95% CI)     | Macro-F1 (95% CI)   | Prec (Contra) | Rec (Contra) |")
+    print("\n| Configuration (Retrospective Subset N=20) | Accuracy (95% stratified CI) | Macro-F1 (95% stratified CI) | Prec (Contra) | Rec (Contra) |")
     print("| :------------------------------------ | :--------------------: | :------------------: | :-----------: | :----------: |")
     print(f"| **ProofGraph Hybrid (Threshold={best_thresh:.2f})** | **{m_test_hybrid['accuracy']*100:.1f}%** [{ci_test_hybrid['accuracy_ci_95'][0]*100:.0f}–{ci_test_hybrid['accuracy_ci_95'][1]*100:.0f}%] | **{m_test_hybrid['macro_f1']:.3f}** [{ci_test_hybrid['macro_f1_ci_95'][0]:.2f}–{ci_test_hybrid['macro_f1_ci_95'][1]:.2f}] |     {m_test_hybrid['per_class']['CONTRADICTED']['precision']:.3f}     |    **{m_test_hybrid['per_class']['CONTRADICTED']['recall']:.3f}**   |")
     print(f"| ProofGraph Rules Alone                |  {m_test_rules['accuracy']*100:.1f}% [{ci_test_rules['accuracy_ci_95'][0]*100:.0f}–{ci_test_rules['accuracy_ci_95'][1]*100:.0f}%]  |   {m_test_rules['macro_f1']:.3f} [{ci_test_rules['macro_f1_ci_95'][0]:.2f}–{ci_test_rules['macro_f1_ci_95'][1]:.2f}]  |     {m_test_rules['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_test_rules['per_class']['CONTRADICTED']['recall']:.3f}   |")
@@ -686,12 +699,15 @@ def run_ablation_and_baselines(sample_path: str):
             "Conflicting Evidence/Cherrypicking": "INSUFFICIENT_EVIDENCE",
             "Not Enough Evidence": "INSUFFICIENT_EVIDENCE",
         },
-        "protocol": "Stratified 40-Dev / 20-Held-Out-Test Split (Zero Hyperparameter Snooping) with 1000-resample non-parametric bootstrap 95% CIs.",
+        "protocol": "Retrospective class-stratified 40/20 partition. Prior threshold sweeps included all 60 claims, so the 20-claim subset is not an independent test set. CIs use class-stratified paired bootstrap.",
         "evaluation_status": {
-            "type": "stratified_dev_tuning_and_held_out_test_evaluation",
-            "threshold_selection": f"neural_fallback_threshold={best_thresh:.2f} was selected solely on the 40-claim Dev split, then evaluated once on the 20-claim held-out test split",
-            "independent_test_estimate": True,
-            "bootstrap_ci_method": "Non-parametric percentile bootstrap (n=1000, alpha=0.05)",
+            "type": "retrospective_stratified_development_diagnostic",
+            "threshold_selection": f"Current run selected neural_fallback_threshold={best_thresh:.2f} on its 40-claim development partition; prior experiments swept thresholds on the full 60-claim sample before this partition existed.",
+            "independent_test_estimate": False,
+            "historical_data_reuse": True,
+            "historical_data_reuse_note": "All 60 examples, including this 20-claim diagnostic subset, appeared in earlier threshold sweeps. Do not report this subset as untouched, independent, or held out.",
+            "bootstrap_ci_method": "Class-stratified paired non-parametric percentile bootstrap (n=1000, alpha=0.05); describes sampling variability only and does not correct historical data reuse.",
+            "final_performance_claim_supported": False,
         },
         "dev_sweep": {
             "dev_sample_size": len(dev_data),
@@ -699,7 +715,7 @@ def run_ablation_and_baselines(sample_path: str):
             "selected_threshold": best_thresh,
             "threshold_evaluations": sweep_results,
         },
-        "held_out_test_metrics": {
+        "retrospective_subset_metrics": {
             "test_sample_size": len(test_data),
             "rules": m_test_rules,
             "hybrid": m_test_hybrid,
@@ -722,7 +738,7 @@ def run_ablation_and_baselines(sample_path: str):
             "neural_only_active": bool(neural_verifier.is_available),
         },
         "predictions": {
-            "held_out_test": test_per_claim_results,
+            "retrospective_subset": test_per_claim_results,
             "full_sample": full_per_claim_results,
         },
     }
@@ -730,7 +746,7 @@ def run_ablation_and_baselines(sample_path: str):
     os.makedirs(os.path.dirname(artifact_path), exist_ok=True)
     with open(artifact_path, "w", encoding="utf-8") as artifact:
         json.dump(results, artifact, indent=2)
-    print(f"\nWrote stratified dev/test evaluation, sweep results, bootstrap CIs, and dataset hash to {artifact_path}")
+    print(f"\nWrote retrospective split diagnostics, sweep results, stratified bootstrap CIs, and dataset hash to {artifact_path}")
 
 def run_held_out_context_mismatch_benchmark():
     print("\n" + "=" * 78)
@@ -795,8 +811,8 @@ def run_held_out_context_mismatch_benchmark():
 
     print(f"\n| Gate Configuration                      | Accuracy (N=20) | False Refutations (Mismatches N=10) |")
     print(f"| :-------------------------------------- | :-------------: | :----------------------------------: |")
-    print(f"| **ProofGraph (With RefNLI Gate)**       | **{correct_with/n*100:.1f}% ({correct_with}/{n})** | **{false_contra_with}/{n_mismatches} ({false_contra_with/n_mismatches*100:.1f}%)**           |")
-    print(f"| Ablation (WITHOUT RefNLI Gate)          | {correct_without/n*100:.1f}% ({correct_without}/{n})  | {false_contra_without}/{n_mismatches} ({false_contra_without/n_mismatches*100:.1f}%)             |")
+    print(f"| **ProofGraph (With lexical alignment heuristic)** | **{correct_with/n*100:.1f}% ({correct_with}/{n})** | **{false_contra_with}/{n_mismatches} ({false_contra_with/n_mismatches*100:.1f}%)** |")
+    print(f"| Ablation (WITHOUT alignment gate) | {correct_without/n*100:.1f}% ({correct_without}/{n}) | {false_contra_without}/{n_mismatches} ({false_contra_without/n_mismatches*100:.1f}%) |")
     print("=" * 78)
 
 if __name__ == "__main__":

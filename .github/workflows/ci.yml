@@ -49,7 +49,7 @@ jobs:
       run: |
         python evaluate.py --backend all
         test -f outputs/benchmark_results.json
-        python -c "import json; d=json.load(open('outputs/benchmark_results.json')); assert d['neural_status']['hybrid_fallback_active'] is True, 'Neural fallback inactive'; assert d['neural_status']['neural_only_active'] is True, 'Neural verifier inactive'; assert len(d['dev_sweep']['threshold_evaluations']) == 8, 'Dev sweep incomplete'; assert 'bootstrap_ci_95' in d['held_out_test_metrics']['hybrid'], 'Bootstrap CI missing'; print('✅ Verified Neural NLI, dev sweep, and bootstrap CIs active!')"
+        python -c "import json; d=json.load(open('outputs/benchmark_results.json')); assert d['neural_status']['hybrid_fallback_active'] is True, 'Neural fallback inactive'; assert d['neural_status']['neural_only_active'] is True, 'Neural verifier inactive'; assert len(d['dev_sweep']['threshold_evaluations']) == 8, 'Dev sweep incomplete'; assert 'bootstrap_ci_95' in d['retrospective_subset_metrics']['hybrid'], 'Bootstrap CI missing'; assert d['evaluation_status']['independent_test_estimate'] is False, 'Historically exposed sample mislabeled independent'; print('✅ Verified Neural NLI, dev sweep, CIs, and honest evaluation status!')"
         python evaluate_live.py --verify-fixture
         test -f outputs/tinyfish_fixture_evaluation.md
         python demo_case_study.py

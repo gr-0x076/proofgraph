@@ -47,6 +47,33 @@ def test_refnli_alignment_gate():
     assert aligned is False
     assert "Context Mismatch" in msg
 
+def test_alignment_gate_rejects_stopword_and_coincidental_entity_matches():
+    gate = RefNLIAlignmentGate(jaccard_threshold=0.15)
+    claim = AtomicClaim(
+        text="The Eiffel Tower was built in Paris.",
+        parent_sentence="",
+        entities=["The Eiffel Tower", "Paris"],
+    )
+    unrelated = EvidencePassage(
+        text="The Colosseum in Rome is an ancient amphitheater.",
+        source_title="Unrelated history page",
+    )
+    aligned, _, reason = gate.check_alignment(claim, unrelated)
+    assert aligned is False
+    assert "Primary subject" in reason
+
+
+def test_alignment_gate_without_entities_requires_lexical_overlap():
+    gate = RefNLIAlignmentGate(jaccard_threshold=0.15)
+    claim = AtomicClaim(text="A rare enzyme regulates cell division.", parent_sentence="")
+    unrelated = EvidencePassage(
+        text="The Colosseum in Rome is an ancient amphitheater.",
+        source_title="Unrelated history page",
+    )
+    aligned, _, _ = gate.check_alignment(claim, unrelated)
+    assert aligned is False
+
+
 def test_synthetic_context_mismatch_examples():
     """Checks a small hand-authored alignment example set; this is not RefNLI or held out."""
     gate = RefNLIAlignmentGate(jaccard_threshold=0.12)
@@ -697,4 +724,6 @@ def test_demo_case_study_execution(tmp_path):
     with open(res, "r", encoding="utf-8") as f:
         content = f.read()
     assert "Eiffel Tower" in content
-    assert "RefNLI Context Alignment Gating" in content
+    assert "Lexical Context Alignment Heuristic" in content
+    assert "REJECTED" in content
+    assert "does not perform live TinyFish search or fetch" in content

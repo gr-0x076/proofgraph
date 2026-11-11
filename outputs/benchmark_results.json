@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at_utc": "2026-11-11T14:41:56.571878+00:00",
+  "generated_at_utc": "2026-11-11T16:23:59.987386+00:00",
   "dataset": "data/benchmarks/averitec_dev_sample.json",
   "dataset_sha256": "3a7b3c9a7c81837b048147b386ea3de5c3a43ddea3eb4e361b8a638ee44841ef",
   "total_sample_size": 60,
@@ -10,86 +10,89 @@
     "Conflicting Evidence/Cherrypicking": "INSUFFICIENT_EVIDENCE",
     "Not Enough Evidence": "INSUFFICIENT_EVIDENCE"
   },
-  "protocol": "Stratified 40-Dev / 20-Held-Out-Test Split (Zero Hyperparameter Snooping) with 1000-resample non-parametric bootstrap 95% CIs.",
+  "protocol": "Retrospective class-stratified 40/20 partition. Prior threshold sweeps included all 60 claims, so the 20-claim subset is not an independent test set. CIs use class-stratified paired bootstrap.",
   "evaluation_status": {
-    "type": "stratified_dev_tuning_and_held_out_test_evaluation",
-    "threshold_selection": "neural_fallback_threshold=0.95 was selected solely on the 40-claim Dev split, then evaluated once on the 20-claim held-out test split",
-    "independent_test_estimate": true,
-    "bootstrap_ci_method": "Non-parametric percentile bootstrap (n=1000, alpha=0.05)"
+    "type": "retrospective_stratified_development_diagnostic",
+    "threshold_selection": "Current run selected neural_fallback_threshold=0.50 on its 40-claim development partition; prior experiments swept thresholds on the full 60-claim sample before this partition existed.",
+    "independent_test_estimate": false,
+    "historical_data_reuse": true,
+    "historical_data_reuse_note": "All 60 examples, including this 20-claim diagnostic subset, appeared in earlier threshold sweeps. Do not report this subset as untouched, independent, or held out.",
+    "bootstrap_ci_method": "Class-stratified paired non-parametric percentile bootstrap (n=1000, alpha=0.05); describes sampling variability only and does not correct historical data reuse.",
+    "final_performance_claim_supported": false
   },
   "dev_sweep": {
     "dev_sample_size": 40,
     "selection_criterion": "Maximizes Macro-F1 on the 40-claim development split",
-    "selected_threshold": 0.95,
+    "selected_threshold": 0.5,
     "threshold_evaluations": [
       {
         "threshold": 0.5,
         "accuracy": 0.425,
-        "macro_f1": 0.423015873015873,
-        "contra_recall": 0.3,
-        "contra_precision": 0.2727272727272727
+        "macro_f1": 0.39799331103678925,
+        "contra_recall": 0.4,
+        "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.6,
         "accuracy": 0.425,
-        "macro_f1": 0.423015873015873,
-        "contra_recall": 0.3,
-        "contra_precision": 0.2727272727272727
+        "macro_f1": 0.39799331103678925,
+        "contra_recall": 0.4,
+        "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.7,
         "accuracy": 0.425,
-        "macro_f1": 0.423015873015873,
-        "contra_recall": 0.3,
-        "contra_precision": 0.2727272727272727
+        "macro_f1": 0.39799331103678925,
+        "contra_recall": 0.4,
+        "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.75,
         "accuracy": 0.425,
-        "macro_f1": 0.423015873015873,
-        "contra_recall": 0.3,
-        "contra_precision": 0.2727272727272727
+        "macro_f1": 0.39799331103678925,
+        "contra_recall": 0.4,
+        "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.8,
         "accuracy": 0.425,
-        "macro_f1": 0.423015873015873,
-        "contra_recall": 0.3,
-        "contra_precision": 0.2727272727272727
+        "macro_f1": 0.39799331103678925,
+        "contra_recall": 0.4,
+        "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.85,
         "accuracy": 0.425,
-        "macro_f1": 0.423015873015873,
-        "contra_recall": 0.3,
-        "contra_precision": 0.2727272727272727
+        "macro_f1": 0.39799331103678925,
+        "contra_recall": 0.4,
+        "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.9,
-        "accuracy": 0.475,
-        "macro_f1": 0.46345029239766083,
+        "accuracy": 0.425,
+        "macro_f1": 0.3857142857142857,
         "contra_recall": 0.3,
-        "contra_precision": 0.375
+        "contra_precision": 0.3
       },
       {
         "threshold": 0.95,
-        "accuracy": 0.5,
-        "macro_f1": 0.48303167420814486,
+        "accuracy": 0.425,
+        "macro_f1": 0.3857142857142857,
         "contra_recall": 0.3,
-        "contra_precision": 0.42857142857142855
+        "contra_precision": 0.3
       }
     ]
   },
-  "held_out_test_metrics": {
+  "retrospective_subset_metrics": {
     "test_sample_size": 20,
     "rules": {
       "accuracy": 0.55,
-      "macro_f1": 0.5079365079365079,
+      "macro_f1": 0.5003663003663004,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.5714285714285714,
+          "precision": 0.5,
           "recall": 0.8,
-          "f1": 0.6666666666666666,
+          "f1": 0.6153846153846154,
           "support": 5
         },
         "CONTRADICTED": {
@@ -99,9 +102,9 @@
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5454545454545454,
+          "precision": 0.6,
           "recall": 0.6,
-          "f1": 0.5714285714285713,
+          "f1": 0.6,
           "support": 10
         }
       },
@@ -112,9 +115,9 @@
           "INSUFFICIENT_EVIDENCE": 1
         },
         "CONTRADICTED": {
-          "SUPPORTED": 0,
+          "SUPPORTED": 1,
           "CONTRADICTED": 1,
-          "INSUFFICIENT_EVIDENCE": 4
+          "INSUFFICIENT_EVIDENCE": 3
         },
         "INSUFFICIENT_EVIDENCE": {
           "SUPPORTED": 3,
@@ -131,12 +134,12 @@
           0.75
         ],
         "macro_f1_ci_95": [
-          0.288,
+          0.285,
           0.722
         ],
         "contra_recall_ci_95": [
           0.0,
-          0.667
+          0.6
         ],
         "contra_precision_ci_95": [
           0.0,
@@ -145,8 +148,8 @@
       }
     },
     "hybrid": {
-      "accuracy": 0.55,
-      "macro_f1": 0.5079365079365079,
+      "accuracy": 0.75,
+      "macro_f1": 0.760546642899584,
       "per_class": {
         "SUPPORTED": {
           "precision": 0.5714285714285714,
@@ -155,15 +158,15 @@
           "support": 5
         },
         "CONTRADICTED": {
-          "precision": 0.5,
-          "recall": 0.2,
-          "f1": 0.28571428571428575,
+          "precision": 0.8333333333333334,
+          "recall": 1.0,
+          "f1": 0.9090909090909091,
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5454545454545454,
+          "precision": 0.8571428571428571,
           "recall": 0.6,
-          "f1": 0.5714285714285713,
+          "f1": 0.7058823529411764,
           "support": 10
         }
       },
@@ -175,8 +178,8 @@
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
-          "CONTRADICTED": 1,
-          "INSUFFICIENT_EVIDENCE": 4
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 0
         },
         "INSUFFICIENT_EVIDENCE": {
           "SUPPORTED": 3,
@@ -189,26 +192,26 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.35,
-          0.75
+          0.6,
+          0.9
         ],
         "macro_f1_ci_95": [
-          0.288,
-          0.722
+          0.6,
+          0.907
         ],
         "contra_recall_ci_95": [
-          0.0,
-          0.667
+          1.0,
+          1.0
         ],
         "contra_precision_ci_95": [
-          0.0,
+          0.625,
           1.0
         ]
       }
     },
     "neural": {
-      "accuracy": 0.6,
-      "macro_f1": 0.5164835164835165,
+      "accuracy": 0.75,
+      "macro_f1": 0.6894409937888198,
       "per_class": {
         "SUPPORTED": {
           "precision": 0.5,
@@ -218,14 +221,14 @@
         },
         "CONTRADICTED": {
           "precision": 1.0,
-          "recall": 0.4,
-          "f1": 0.5714285714285715,
+          "recall": 1.0,
+          "f1": 1.0,
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5625,
+          "precision": 0.6923076923076923,
           "recall": 0.9,
-          "f1": 0.6923076923076923,
+          "f1": 0.7826086956521738,
           "support": 10
         }
       },
@@ -237,8 +240,8 @@
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
-          "CONTRADICTED": 2,
-          "INSUFFICIENT_EVIDENCE": 3
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 0
         },
         "INSUFFICIENT_EVIDENCE": {
           "SUPPORTED": 1,
@@ -251,31 +254,31 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.4,
-          0.8
+          0.6,
+          0.9
         ],
         "macro_f1_ci_95": [
-          0.243,
-          0.725
+          0.565,
+          0.886
         ],
         "contra_recall_ci_95": [
-          0.0,
+          1.0,
           1.0
         ],
         "contra_precision_ci_95": [
-          0.0,
+          1.0,
           1.0
         ]
       }
     },
     "without_alignment_gate": {
       "accuracy": 0.55,
-      "macro_f1": 0.5079365079365079,
+      "macro_f1": 0.5003663003663004,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.5714285714285714,
+          "precision": 0.5,
           "recall": 0.8,
-          "f1": 0.6666666666666666,
+          "f1": 0.6153846153846154,
           "support": 5
         },
         "CONTRADICTED": {
@@ -285,9 +288,9 @@
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5454545454545454,
+          "precision": 0.6,
           "recall": 0.6,
-          "f1": 0.5714285714285713,
+          "f1": 0.6,
           "support": 10
         }
       },
@@ -298,9 +301,9 @@
           "INSUFFICIENT_EVIDENCE": 1
         },
         "CONTRADICTED": {
-          "SUPPORTED": 0,
+          "SUPPORTED": 1,
           "CONTRADICTED": 1,
-          "INSUFFICIENT_EVIDENCE": 4
+          "INSUFFICIENT_EVIDENCE": 3
         },
         "INSUFFICIENT_EVIDENCE": {
           "SUPPORTED": 3,
@@ -317,12 +320,12 @@
           0.75
         ],
         "macro_f1_ci_95": [
-          0.288,
+          0.285,
           0.722
         ],
         "contra_recall_ci_95": [
           0.0,
-          0.667
+          0.6
         ],
         "contra_precision_ci_95": [
           0.0,
@@ -375,16 +378,16 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.4,
-          0.8
+          0.45,
+          0.75
         ],
         "macro_f1_ci_95": [
-          0.321,
-          0.755
+          0.353,
+          0.744
         ],
         "contra_recall_ci_95": [
           0.0,
-          0.667
+          0.6
         ],
         "contra_precision_ci_95": [
           0.0,
@@ -437,16 +440,16 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.35,
+          0.4,
           0.75
         ],
         "macro_f1_ci_95": [
-          0.298,
-          0.704
+          0.326,
+          0.707
         ],
         "contra_recall_ci_95": [
           0.0,
-          0.667
+          0.6
         ],
         "contra_precision_ci_95": [
           0.0,
@@ -458,167 +461,43 @@
   "full_sample_descriptive_metrics": {
     "full_sample_size": 60,
     "rules": {
-      "accuracy": 0.5166666666666667,
-      "macro_f1": 0.49259259259259264,
-      "per_class": {
-        "SUPPORTED": {
-          "precision": 0.5238095238095238,
-          "recall": 0.7333333333333333,
-          "f1": 0.611111111111111,
-          "support": 15
-        },
-        "CONTRADICTED": {
-          "precision": 0.4444444444444444,
-          "recall": 0.26666666666666666,
-          "f1": 0.33333333333333337,
-          "support": 15
-        },
-        "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5333333333333333,
-          "recall": 0.5333333333333333,
-          "f1": 0.5333333333333333,
-          "support": 30
-        }
-      },
-      "confusion_matrix": {
-        "SUPPORTED": {
-          "SUPPORTED": 11,
-          "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 4
-        },
-        "CONTRADICTED": {
-          "SUPPORTED": 1,
-          "CONTRADICTED": 4,
-          "INSUFFICIENT_EVIDENCE": 10
-        },
-        "INSUFFICIENT_EVIDENCE": {
-          "SUPPORTED": 9,
-          "CONTRADICTED": 5,
-          "INSUFFICIENT_EVIDENCE": 16
-        }
-      },
-      "total": 60,
-      "bootstrap_ci_95": {
-        "n_bootstraps": 1000,
-        "confidence_level": 0.95,
-        "accuracy_ci_95": [
-          0.383,
-          0.65
-        ],
-        "macro_f1_ci_95": [
-          0.354,
-          0.63
-        ],
-        "contra_recall_ci_95": [
-          0.062,
-          0.533
-        ],
-        "contra_precision_ci_95": [
-          0.1,
-          0.833
-        ]
-      }
-    },
-    "hybrid": {
-      "accuracy": 0.5166666666666667,
-      "macro_f1": 0.49259259259259264,
-      "per_class": {
-        "SUPPORTED": {
-          "precision": 0.5238095238095238,
-          "recall": 0.7333333333333333,
-          "f1": 0.611111111111111,
-          "support": 15
-        },
-        "CONTRADICTED": {
-          "precision": 0.4444444444444444,
-          "recall": 0.26666666666666666,
-          "f1": 0.33333333333333337,
-          "support": 15
-        },
-        "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5333333333333333,
-          "recall": 0.5333333333333333,
-          "f1": 0.5333333333333333,
-          "support": 30
-        }
-      },
-      "confusion_matrix": {
-        "SUPPORTED": {
-          "SUPPORTED": 11,
-          "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 4
-        },
-        "CONTRADICTED": {
-          "SUPPORTED": 1,
-          "CONTRADICTED": 4,
-          "INSUFFICIENT_EVIDENCE": 10
-        },
-        "INSUFFICIENT_EVIDENCE": {
-          "SUPPORTED": 9,
-          "CONTRADICTED": 5,
-          "INSUFFICIENT_EVIDENCE": 16
-        }
-      },
-      "total": 60,
-      "bootstrap_ci_95": {
-        "n_bootstraps": 1000,
-        "confidence_level": 0.95,
-        "accuracy_ci_95": [
-          0.383,
-          0.65
-        ],
-        "macro_f1_ci_95": [
-          0.354,
-          0.63
-        ],
-        "contra_recall_ci_95": [
-          0.062,
-          0.533
-        ],
-        "contra_precision_ci_95": [
-          0.1,
-          0.833
-        ]
-      }
-    },
-    "neural": {
       "accuracy": 0.48333333333333334,
-      "macro_f1": 0.3430155527018488,
+      "macro_f1": 0.44037145650048876,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.6666666666666666,
-          "recall": 0.13333333333333333,
-          "f1": 0.2222222222222222,
+          "precision": 0.42857142857142855,
+          "recall": 0.6,
+          "f1": 0.5,
           "support": 15
         },
         "CONTRADICTED": {
-          "precision": 0.25,
-          "recall": 0.13333333333333333,
-          "f1": 0.1739130434782609,
+          "precision": 0.42857142857142855,
+          "recall": 0.2,
+          "f1": 0.27272727272727276,
           "support": 15
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5102040816326531,
-          "recall": 0.8333333333333334,
-          "f1": 0.6329113924050633,
+          "precision": 0.53125,
+          "recall": 0.5666666666666667,
+          "f1": 0.5483870967741935,
           "support": 30
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 2,
-          "CONTRADICTED": 2,
-          "INSUFFICIENT_EVIDENCE": 11
+          "SUPPORTED": 9,
+          "CONTRADICTED": 0,
+          "INSUFFICIENT_EVIDENCE": 6
         },
         "CONTRADICTED": {
-          "SUPPORTED": 0,
-          "CONTRADICTED": 2,
-          "INSUFFICIENT_EVIDENCE": 13
+          "SUPPORTED": 3,
+          "CONTRADICTED": 3,
+          "INSUFFICIENT_EVIDENCE": 9
         },
         "INSUFFICIENT_EVIDENCE": {
-          "SUPPORTED": 1,
+          "SUPPORTED": 9,
           "CONTRADICTED": 4,
-          "INSUFFICIENT_EVIDENCE": 25
+          "INSUFFICIENT_EVIDENCE": 17
         }
       },
       "total": 60,
@@ -627,55 +506,179 @@
         "confidence_level": 0.95,
         "accuracy_ci_95": [
           0.367,
-          0.617
+          0.6
         ],
         "macro_f1_ci_95": [
-          0.227,
-          0.475
+          0.31,
+          0.563
         ],
         "contra_recall_ci_95": [
           0.0,
-          0.333
+          0.4
         ],
         "contra_precision_ci_95": [
           0.0,
-          0.6
+          0.833
         ]
       }
     },
-    "without_alignment_gate": {
-      "accuracy": 0.5166666666666667,
-      "macro_f1": 0.49259259259259264,
+    "hybrid": {
+      "accuracy": 0.5333333333333333,
+      "macro_f1": 0.5225023342670402,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.5238095238095238,
-          "recall": 0.7333333333333333,
-          "f1": 0.611111111111111,
+          "precision": 0.4666666666666667,
+          "recall": 0.4666666666666667,
+          "f1": 0.4666666666666667,
           "support": 15
         },
         "CONTRADICTED": {
-          "precision": 0.4444444444444444,
-          "recall": 0.26666666666666666,
-          "f1": 0.33333333333333337,
+          "precision": 0.47368421052631576,
+          "recall": 0.6,
+          "f1": 0.5294117647058824,
           "support": 15
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5333333333333333,
+          "precision": 0.6153846153846154,
           "recall": 0.5333333333333333,
-          "f1": 0.5333333333333333,
+          "f1": 0.5714285714285715,
           "support": 30
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 11,
-          "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 4
+          "SUPPORTED": 7,
+          "CONTRADICTED": 3,
+          "INSUFFICIENT_EVIDENCE": 5
         },
         "CONTRADICTED": {
           "SUPPORTED": 1,
-          "CONTRADICTED": 4,
+          "CONTRADICTED": 9,
+          "INSUFFICIENT_EVIDENCE": 5
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 7,
+          "CONTRADICTED": 7,
+          "INSUFFICIENT_EVIDENCE": 16
+        }
+      },
+      "total": 60,
+      "bootstrap_ci_95": {
+        "n_bootstraps": 1000,
+        "confidence_level": 0.95,
+        "accuracy_ci_95": [
+          0.4,
+          0.667
+        ],
+        "macro_f1_ci_95": [
+          0.392,
+          0.657
+        ],
+        "contra_recall_ci_95": [
+          0.333,
+          0.867
+        ],
+        "contra_precision_ci_95": [
+          0.316,
+          0.667
+        ]
+      }
+    },
+    "neural": {
+      "accuracy": 0.55,
+      "macro_f1": 0.46349206349206346,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.4,
+          "recall": 0.13333333333333333,
+          "f1": 0.2,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.5333333333333333,
+          "recall": 0.5333333333333333,
+          "f1": 0.5333333333333333,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.575,
+          "recall": 0.7666666666666667,
+          "f1": 0.6571428571428571,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 2,
+          "CONTRADICTED": 3,
           "INSUFFICIENT_EVIDENCE": 10
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 0,
+          "CONTRADICTED": 8,
+          "INSUFFICIENT_EVIDENCE": 7
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 3,
+          "CONTRADICTED": 4,
+          "INSUFFICIENT_EVIDENCE": 23
+        }
+      },
+      "total": 60,
+      "bootstrap_ci_95": {
+        "n_bootstraps": 1000,
+        "confidence_level": 0.95,
+        "accuracy_ci_95": [
+          0.45,
+          0.65
+        ],
+        "macro_f1_ci_95": [
+          0.347,
+          0.586
+        ],
+        "contra_recall_ci_95": [
+          0.267,
+          0.8
+        ],
+        "contra_precision_ci_95": [
+          0.353,
+          0.778
+        ]
+      }
+    },
+    "without_alignment_gate": {
+      "accuracy": 0.4666666666666667,
+      "macro_f1": 0.42848657638393917,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.42857142857142855,
+          "recall": 0.6,
+          "f1": 0.5,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.375,
+          "recall": 0.2,
+          "f1": 0.26086956521739135,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.5161290322580645,
+          "recall": 0.5333333333333333,
+          "f1": 0.5245901639344263,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 9,
+          "CONTRADICTED": 0,
+          "INSUFFICIENT_EVIDENCE": 6
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 3,
+          "CONTRADICTED": 3,
+          "INSUFFICIENT_EVIDENCE": 9
         },
         "INSUFFICIENT_EVIDENCE": {
           "SUPPORTED": 9,
@@ -688,20 +691,20 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.383,
-          0.65
+          0.35,
+          0.584
         ],
         "macro_f1_ci_95": [
-          0.354,
-          0.63
+          0.292,
+          0.559
         ],
         "contra_recall_ci_95": [
-          0.062,
-          0.533
+          0.0,
+          0.4
         ],
         "contra_precision_ci_95": [
-          0.1,
-          0.833
+          0.0,
+          0.75
         ]
       }
     },
@@ -750,16 +753,16 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.3,
-          0.533
+          0.333,
+          0.5
         ],
         "macro_f1_ci_95": [
-          0.24,
-          0.452
+          0.257,
+          0.446
         ],
         "contra_recall_ci_95": [
           0.0,
-          0.222
+          0.2
         ],
         "contra_precision_ci_95": [
           0.0,
@@ -812,16 +815,16 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.35,
-          0.6
+          0.367,
+          0.583
         ],
         "macro_f1_ci_95": [
-          0.296,
-          0.506
+          0.308,
+          0.501
         ],
         "contra_recall_ci_95": [
           0.0,
-          0.222
+          0.2
         ],
         "contra_precision_ci_95": [
           0.0,
@@ -835,106 +838,107 @@
     "neural_only_active": true
   },
   "predictions": {
-    "held_out_test": [
+    "retrospective_subset": [
       {
         "global_index": 10,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "4c2c32b2f53f39d31ce05dd2fd4aeb472cadae3a603e43b59a21ac146dcf8473",
         "ground_truth": "CONTRADICTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
           "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "INSUFFICIENT_EVIDENCE",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_8259216b",
+          "claim_id": "claim_af584c4b",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
           "neural_label": "CONTRADICTED",
-          "neural_confidence": 0.945,
+          "neural_confidence": 0.932,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
         "global_index": 11,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "e766d65f77458e38b3b763c6b738cc77fd04e7afdd4607cf61a577c42bcf936e",
         "ground_truth": "CONTRADICTED",
         "predictions": {
-          "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "INSUFFICIENT_EVIDENCE",
-          "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+          "rules": "SUPPORTED",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
+          "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_caabaffd",
-          "rule_label": "INSUFFICIENT_EVIDENCE",
-          "rule_confidence": 0.3,
+          "claim_id": "claim_9ed0a3a9",
+          "rule_label": "SUPPORTED",
+          "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
-          "agreement": null,
-          "overturned_abstention": false
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.895,
+          "agreement": false,
+          "overturned_abstention": false,
+          "overturned_lexical_support": true
         }
       },
       {
         "global_index": 12,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "6964584c71669e43cfba38e4d863d8070ea416adc06483b064bb610c62aaea44",
         "ground_truth": "CONTRADICTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_16c6db1f",
+          "claim_id": "claim_8ac88c58",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.879,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
         "global_index": 13,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "cb2f5e8c92a10fda089fc9f0e0e99c7e107936eb05234d3c114f3ddbfe014070",
         "ground_truth": "CONTRADICTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_141021eb",
+          "claim_id": "claim_083d9217",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.874,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
         "global_index": 14,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "7c24b1db55c3650bf2e44c955171f8eb7dfb70babbb8d7b0951b82874fa235ac",
         "ground_truth": "CONTRADICTED",
         "predictions": {
@@ -946,7 +950,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_faac2667",
+          "claim_id": "claim_2815859e",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -958,7 +962,7 @@
       },
       {
         "global_index": 25,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "874318daa3292036b00d824da7db58163f091557d9a2be6644690495029f0195",
         "ground_truth": "SUPPORTED",
         "predictions": {
@@ -970,7 +974,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_7373d5de",
+          "claim_id": "claim_e6aafee9",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -982,7 +986,7 @@
       },
       {
         "global_index": 26,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "50e54fd38994727186a824f8299c5d53f827fda1dc0034072a4ac3ae7f035615",
         "ground_truth": "SUPPORTED",
         "predictions": {
@@ -994,7 +998,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_4bb4a191",
+          "claim_id": "claim_84c7e63b",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1006,7 +1010,7 @@
       },
       {
         "global_index": 27,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "c775b98637fe2ef554403ff43c6e0680a9abbbaea5c1d53106ceabaae6541974",
         "ground_truth": "SUPPORTED",
         "predictions": {
@@ -1018,7 +1022,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_3ddb425a",
+          "claim_id": "claim_e3351baa",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1030,7 +1034,7 @@
       },
       {
         "global_index": 28,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "fd4b8cd55073d96e0a355789b6e40e3c7305ca3d6464358851827c45ee83acbe",
         "ground_truth": "SUPPORTED",
         "predictions": {
@@ -1042,7 +1046,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_ebc7a7b1",
+          "claim_id": "claim_f68c4595",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1054,7 +1058,7 @@
       },
       {
         "global_index": 29,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "1ffac11298b526ee8536f2d221691e6aebb3550e9dc2433316a173695e82abfc",
         "ground_truth": "SUPPORTED",
         "predictions": {
@@ -1066,7 +1070,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_67bfac3e",
+          "claim_id": "claim_54a55009",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1078,7 +1082,7 @@
       },
       {
         "global_index": 40,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "5ba2508f4d49ecb3677e0567689f107d75c65503effe662f233ef4d11f0c8b61",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1090,7 +1094,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_85b205b1",
+          "claim_id": "claim_b881b2aa",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1102,7 +1106,7 @@
       },
       {
         "global_index": 41,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "ad3836eb75700940c15146f2d0bf7a2cc043583519428a749f56e3de501f1a4f",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1114,7 +1118,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_fa4530c0",
+          "claim_id": "claim_e11b0f82",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1126,7 +1130,7 @@
       },
       {
         "global_index": 42,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "e27eb82376c2090c1d79225ed1c132a6fdc7c38d7d27dd5206e2d93bc487557f",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1138,7 +1142,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_860d50cf",
+          "claim_id": "claim_df8bb14d",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1150,7 +1154,7 @@
       },
       {
         "global_index": 43,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "ccdb77cd6bcd0749539f75d4a19699535dbdea32142fecbd070366cfb027c67a",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1162,7 +1166,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_9d2b03f0",
+          "claim_id": "claim_4335ce41",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1174,7 +1178,7 @@
       },
       {
         "global_index": 44,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "c2aca5a79bae0f5089ddcdd2109f12820dd0f95616f2f489fa3bad3524516717",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1186,7 +1190,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_c1f5032f",
+          "claim_id": "claim_a53ddf15",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1198,7 +1202,7 @@
       },
       {
         "global_index": 55,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "f892a405e4a91ee7f8bb9dee6ae998805000c9093cfee5a64a4d721e7efe679b",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1210,7 +1214,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_e1096072",
+          "claim_id": "claim_e5a5fae7",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1222,7 +1226,7 @@
       },
       {
         "global_index": 56,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "25cb4ff204919cc9eedcbd68f9a276515e6340d0a8a2c16bc1dada73c668fe57",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1234,7 +1238,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_69541868",
+          "claim_id": "claim_02ab4a58",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1246,7 +1250,7 @@
       },
       {
         "global_index": 57,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "099dec0c9eeb4b84142e5556da113a0134ea8f21cb920e6f0329ec8ec12a46d9",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1258,7 +1262,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_b07a3769",
+          "claim_id": "claim_752d3b88",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1270,7 +1274,7 @@
       },
       {
         "global_index": 58,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "492bc8cb1f72b7fced435a46687314e365e788159b7e51792d6e2551e5bd0705",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1282,7 +1286,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_e1ae5d1c",
+          "claim_id": "claim_ef526329",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1294,7 +1298,7 @@
       },
       {
         "global_index": 59,
-        "split": "held_out_test",
+        "split": "retrospective_test_partition",
         "claim_sha256": "099dec0c9eeb4b84142e5556da113a0134ea8f21cb920e6f0329ec8ec12a46d9",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
@@ -1306,7 +1310,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_7321628c",
+          "claim_id": "claim_d6e2afc4",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1331,7 +1335,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_832a67cf",
+          "claim_id": "claim_a114e469",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1354,7 +1358,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_94c39e39",
+          "claim_id": "claim_7e76ec7d",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1370,21 +1374,21 @@
         "ground_truth": "CONTRADICTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "INSUFFICIENT_EVIDENCE",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_958f606a",
+          "claim_id": "claim_ba5b7736",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.886,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
@@ -1392,22 +1396,23 @@
         "claim_sha256": "2a93dbaedd338e835835fc761c74eae37ecd9921e33431f755ee928d3a7557cc",
         "ground_truth": "CONTRADICTED",
         "predictions": {
-          "rules": "CONTRADICTED",
+          "rules": "SUPPORTED",
           "hybrid": "CONTRADICTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
-          "without_alignment_gate": "CONTRADICTED",
+          "neural": "CONTRADICTED",
+          "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_512ab988",
-          "rule_label": "CONTRADICTED",
+          "claim_id": "claim_a04fecda",
+          "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.889,
           "agreement": false,
-          "overturned_abstention": false
+          "overturned_abstention": false,
+          "overturned_lexical_support": true
         }
       },
       {
@@ -1417,19 +1422,19 @@
         "predictions": {
           "rules": "CONTRADICTED",
           "hybrid": "CONTRADICTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "CONTRADICTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_d91f3d6f",
+          "claim_id": "claim_acada995",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.533620823359577,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
-          "agreement": false,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.868,
+          "agreement": true,
           "overturned_abstention": false
         }
       },
@@ -1446,7 +1451,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_3b938259",
+          "claim_id": "claim_7ba2af7a",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1469,7 +1474,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_d84f2a12",
+          "claim_id": "claim_03d6cc5f",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1492,7 +1497,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_3a6acdcd",
+          "claim_id": "claim_f64ec88d",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1515,7 +1520,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_1f7cda07",
+          "claim_id": "claim_5c23fad9",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1538,7 +1543,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_e3f28501",
+          "claim_id": "claim_3496e488",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1554,21 +1559,21 @@
         "ground_truth": "CONTRADICTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
           "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "INSUFFICIENT_EVIDENCE",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_c3be52f8",
+          "claim_id": "claim_c3f90dfa",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
           "neural_label": "CONTRADICTED",
-          "neural_confidence": 0.945,
+          "neural_confidence": 0.932,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
@@ -1576,22 +1581,23 @@
         "claim_sha256": "e766d65f77458e38b3b763c6b738cc77fd04e7afdd4607cf61a577c42bcf936e",
         "ground_truth": "CONTRADICTED",
         "predictions": {
-          "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "INSUFFICIENT_EVIDENCE",
-          "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+          "rules": "SUPPORTED",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
+          "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_d00a05cd",
-          "rule_label": "INSUFFICIENT_EVIDENCE",
-          "rule_confidence": 0.3,
+          "claim_id": "claim_e1937d61",
+          "rule_label": "SUPPORTED",
+          "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
-          "agreement": null,
-          "overturned_abstention": false
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.895,
+          "agreement": false,
+          "overturned_abstention": false,
+          "overturned_lexical_support": true
         }
       },
       {
@@ -1600,21 +1606,21 @@
         "ground_truth": "CONTRADICTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_c5612670",
+          "claim_id": "claim_491e2813",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.879,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
@@ -1623,21 +1629,21 @@
         "ground_truth": "CONTRADICTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_2cffe8ab",
+          "claim_id": "claim_877dea1c",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.874,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
@@ -1653,7 +1659,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_5faee2ce",
+          "claim_id": "claim_4406d446",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1676,7 +1682,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_22fad883",
+          "claim_id": "claim_6aab5e08",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1692,21 +1698,21 @@
         "ground_truth": "SUPPORTED",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
           "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_8eaa6e70",
+          "claim_id": "claim_a1454ed6",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
           "neural_label": "CONTRADICTED",
           "neural_confidence": 0.891,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
@@ -1714,21 +1720,21 @@
         "claim_sha256": "2e02619ac0f41b698f72b3b17e72d17bc89930d1a0102c8dcf34968e7aba5d29",
         "ground_truth": "SUPPORTED",
         "predictions": {
-          "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
+          "rules": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "INSUFFICIENT_EVIDENCE",
           "neural": "INSUFFICIENT_EVIDENCE",
-          "without_alignment_gate": "SUPPORTED",
+          "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_3ef99cea",
-          "rule_label": "SUPPORTED",
-          "rule_confidence": 0.95,
+          "claim_id": "claim_5f7ad1e3",
+          "rule_label": "INSUFFICIENT_EVIDENCE",
+          "rule_confidence": 0.3,
           "neural_evaluated": true,
           "neural_label": "INSUFFICIENT_EVIDENCE",
           "neural_confidence": 0.5,
-          "agreement": false,
+          "agreement": null,
           "overturned_abstention": false
         }
       },
@@ -1745,7 +1751,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_7ef53be5",
+          "claim_id": "claim_6f638d82",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1768,7 +1774,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_14c372ce",
+          "claim_id": "claim_2e310281",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1791,7 +1797,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_ef7de442",
+          "claim_id": "claim_28aa1852",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1806,21 +1812,21 @@
         "claim_sha256": "6bac2c13ee6c2a8ca59a037a0efe7a158cbcc11e7e90e4950011cc1daee4a5ae",
         "ground_truth": "SUPPORTED",
         "predictions": {
-          "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
+          "rules": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "INSUFFICIENT_EVIDENCE",
           "neural": "INSUFFICIENT_EVIDENCE",
-          "without_alignment_gate": "SUPPORTED",
+          "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_f8a590be",
-          "rule_label": "SUPPORTED",
-          "rule_confidence": 0.95,
+          "claim_id": "claim_6cb81fe2",
+          "rule_label": "INSUFFICIENT_EVIDENCE",
+          "rule_confidence": 0.3,
           "neural_evaluated": true,
           "neural_label": "INSUFFICIENT_EVIDENCE",
           "neural_confidence": 0.5,
-          "agreement": false,
+          "agreement": null,
           "overturned_abstention": false
         }
       },
@@ -1830,21 +1836,22 @@
         "ground_truth": "SUPPORTED",
         "predictions": {
           "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_878e1040",
+          "claim_id": "claim_4babde9e",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.883,
           "agreement": false,
-          "overturned_abstention": false
+          "overturned_abstention": false,
+          "overturned_lexical_support": true
         }
       },
       {
@@ -1853,21 +1860,22 @@
         "ground_truth": "SUPPORTED",
         "predictions": {
           "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
+          "hybrid": "CONTRADICTED",
           "neural": "CONTRADICTED",
           "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_eae46734",
+          "claim_id": "claim_e6b5cffe",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
           "neural_label": "CONTRADICTED",
           "neural_confidence": 0.893,
           "agreement": false,
-          "overturned_abstention": false
+          "overturned_abstention": false,
+          "overturned_lexical_support": true
         }
       },
       {
@@ -1883,7 +1891,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_c3d8b265",
+          "claim_id": "claim_54dc88fd",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1906,7 +1914,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_18631afb",
+          "claim_id": "claim_dee6a95e",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1929,7 +1937,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_5b7888c1",
+          "claim_id": "claim_ab9253aa",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1952,7 +1960,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_0900917d",
+          "claim_id": "claim_5fd7ae16",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1975,7 +1983,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_2e099e23",
+          "claim_id": "claim_0df43d99",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1998,7 +2006,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_73339079",
+          "claim_id": "claim_0d9c89ef",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2014,21 +2022,21 @@
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
-          "hybrid": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
           "neural": "CONTRADICTED",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_5d1fff87",
+          "claim_id": "claim_1e513f4a",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
           "neural_label": "CONTRADICTED",
           "neural_confidence": 0.892,
           "agreement": null,
-          "overturned_abstention": false
+          "overturned_abstention": true
         }
       },
       {
@@ -2044,7 +2052,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_32fc009b",
+          "claim_id": "claim_81d24220",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2067,7 +2075,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_ad4c205b",
+          "claim_id": "claim_227609bd",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2084,18 +2092,18 @@
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
           "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "CONTRADICTED",
+          "neural": "INSUFFICIENT_EVIDENCE",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_db478cea",
+          "claim_id": "claim_acb6ac75",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "CONTRADICTED",
-          "neural_confidence": 0.892,
+          "neural_label": "INSUFFICIENT_EVIDENCE",
+          "neural_confidence": 0.5,
           "agreement": null,
           "overturned_abstention": false
         }
@@ -2107,19 +2115,19 @@
         "predictions": {
           "rules": "SUPPORTED",
           "hybrid": "SUPPORTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "neural": "SUPPORTED",
           "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_bb9fc2fe",
+          "claim_id": "claim_27cbdfd9",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
-          "agreement": false,
+          "neural_label": "SUPPORTED",
+          "neural_confidence": 0.881,
+          "agreement": true,
           "overturned_abstention": false
         }
       },
@@ -2136,7 +2144,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_275bf627",
+          "claim_id": "claim_c8bde281",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2159,7 +2167,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_5ab960f2",
+          "claim_id": "claim_a31fab3a",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.6505667956673388,
           "neural_evaluated": true,
@@ -2182,7 +2190,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_47a86b17",
+          "claim_id": "claim_d6a39bcb",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.6525409903792577,
           "neural_evaluated": true,
@@ -2199,19 +2207,19 @@
         "predictions": {
           "rules": "CONTRADICTED",
           "hybrid": "CONTRADICTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "CONTRADICTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_2e482fb4",
+          "claim_id": "claim_49124052",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
-          "agreement": false,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.882,
+          "agreement": true,
           "overturned_abstention": false
         }
       },
@@ -2228,7 +2236,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_7e3f9571",
+          "claim_id": "claim_a747b522",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2251,7 +2259,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_44b10c4e",
+          "claim_id": "claim_89525b54",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2274,7 +2282,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_78ae34a5",
+          "claim_id": "claim_d47e57f2",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2297,7 +2305,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_c8074239",
+          "claim_id": "claim_c902f887",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2320,7 +2328,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_6e682793",
+          "claim_id": "claim_ed3b162b",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2343,7 +2351,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_93869461",
+          "claim_id": "claim_84010e08",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2360,18 +2368,18 @@
         "predictions": {
           "rules": "INSUFFICIENT_EVIDENCE",
           "hybrid": "INSUFFICIENT_EVIDENCE",
-          "neural": "CONTRADICTED",
+          "neural": "INSUFFICIENT_EVIDENCE",
           "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_a7a62b38",
+          "claim_id": "claim_a0a16eea",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "CONTRADICTED",
-          "neural_confidence": 0.932,
+          "neural_label": "INSUFFICIENT_EVIDENCE",
+          "neural_confidence": 0.5,
           "agreement": null,
           "overturned_abstention": false
         }
@@ -2389,7 +2397,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_31cd6809",
+          "claim_id": "claim_f6ab55dd",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2406,19 +2414,19 @@
         "predictions": {
           "rules": "SUPPORTED",
           "hybrid": "SUPPORTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "neural": "SUPPORTED",
           "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_b2365a18",
+          "claim_id": "claim_afb5ffa9",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
-          "agreement": false,
+          "neural_label": "SUPPORTED",
+          "neural_confidence": 0.875,
+          "agreement": true,
           "overturned_abstention": false
         }
       },
@@ -2435,7 +2443,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_47e2acfd",
+          "claim_id": "claim_9e5f47d8",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2458,7 +2466,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_858ca019",
+          "claim_id": "claim_7ea04b4e",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2481,7 +2489,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_b76b8585",
+          "claim_id": "claim_2bd4ef12",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2496,21 +2504,21 @@
         "claim_sha256": "ad26ac380750165037020082a076f3b9a6e2286a83a51d908a5cdec55960cc48",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
-          "rules": "CONTRADICTED",
-          "hybrid": "CONTRADICTED",
+          "rules": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "INSUFFICIENT_EVIDENCE",
           "neural": "INSUFFICIENT_EVIDENCE",
           "without_alignment_gate": "CONTRADICTED",
           "dense_baseline": "CONTRADICTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_35650b6c",
-          "rule_label": "CONTRADICTED",
-          "rule_confidence": 0.7387376295230788,
+          "claim_id": "claim_331990eb",
+          "rule_label": "INSUFFICIENT_EVIDENCE",
+          "rule_confidence": 0.3,
           "neural_evaluated": true,
           "neural_label": "INSUFFICIENT_EVIDENCE",
           "neural_confidence": 0.5,
-          "agreement": false,
+          "agreement": null,
           "overturned_abstention": false
         }
       },
@@ -2520,21 +2528,22 @@
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
           "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
+          "hybrid": "CONTRADICTED",
           "neural": "CONTRADICTED",
           "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_fc58bd7c",
+          "claim_id": "claim_565251c8",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
           "neural_label": "CONTRADICTED",
           "neural_confidence": 0.932,
           "agreement": false,
-          "overturned_abstention": false
+          "overturned_abstention": false,
+          "overturned_lexical_support": true
         }
       },
       {
@@ -2543,21 +2552,22 @@
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
           "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
           "without_alignment_gate": "SUPPORTED",
           "dense_baseline": "CONTRADICTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_73fad374",
+          "claim_id": "claim_9df1e008",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.879,
           "agreement": false,
-          "overturned_abstention": false
+          "overturned_abstention": false,
+          "overturned_lexical_support": true
         }
       },
       {
@@ -2573,7 +2583,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_1c5ef6c3",
+          "claim_id": "claim_b57b1dc1",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2596,7 +2606,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_440a937e",
+          "claim_id": "claim_7041a60c",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2619,7 +2629,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_be650f1e",
+          "claim_id": "claim_20575fd3",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2642,7 +2652,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_a85a2192",
+          "claim_id": "claim_b5cbb0ae",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2665,7 +2675,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_06d55fbc",
+          "claim_id": "claim_1db1c3e0",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2688,7 +2698,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_9ea7ead3",
+          "claim_id": "claim_88ae2aa6",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,

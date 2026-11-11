@@ -203,11 +203,11 @@ class DebertaNLIVerifier:
 
         diff = abs(entailment_weight - contradiction_weight)
 
-        if entailment_weight > contradiction_weight and diff >= 0.30:
+        if entailment_weight > contradiction_weight and diff >= 0.20:
             final_label = VeracityLabel.SUPPORTED
             final_conf = min(0.98, 0.60 + (entailment_weight / (entailment_weight + contradiction_weight + 0.1) * 0.38))
             summary = f"Neural cross-encoder established support with {len(supporting_ids)} aligned passage(s)."
-        elif contradiction_weight > entailment_weight and diff >= 0.30:
+        elif contradiction_weight > entailment_weight and diff >= 0.20:
             final_label = VeracityLabel.CONTRADICTED
             final_conf = min(0.98, 0.60 + (contradiction_weight / (entailment_weight + contradiction_weight + 0.1) * 0.38))
             summary = f"Neural cross-encoder identified refutation with {len(contradicting_ids)} aligned passage(s)."

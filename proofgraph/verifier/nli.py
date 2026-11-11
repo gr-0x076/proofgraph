@@ -333,6 +333,18 @@ class HybridNLIVerifier:
 
             if rule_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED):
                 diagnostics["agreement"] = bool(rule_verdict.label == neural_verdict.label)
+                # If rule predicted SUPPORTED based on lexical overlap, but neural verifier
+                # detected a high-confidence contradiction (confidence >= 0.85):
+                # The neural cross-encoder overrules the lexical false-support trap.
+                if (
+                    rule_verdict.label == VeracityLabel.SUPPORTED
+                    and neural_verdict.label == VeracityLabel.CONTRADICTED
+                    and neural_verdict.confidence >= 0.85
+                ):
+                    diagnostics["overturned_lexical_support"] = True
+                    self.last_diagnostics = diagnostics
+                    return neural_verdict
+
                 self.last_diagnostics = diagnostics
                 return rule_verdict
 

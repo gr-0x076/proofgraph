@@ -58,35 +58,74 @@ class ClaimDecomposer:
             return True
         return False
 
+    COMMON_STARTERS = {
+        "the", "a", "an", "in", "on", "at", "if", "why", "when", "what", "where", "how", "who",
+        "there", "it", "its", "this", "that", "these", "those", "more", "all", "any", "some",
+        "video", "viral", "according", "while", "after", "before", "one", "two", "three", "several", "most"
+    }
+
+    COMMON_GRAMMAR = {
+        "with", "was", "were", "in", "on", "at", "to", "for", "of", "and", "or", "is", "are",
+        "it", "its", "by", "as", "from", "be", "been", "has", "had", "have", "do", "did", "does",
+        "will", "would", "shall", "should", "can", "could", "may", "might", "must", "get", "got",
+        "out", "about", "over", "after", "before", "all", "any", "some", "no", "not", "their", "his",
+        "her", "my", "our", "your", "says", "said", "shows", "shown", "intended", "plastered", "thrown",
+        "arriving", "claimed", "claiming", "inside", "outside", "between", "among"
+    }
+
     def extract_entities(self, text: str) -> List[str]:
         """Extracts candidate entities: capitalized multi-word sequences, quoted terms, numbers, dates."""
         entities = []
-        # Multi-word proper nouns: e.g., "World Health Organization", "Albert Einstein"
-        prop_nouns = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b', text)
-        entities.extend(prop_nouns)
-        
         # Quoted terms
         quotes = re.findall(r'["\']([^"\']+)["\']', text)
         entities.extend(quotes)
-        
+
         # Years / Dates: e.g., "2024", "19th century"
         years = re.findall(r'\b(?:19|20)\d{2}\b', text)
         entities.extend(years)
-        
-        # Single capitalized words (excluding start of sentence if not already included)
+
+        # Words analysis for headline detection
         words = text.split()
-        for w in words[1:]:
+        cap_ratio = sum(1 for w in words if w and w[0].isupper()) / max(1, len(words))
+        is_headline = cap_ratio >= 0.50
+
+        # Multi-word proper nouns: e.g., "World Health Organization", "Albert Einstein"
+        prop_nouns = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b', text)
+        for pn in prop_nouns:
+            pn_words = pn.split()
+            if is_headline or any(w.lower() in self.COMMON_GRAMMAR for w in pn_words):
+                chunk = []
+                for w in pn_words:
+                    if w.lower() in self.COMMON_GRAMMAR:
+                        if chunk:
+                            entities.append(" ".join(chunk))
+                            chunk = []
+                    else:
+                        chunk.append(w)
+                if chunk:
+                    entities.append(" ".join(chunk))
+            else:
+                entities.append(pn)
+
+        # Single capitalized words (including first word if not a generic sentence starter)
+        for idx, w in enumerate(words):
             clean = re.sub(r'[^\w]', '', w)
-            if clean and clean[0].isupper() and clean not in entities:
-                entities.append(clean)
-                
+            if not clean or not clean[0].isupper():
+                continue
+            if idx == 0 and clean.lower() in self.COMMON_STARTERS:
+                continue
+            if clean.lower() in self.COMMON_GRAMMAR or clean.lower() in self.COMMON_STARTERS:
+                continue
+            entities.append(clean)
+
         # Deduplicate while preserving order
         seen = set()
         deduped = []
         for e in entities:
-            if e.lower() not in seen:
-                seen.add(e.lower())
-                deduped.append(e)
+            clean_e = e.strip()
+            if clean_e.lower() not in seen and len(clean_e) >= 2:
+                seen.add(clean_e.lower())
+                deduped.append(clean_e)
         return deduped
 
     def decompose(self, document_or_claim: str) -> List[AtomicClaim]:

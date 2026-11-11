@@ -1,14 +1,14 @@
 # ProofGraph: Dedicated TinyFish Web Retrieval Evaluation Report
-**Execution Mode:** `FIXTURE REPLAY (Offline Diagnostic)`  
-**Timestamp:** `2026-11-11 14:57:54 UTC`  
-**Sample Size:** `N=10 claims` across history, science, geography, and current events.  
+**Execution Mode:** `FIXTURE REPLAY (Offline Diagnostic)`
+**Timestamp:** `2026-11-11 16:24:38 UTC`
+**Sample Size:** `N=10 claims` across history, science, geography, and current events.
 
 ## 📊 Executive Summary Metrics
 - **Search Coverage:** `100.0%` (10/10 claims returned at least one candidate; this does not establish relevance or source quality)
-- **End-to-End Classification Accuracy:** `70.0%` (7/10 matched ground truth)
+- **End-to-End Classification Accuracy:** `90.0%` (9/10 matched ground truth)
 - **Total Evidence Passages Ingested:** `10` passages
 - **Total Chromium Pages Rendered & Fetched:** `10` full pages via TinyFetch
-- **Total Wall Time:** `1.72s` (Average: `0.17s/claim`)  
+- **Total Wall Time:** `0.92s` (Average: `0.09s/claim`)
 
 ## 🌐 Retrieved Domain Distribution
 | Domain | Frequency | Authority Category |
@@ -32,9 +32,9 @@
 | The Great Wall of China is visible from the M... | Astronomy Myth | `CONTRADICTED` | `CONTRADICTED` | 95.0% | 1 | 0.0s | ✅ |
 | Albert Einstein was awarded the 1921 Nobel Pr... | History of Science | `SUPPORTED` | `SUPPORTED` | 95.0% | 1 | 0.0s | ✅ |
 | Trump Administration claimed songwriter Billi... | Political Reporting | `CONTRADICTED` | `CONTRADICTED` | 95.0% | 1 | 0.0s | ✅ |
-| UNESCO declared the Nadar community as the mo... | Social Media Rumor | `CONTRADICTED` | `SUPPORTED` | 95.0% | 1 | 0.0s | ❌ |
+| UNESCO declared the Nadar community as the mo... | Social Media Rumor | `CONTRADICTED` | `CONTRADICTED` | 91.0% | 1 | 0.0s | ✅ |
 | Quantum computers have officially proven that... | Theoretical Computer Science | `INSUFFICIENT_EVIDENCE` | `CONTRADICTED` | 93.7% | 1 | 0.0s | ❌ |
-| All USA mail-in ballots arriving after electi... | Electoral Law | `CONTRADICTED` | `SUPPORTED` | 95.0% | 1 | 0.0s | ❌ |
+| All USA mail-in ballots arriving after electi... | Electoral Law | `CONTRADICTED` | `CONTRADICTED` | 91.1% | 1 | 0.0s | ✅ |
 
 ## Retrieved Source URLs
 The records below make individual results auditable; source presence is not an endorsement of source reliability.
