@@ -1,9 +1,9 @@
 # ProofGraph: Official Hackathon Submission Deck & 3-Minute Demo Script
 
-> **Event:** Hack on Holiday 2026 — Reinforce Club, Scaler School of Technology  
-> **Team:** Reinforce SPG  
-> **Track:** Advanced Track / Product  
-> **Live Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)  
+> **Event:** Hack on Holiday 2026 — The Reinforce Club, Scaler School of Technology
+> **Team:** AltF4 (Mohith GR & Sudarshan Patil HJ)
+> **Track:** Advanced Track / Product
+> **Live Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)
 
 ---
 
@@ -22,7 +22,7 @@
 * **Visual:** Flow diagram from README showing the 5-stage pipeline with real code snippets.
 * **Speaker:**
   > "ProofGraph uses five stages, combining established ideas with lightweight prototype implementations:
-  > 
+  >
   > 1. **Claim splitting:** A heuristic splitter inspired by Claimify identifies candidate statements; it is not a reproduction of Claimify.
   > 2. **Retrieval:** Local mode uses BM25 and FastEmbed with reciprocal-rank fusion. Optional TinyFish Search discovers pages and TinyFish Fetch extracts page text. A FIRE-inspired heuristic can request another query when entity coverage is low.
   > 3. **Rule-based review:** A lexical alignment filter and numeric, location, and attribution rules assign support, contradiction, or insufficient evidence. These are guardrails, not a trained NLI model.
@@ -65,7 +65,7 @@
 * **Speaker:**
   > "ProofGraph is open-source under Apache-2.0 for its code, uses pinned direct dependencies in CI, and generates Markdown reports and interactive provenance graphs. The current verifier is a prototype; our next work is to evaluate on public benchmarks and improve contradiction detection.
   >
-  > We are Team Reinforce SPG, and ProofGraph brings transparency, accountability, and evidence graph intelligence to claim verification. Thank you!"
+  > We are Team AltF4, and ProofGraph brings transparency, accountability, and evidence graph intelligence to claim verification. Thank you!"
 
 ---
 
@@ -74,7 +74,7 @@
 ### Slide 1: Title & Team
 * **Header:** ProofGraph: Evidence-Backed Claim Review Prototype
 * **Subheader:** Hack on Holiday 2026 — Advanced Track / Product
-* **Team:** Reinforce SPG | Scaler School of Technology
+* **Team:** AltF4 (Mohith GR & Sudarshan Patil HJ) | The Reinforce Club, Scaler School of Technology
 * **Key Visual:** Hero visual of the interactive NetworkX / PyVis evidence graph with red contradiction edges.
 
 ### Slide 2: The Core Problem: The Black Box of Hallucinations

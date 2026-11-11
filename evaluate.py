@@ -9,8 +9,10 @@ Note: For full dataset provenance, task formulation, and protocol distinctions (
 """
 
 import json
+import hashlib
 import os
 import re
+from datetime import datetime, timezone
 from collections import Counter, defaultdict
 from typing import List, Dict, Tuple, Any
 import numpy as np
@@ -205,6 +207,14 @@ def compute_classification_metrics(y_true: List[str], y_pred: List[str], labels:
 # =====================================================================
 # RUNNERS
 # =====================================================================
+def verify_claim_against_pool(pipeline: ProofGraphPipeline, claim_text: str, evidence: List[EvidencePassage]) -> str:
+    """Evaluate stance on this example's supplied evidence only, without index leakage."""
+    claims = pipeline.decomposer.decompose(claim_text)
+    claim = claims[0] if claims else AtomicClaim(text=claim_text, parent_sentence=claim_text)
+    verdict = pipeline.verifier.verify_claim(claim, evidence)
+    return verdict.label.value
+
+
 def run_diagnostic_suite(pipeline: ProofGraphPipeline, baseline: LexicalHeuristicBaseline):
     print("=" * 78)
     print("🔬 SECTION 1: DIAGNOSTIC UNIT SANITY SUITE (10 Hand-Authored Stress Cases)")
@@ -216,9 +226,7 @@ def run_diagnostic_suite(pipeline: ProofGraphPipeline, baseline: LexicalHeuristi
     for item in DIAGNOSTIC_DATASET:
         c_text = item["claim"]
         gt = item["ground_truth"].value
-        pipeline.index_corpus(item["evidence"])
-        res = pipeline.verify(c_text, use_live_web_fallback=False)
-        pg_pred = res.verdicts[res.claims[0].id].label.value if res.claims else "INSUFFICIENT_EVIDENCE"
+        pg_pred = verify_claim_against_pool(pipeline, c_text, item["evidence"])
         base_pred = baseline.verify(c_text, item["evidence"]).value
 
         y_true.append(gt)
@@ -312,7 +320,7 @@ def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
     print("\n" + "=" * 78)
     print("📚 SECTION 3: AVeriTeC DEV SAMPLE VERDICT CLASSIFICATION (N=60 CLAIMS, CANDIDATE POOLS)")
     print("=" * 78)
-    print("Evaluation Setup: Verdict classification given claim-specific candidate evidence pools.")
+    print("Evaluation Setup: Direct stance verification on each claim-specific candidate evidence pool (retrieval leakage avoided).")
     print("Protocol Note: Custom classification protocol (see docs/DATA_CARD.md); does not evaluate")
     print("full-corpus open-web document retrieval or official Hungarian METEOR overlap score.")
     print("Dataset: 60 real-world claims fact-checked across 50 professional organizations.")
@@ -347,9 +355,7 @@ def run_averitec_benchmark(pipeline: ProofGraphPipeline, sample_path: str):
             for p in item.get("evidence_passages", [])
         ]
 
-        pipeline.index_corpus(evidence_objs)
-        res = pipeline.verify(claim_text, use_live_web_fallback=False)
-        pred = res.verdicts[res.claims[0].id].label.value if res.claims else "INSUFFICIENT_EVIDENCE"
+        pred = verify_claim_against_pool(pipeline, claim_text, evidence_objs)
 
         y_true.append(gt_mapped)
         y_pred.append(pred)
@@ -395,34 +401,44 @@ def run_ablation_and_baselines(sample_path: str):
 
     pipe_rules = ProofGraphPipeline(verifier_backend="rules")
     pipe_hybrid = ProofGraphPipeline(verifier_backend="hybrid")
+    pipe_neural = ProofGraphPipeline(verifier_backend="neural")
     pipe_no_align = ProofGraphPipeline(verifier=NLIVerifier(refnli_gate=RefNLIAlignmentGate(jaccard_threshold=0.0)))
     base_lexical = LexicalHeuristicBaseline()
     base_dense = DenseSimilarityBaseline(retriever=pipe_rules.retriever)
 
     y_true = [map_label(d["label"]) for d in data]
-    preds_rules, preds_hybrid, preds_no_align, preds_lex, preds_dense = [], [], [], [], []
+    preds_rules, preds_hybrid, preds_neural, preds_no_align, preds_lex, preds_dense = [], [], [], [], [], []
+    per_claim_results = []
 
-    for item in data:
+    for item_index, item in enumerate(data):
         claim_text = item["claim"]
         evidence_objs = [EvidencePassage(text=p["text"], source_title="AVeriTeC") for p in item.get("evidence_passages", [])]
 
-        pipe_rules.index_corpus(evidence_objs)
-        r1 = pipe_rules.verify(claim_text, use_live_web_fallback=False)
-        preds_rules.append(r1.verdicts[r1.claims[0].id].label.value if r1.claims else "INSUFFICIENT_EVIDENCE")
-
-        pipe_hybrid.index_corpus(evidence_objs)
-        r_hyb = pipe_hybrid.verify(claim_text, use_live_web_fallback=False)
-        preds_hybrid.append(r_hyb.verdicts[r_hyb.claims[0].id].label.value if r_hyb.claims else "INSUFFICIENT_EVIDENCE")
-
-        pipe_no_align.index_corpus(evidence_objs)
-        r2 = pipe_no_align.verify(claim_text, use_live_web_fallback=False)
-        preds_no_align.append(r2.verdicts[r2.claims[0].id].label.value if r2.claims else "INSUFFICIENT_EVIDENCE")
+        preds_rules.append(verify_claim_against_pool(pipe_rules, claim_text, evidence_objs))
+        preds_hybrid.append(verify_claim_against_pool(pipe_hybrid, claim_text, evidence_objs))
+        preds_neural.append(verify_claim_against_pool(pipe_neural, claim_text, evidence_objs))
+        preds_no_align.append(verify_claim_against_pool(pipe_no_align, claim_text, evidence_objs))
 
         preds_lex.append(base_lexical.verify(claim_text, evidence_objs).value)
         preds_dense.append(base_dense.verify(claim_text, evidence_objs).value)
 
+        per_claim_results.append({
+            "sample_index": item_index,
+            "claim_sha256": hashlib.sha256(claim_text.encode("utf-8")).hexdigest(),
+            "ground_truth": map_label(item["label"]),
+            "predictions": {
+                "rules": preds_rules[-1],
+                "hybrid": preds_hybrid[-1],
+                "neural": preds_neural[-1],
+                "without_alignment_gate": preds_no_align[-1],
+                "dense_baseline": preds_dense[-1],
+                "lexical_baseline": preds_lex[-1],
+            },
+        })
+
     m_rules = compute_classification_metrics(y_true, preds_rules, labels)
     m_hybrid = compute_classification_metrics(y_true, preds_hybrid, labels)
+    m_neural = compute_classification_metrics(y_true, preds_neural, labels)
     m_no_align = compute_classification_metrics(y_true, preds_no_align, labels)
     m_lex = compute_classification_metrics(y_true, preds_lex, labels)
     m_dense = compute_classification_metrics(y_true, preds_dense, labels)
@@ -431,10 +447,54 @@ def run_ablation_and_baselines(sample_path: str):
     print("| :------------------------------------- | :------: | :------: | :---------: | :-----------: | :----------: |")
     print(f"| **ProofGraph Hybrid (Rules + Neural)** | **{m_hybrid['accuracy']*100:.1f}%** |  **{m_hybrid['macro_f1']:.3f}**  |    {m_hybrid['per_class']['SUPPORTED']['precision']:.3f}    |     {m_hybrid['per_class']['CONTRADICTED']['precision']:.3f}     |    **{m_hybrid['per_class']['CONTRADICTED']['recall']:.3f}**   |")
     print(f"| ProofGraph Rules Alone                 |  {m_rules['accuracy']*100:.1f}%  |   {m_rules['macro_f1']:.3f}  |    {m_rules['per_class']['SUPPORTED']['precision']:.3f}    |     {m_rules['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_rules['per_class']['CONTRADICTED']['recall']:.3f}   |")
+    print(f"| ProofGraph Neural Alone                 |  {m_neural['accuracy']*100:.1f}%  |   {m_neural['macro_f1']:.3f}  |    {m_neural['per_class']['SUPPORTED']['precision']:.3f}    |     {m_neural['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_neural['per_class']['CONTRADICTED']['recall']:.3f}   |")
     print(f"| Ablation: Without Alignment Gate       |  {m_no_align['accuracy']*100:.1f}%  |   {m_no_align['macro_f1']:.3f}  |    {m_no_align['per_class']['SUPPORTED']['precision']:.3f}    |     {m_no_align['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_no_align['per_class']['CONTRADICTED']['recall']:.3f}   |")
     print(f"| Baseline 1: Dense Similarity (No Gate) |  {m_dense['accuracy']*100:.1f}%  |   {m_dense['macro_f1']:.3f}  |    {m_dense['per_class']['SUPPORTED']['precision']:.3f}    |     {m_dense['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_dense['per_class']['CONTRADICTED']['recall']:.3f}   |")
     print(f"| Baseline 2: Lexical Heuristic Baseline |  {m_lex['accuracy']*100:.1f}%  |   {m_lex['macro_f1']:.3f}  |    {m_lex['per_class']['SUPPORTED']['precision']:.3f}    |     {m_lex['per_class']['CONTRADICTED']['precision']:.3f}     |    {m_lex['per_class']['CONTRADICTED']['recall']:.3f}   |")
     print("=" * 78)
+
+    def sha256_file(path: str) -> str:
+        digest = hashlib.sha256()
+        with open(path, "rb") as data_file:
+            for chunk in iter(lambda: data_file.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    neural_verifier = pipe_neural.verifier
+    hybrid_neural_active = pipe_hybrid.verifier.neural_active
+    results = {
+        "schema_version": 1,
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "dataset": os.path.relpath(sample_path, os.path.dirname(os.path.abspath(__file__))),
+        "dataset_sha256": sha256_file(sample_path),
+        "sample_size": len(data),
+        "label_mapping": {
+            "Supported": "SUPPORTED",
+            "Refuted": "CONTRADICTED",
+            "Conflicting Evidence/Cherrypicking": "INSUFFICIENT_EVIDENCE",
+            "Not Enough Evidence": "INSUFFICIENT_EVIDENCE",
+        },
+        "protocol": "Direct verifier on each claim's provided evidence pool; no open-web retrieval.",
+        "neural_status": {
+            "hybrid_fallback_active": hybrid_neural_active,
+            "neural_only_active": bool(neural_verifier.is_available),
+        },
+        "metrics": {
+            "rules": m_rules,
+            "hybrid": m_hybrid,
+            "neural": m_neural,
+            "without_alignment_gate": m_no_align,
+            "dense_baseline": m_dense,
+            "lexical_baseline": m_lex,
+        },
+        "predictions": per_claim_results,
+    }
+    artifact_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "outputs", "benchmark_results.json")
+    os.makedirs(os.path.dirname(artifact_path), exist_ok=True)
+    with open(artifact_path, "w", encoding="utf-8") as artifact:
+        json.dump(results, artifact, indent=2)
+        artifact.write("\n")
+    print(f"\nWrote claim-level predictions, metrics, and dataset hash to {artifact_path}")
 
 def run_held_out_context_mismatch_benchmark():
     print("\n" + "=" * 78)

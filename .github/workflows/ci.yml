@@ -27,6 +27,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-lock.txt
 
+    - name: Cache Neural Model Weights
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/huggingface/hub/
+        key: huggingface-nli-deberta-${{ runner.os }}-2a4f614a701367a02d51389039afc998faeda637
+
+    - name: Preload ONNX Model Weights for Neural Tests
+      run: |
+        python -c "from huggingface_hub import hf_hub_download; repo='Xenova/nli-deberta-v3-xsmall'; rev='2a4f614a701367a02d51389039afc998faeda637'; hf_hub_download(repo_id=repo, filename='onnx/model_quantized.onnx', revision=rev); hf_hub_download(repo_id=repo, filename='tokenizer.json', revision=rev); hf_hub_download(repo_id=repo, filename='config.json', revision=rev)"
+
     - name: Run test suite with coverage
       run: |
-        PYTHONPATH=. pytest tests/ -v --cov=proofgraph --cov-report=term-missing
+        PYTHONPATH=. pytest tests/ -v --cov=proofgraph --cov-report=term-missing --cov-fail-under=80
+
+    - name: Verify benchmark and evaluation artifacts
+      run: |
+        python evaluate.py --backend all
+        test -f outputs/benchmark_results.json
+        python evaluate_live.py
+        test -f outputs/tinyfish_live_evaluation.md

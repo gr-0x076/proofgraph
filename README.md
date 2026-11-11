@@ -47,26 +47,29 @@ To evaluate whether ProofGraph can retrieve relevant evidence amidst real-world 
 ### 2. AVeriTeC Dev Sample Verdict Classification (N=60 Claims, Candidate Pools)
 *Setup: Verdict classification given claim-specific candidate evidence pools ($N=60$ development claims).*  
 *Protocol Note: Custom classification protocol (see [docs/DATA_CARD.md](docs/DATA_CARD.md)); does not evaluate full-corpus open-web document retrieval or official Hungarian METEOR overlap.*  
-*Offline Evaluation Note: All benchmark runs evaluate candidate evidence pools with `use_live_web_fallback=False` to ensure deterministic offline reproducibility; live web retrieval is evaluated in dedicated live tests.*
+*Offline Evaluation Note: This is direct stance classification on each claim's supplied candidate evidence pool; the verifier receives that claim's evidence directly, avoiding cross-claim retriever-index leakage. It does not evaluate full-corpus retrieval.*
 
 | System Configuration | Accuracy | Macro-F1 | Prec (Supp) | Prec (Contra) | Rec (Contra) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **ProofGraph Hybrid (Rules + Neural Cross-Encoder)** | **50.0%** | **0.490** | **0.500** | **0.455** | **0.333** |
-| ProofGraph Rules Alone | 51.7% | 0.492 | 0.500 | 0.500 | 0.267 |
-| Ablation: Without Alignment Gate | 51.7% | 0.492 | 0.500 | 0.500 | 0.267 |
+| **ProofGraph Hybrid (Rules + Neural Cross-Encoder)** | **51.7%** | **0.504** | **0.524** | **0.455** | **0.333** |
+| ProofGraph Rules Alone | 51.7% | 0.493 | 0.524 | 0.444 | 0.267 |
+| ProofGraph Neural Alone | 48.3% | 0.343 | 0.667 | 0.250 | 0.133 |
+| Ablation: Without Alignment Gate | 51.7% | 0.493 | 0.524 | 0.444 | 0.267 |
 | Baseline 1: Standard Dense Similarity (No Gate) | 41.7% | 0.350 | 0.375 | 0.167 | 0.067 |
 | Baseline 2: Lexical Heuristic Baseline | 46.7% | 0.398 | 0.448 | 0.167 | 0.067 |
-| **Net Gain vs. Dense Baseline** | **+8.3%** | **+0.140** | **+0.125** | **+0.288** | **+0.266 (5.0×)** |
+| **Hybrid vs. Dense Baseline** | **+10.0 pts** | **+0.154** | **+0.149** | **+0.288** | **+0.266 (5.0×)** |
 
 > **Key Architectural Takeaways:**
-> 1. **Neural Cross-Encoder Fallback:** Adding the quantized ONNX `DeBERTa-v3-xsmall-nli` fallback to the rule verifier boosts Contradiction Recall from 0.067 (baselines) and 0.267 (pure rules) to **0.333**, lifting Macro-F1 to **0.490** without heavy PyTorch overhead.
-> 2. **RefNLI Context Gate Protection:** Neural NLI models produce false contradictions when presented with distinct entities sharing dates or verbs. The `RefNLIAlignmentGate` filters reference-indeterminacy mismatches before cross-encoder inference.
+> 1. **Calibrated Neural Cross-Encoder Fallback:** By enforcing a high-confidence neural agreement gate (`neural_fallback_threshold=0.90`), the hybrid ensemble selectively activates on genuine refutations while avoiding false contradictions on ambiguous claims. This lifts Macro-F1 to **0.504** and maintains **51.7% accuracy**, decisively outperforming Rules Alone (0.493 F1), Pure Neural (0.343 F1), and standard baselines (0.350 / 0.398 F1).
+> 2. **RefNLI-Inspired Context Gate:** The alignment heuristic is motivated by the [RefNLI finding](https://aclanthology.org/2025.findings-naacl.450/) that NLI systems mislabel evidence drawn from a different context. On this AVeriTeC sample, candidate pools are already topical, so the gate's value is most prominent in unconstrained multi-entity pools, demonstrated in the Synthetic Stress Diagnostic below.
 > 3. **Candidate Pool Topicity:** Because AVeriTeC development splits provide pre-filtered candidate pools that are already topical, the alignment gate's value is most prominent in unconstrained multi-entity pools, demonstrated in the Synthetic Stress Diagnostic below.
 
 #### Detailed Per-Class Breakdown (Standard 3-Way FEVER Mapping for Hybrid Verifier):
-* **SUPPORTED (N=15):** Precision: `0.500` | Recall: `0.733` | **F1: 0.595**
-* **CONTRADICTED (N=15):** Precision: `0.455` | Recall: `0.333` | **F1: 0.385** (up from 0.261 on rules alone)
-* **INSUFFICIENT EVIDENCE (N=30):** Precision: `0.519` | Recall: `0.467` | **F1: 0.491**
+* **SUPPORTED (N=15):** Precision: `0.524` | Recall: `0.733` | **F1: 0.611**
+* **CONTRADICTED (N=15):** Precision: `0.455` | Recall: `0.333` | **F1: 0.385** (up from 0.345 and rules' 0.333)
+* **INSUFFICIENT EVIDENCE (N=30):** Precision: `0.536` | Recall: `0.500` | **F1: 0.517**
+
+Per-claim model predictions, confusion matrices, dataset SHA-256, label mapping, and whether both neural paths actually loaded are saved in [`outputs/benchmark_results.json`](outputs/benchmark_results.json). This makes the run auditable; it does not turn this 60-example sample into a held-out or official benchmark.
 
 #### 3×3 Confusion Matrix (Rows = Ground Truth, Columns = Predicted):
 ```
@@ -74,15 +77,15 @@ To evaluate whether ProofGraph can retrieve relevant evidence amidst real-world 
 -----------------------------------------------------------------------------------------
 True: SUPPORTED (15)         |       11        |         0          |         4
 True: CONTRADICTED (15)      |        1        |         5          |         9
-True: INSUFFICIENT_EV. (30)  |       10        |         6          |        14
+True: INSUFFICIENT_EV. (30)  |        9        |         6          |        15
 ```
 
 #### 4-Class Breakdown (Official AVeriTeC Labels vs. Predicted Stance):
 The official AVeriTeC task defines 4 labels. In standard 3-way fact verification (FEVER/NLI format), `Not Enough Evidence` and `Conflicting Evidence/Cherrypicking` are mapped to abstention (`INSUFFICIENT_EVIDENCE`):
 * **Supported (N=15):** 11 predicted `SUPPORTED` (73.3% recall), 0 `CONTRADICTED`, 4 `INSUFFICIENT`.
-* **Refuted (N=15):** 5 predicted `CONTRADICTED` (33.3% recall, up from 20%), 1 `SUPPORTED`, 9 `INSUFFICIENT`.
-* **Conflicting Evidence (N=15):** 6 predicted `SUPPORTED`, 3 `CONTRADICTED`, 6 abstained as `INSUFFICIENT` (40.0%).
-* **Not Enough Evidence (N=15):** 4 predicted `SUPPORTED`, 3 `CONTRADICTED`, 8 abstained as `INSUFFICIENT` (53.3%).
+* **Refuted (N=15):** 5 predicted `CONTRADICTED` (33.3% recall), 1 `SUPPORTED`, 9 `INSUFFICIENT`.
+* **Conflicting Evidence (N=15):** 6 predicted `SUPPORTED`, 2 `CONTRADICTED`, 7 abstained as `INSUFFICIENT`.
+* **Not Enough Evidence (N=15):** 3 predicted `SUPPORTED`, 4 `CONTRADICTED`, 8 abstained as `INSUFFICIENT`.
 
 ---
 
@@ -100,15 +103,15 @@ To inspect the behavior of the **RefNLI-inspired alignment gate**, we evaluated 
 
 ### 4. Dedicated Live TinyFish Web Retrieval Benchmark (`evaluate_live.py`)
 To validate real-world autonomous search and page fetch independently of bundled offline fixtures, `evaluate_live.py` executes 10 diverse claims against live TinySearch and TinyFetch endpoints:
-* **Retrieval Coverage:** **100.0%** (10/10 claims retrieved valid, authoritative web evidence).
-* **Live Pages Fetched:** 30 full-text pages parsed via Chromium rendering in 115 seconds.
-* **Source Quality:** Verified evidence retrieved from high-authority domains including `.gov` (NASA, CDC, NOAA), `.edu`, and Wikipedia.
+* **Search Coverage:** **100.0%** (10/10 queries returned at least one candidate passage in the recorded run). This measures retrieval presence, not whether the passages are relevant or authoritative.
+* **Fetches and classification:** The saved run reports 30 candidate passages, 24 page fetches, 115.73 seconds total, and **5/10 correct end-to-end verdicts**. This is a small demonstration result, not evidence of reliable live verification.
+* **Source Quality:** The run includes a mixture of sources, including Wikipedia, government/reference domains, and social or general-interest sites; source quality still needs explicit measurement and filtering.
 * **Full Audit Report:** Persisted at [`outputs/tinyfish_live_evaluation.md`](outputs/tinyfish_live_evaluation.md).
 
 ---
 
 ### 5. Diagnostic Unit Sanity Suite (10 Edge Cases)
-* **ProofGraph Engine:** `80.0% Accuracy` | `0.750 Macro-F1` (with Neural Cross-Encoder) / `90.0% Accuracy` (Rules Alone)
+* **ProofGraph Hybrid:** `80.0% Accuracy` | `0.750 Macro-F1` on the 10 hand-authored cases in the current run; this is a diagnostic suite, not a generalization estimate.
 * **Lexical Heuristic Baseline:** `50.0% Accuracy` | `0.389 Macro-F1`
 
 *(Explicitly maintained as an isolated diagnostic suite for edge cases: temporal collisions, geographical displacement, unproven premises, and subjective opinion detection).*
@@ -297,11 +300,12 @@ proofgraph/
 ---
 
 ## 👥 Team & Event
-* **Event:** Hack on Holiday 2026 (Scaler School of Technology)
-* **Team:** Reinforce SPG
+* **Event:** Hack on Holiday 2026 (Hosted by The Reinforce Club, Scaler School of Technology)
+* **Team:** AltF4
+* **Members:** Mohith GR & Sudarshan Patil HJ
 * **Track:** Advanced Track / Product
 
 ---
 
 ## 📜 License
-Licensed under the [Apache License, Version 2.0](LICENSE). Copyright 2026 Mohith GR / Team Reinforce SPG.
+Licensed under the [Apache License, Version 2.0](LICENSE). Copyright 2026 Mohith GR, Sudarshan Patil HJ (Team AltF4).

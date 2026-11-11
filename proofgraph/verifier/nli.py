@@ -1,5 +1,6 @@
 import re
 from typing import List, Tuple, Set, Optional, Dict, Any
+import warnings
 from proofgraph.schemas.claim import AtomicClaim
 from proofgraph.schemas.evidence import EvidencePassage
 from proofgraph.schemas.verdict import VeracityLabel, ClaimVerdict
@@ -271,7 +272,8 @@ class HybridNLIVerifier:
         self,
         refnli_gate: Optional[RefNLIAlignmentGate] = None,
         credibility_scorer: Optional[SourceCredibilityScorer] = None,
-        prefer_offline: bool = False
+        prefer_offline: bool = False,
+        neural_fallback_threshold: float = 0.90
     ):
         self.alignment_gate = refnli_gate or RefNLIAlignmentGate()
         self.credibility_scorer = credibility_scorer or SourceCredibilityScorer()
@@ -280,6 +282,7 @@ class HybridNLIVerifier:
             credibility_scorer=self.credibility_scorer
         )
         self.prefer_offline = prefer_offline
+        self.neural_fallback_threshold = neural_fallback_threshold
         self._neural_verifier = None
 
     @property
@@ -291,9 +294,19 @@ class HybridNLIVerifier:
                     refnli_gate=self.alignment_gate,
                     credibility_scorer=self.credibility_scorer
                 )
-            except Exception:
+            except Exception as exc:
                 self._neural_verifier = None
+                warnings.warn(
+                    f"Neural NLI could not be initialized; hybrid verification is using rules only: {exc}",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
         return self._neural_verifier
+
+    @property
+    def neural_active(self) -> bool:
+        """Whether the optional neural fallback loaded successfully."""
+        return bool(self.neural_verifier and self.neural_verifier.is_available)
 
     def verify_claim(self, claim: AtomicClaim, evidence_passages: List[EvidencePassage]) -> ClaimVerdict:
         # 1. First run deterministic rule-based verification
@@ -302,12 +315,14 @@ class HybridNLIVerifier:
         if rule_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED):
             return rule_verdict
 
-        # 2. If rules abstained, consult neural cross-encoder if available
-        if self.neural_verifier and self.neural_verifier.is_available:
+        # 2. If rules abstained, consult neural cross-encoder if available with calibrated confidence threshold
+        if self.neural_active:
             neural_verdict = self.neural_verifier.verify_claim(claim, evidence_passages)
-            if neural_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED):
+            if (
+                neural_verdict.label in (VeracityLabel.SUPPORTED, VeracityLabel.CONTRADICTED)
+                and neural_verdict.confidence >= self.neural_fallback_threshold
+            ):
                 return neural_verdict
-
         return rule_verdict
 
 def create_verifier(backend: str = "rules", **kwargs):

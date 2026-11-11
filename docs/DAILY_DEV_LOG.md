@@ -1,10 +1,10 @@
 # ProofGraph: Daily Development Log & Continuous Progress Report
 
-> **Event:** Hack on Holiday 2026 (Hosted by Reinforce Club, Scaler School of Technology)  
-> **Team:** Reinforce SPG  
-> **Track:** Advanced Track / Product  
-> **Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)  
-> **Build Window:** November 5 – November 15, 2026  
+> **Event:** Hack on Holiday 2026 (Hosted by The Reinforce Club, Scaler School of Technology)
+> **Team:** AltF4 (Mohith GR & Sudarshan Patil HJ)
+> **Track:** Advanced Track / Product
+> **Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)
+> **Build Window:** November 5 – November 15, 2026
 > *(Note: This document serves as our internal engineering changelog and milestone tracker across the 10-day build window).*
 
 ---
@@ -128,4 +128,12 @@ The entries above record the Day 7 state and should not be read as the current t
     * Aligned `TinyFishWebAgent` domain parsing with official TinySearch response schema (`domain` field).
   * **Pipeline Cleanliness & CI Coverage:**
     * Fixed graph visualizer link rendering in `ReportGenerator` when `output_dir is None` (setting `graph_html_rel_path=None`).
-    * Added `--cov=proofgraph --cov-report=term-missing` to GitHub Actions CI workflow, enforcing 80% test coverage across 23 passing tests (1 skipped for opt-in live network).
+    * Added `--cov=proofgraph --cov-report=term-missing` to GitHub Actions CI workflow. At this point coverage was reported but not enforced; later audit adds an 80% minimum.
+
+### Audit correction & Production Hardening — November 11, 2026
+* **Evaluation Leakage Resolved:** Re-ran `evaluate.py --backend all` after eliminating retriever index accumulation. The evaluation now delivers candidate evidence pools directly to the example verifier without cross-claim index leakage.
+* **Calibrated Hybrid Fallback (`neural_fallback_threshold=0.90`):** Requires high neural confidence (≥0.90) before overturning rule-based abstentions. This eliminates false contradictions on ambiguous claims while capturing genuine refutations, lifting Hybrid performance to **51.7% Accuracy / 0.504 Macro-F1 / 0.400 Contradiction Recall** (surpassing Rules Alone at 0.493 and Baselines at 0.350/0.398).
+* **Immutable Model Revision & Label Validation:** Pinned `Xenova/nli-deberta-v3-xsmall` to immutable commit SHA `2a4f614a701367a02d51389039afc998faeda637` (Apache-2.0 base: `cross-encoder/nli-deberta-v3-xsmall`). Added dynamic runtime validation of `config.json` `id2label` confirming index 0=contradiction, 1=entailment, 2=neutral.
+* **Warm-Run Dynamic Padding:** Eliminated fixed 512 padding, achieving ~10 ms median CPU inference per pair.
+* **Auditable Live Web Retrieval Artifact:** Re-ran `evaluate_live.py` with real TinySearch & TinyFetch endpoints. Generated auditable table of 26 retrieved source URLs, domain distribution, and 50% live accuracy disclosure at [`outputs/tinyfish_live_evaluation.md`](../outputs/tinyfish_live_evaluation.md).
+* **CI Matrix Hardening:** Added model weight caching, `--cov-fail-under=80` coverage threshold (current: 82.2%), benchmark execution, and live fixture validation across Python 3.10, 3.11, and 3.12.

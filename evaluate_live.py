@@ -136,6 +136,16 @@ def run_live_tinyfish_evaluation(output_dir: str = "outputs") -> Dict[str, Any]:
             "is_correct": is_match,
             "evidence_count": len(passages),
             "sources": [p.source_domain for p in passages],
+            "source_records": [
+                {
+                    "title": p.source_title,
+                    "domain": p.source_domain,
+                    "url": p.source_url,
+                    "retrieval_method": p.metadata.get("retrieval_method", "unknown"),
+                    "http_status": p.metadata.get("http_status"),
+                }
+                for p in passages
+            ],
             "sample_snippet": passages[0].text[:120] if passages else "No evidence retrieved",
             "latency_sec": round(elapsed, 2)
         })
@@ -161,7 +171,7 @@ def run_live_tinyfish_evaluation(output_dir: str = "outputs") -> Dict[str, Any]:
     md.append(f"**Sample Size:** `N=10 claims` across history, science, geography, and current events.  \n")
     
     md.append("## 📊 Executive Summary Metrics")
-    md.append(f"- **Evidence Retrieval Coverage:** `{coverage*100:.1f}%` ({sum(1 for r in results if r['evidence_count'] > 0)}/10 claims retrieved verified web passages)")
+    md.append(f"- **Search Coverage:** `{coverage*100:.1f}%` ({sum(1 for r in results if r['evidence_count'] > 0)}/10 claims returned at least one candidate; this does not establish relevance or source quality)")
     md.append(f"- **End-to-End Classification Accuracy:** `{accuracy*100:.1f}%` ({sum(1 for r in results if r['is_correct'])}/10 matched ground truth)")
     md.append(f"- **Total Evidence Passages Ingested:** `{total_passages_retrieved}` passages")
     md.append(f"- **Total Chromium Pages Rendered & Fetched:** `{total_pages_fetched}` full pages via TinyFetch")
@@ -181,6 +191,19 @@ def run_live_tinyfish_evaluation(output_dir: str = "outputs") -> Dict[str, Any]:
     for r in results:
         m_icon = "✅" if r["is_correct"] else "❌"
         md.append(f"| {r['claim'][:45]}... | {r['category']} | `{r['expected']}` | `{r['predicted']}` | {r['confidence']*100:.1f}% | {r['evidence_count']} | {r['latency_sec']}s | {m_icon} |")
+
+    md.append("\n## Retrieved Source URLs")
+    md.append("The records below make individual results auditable; source presence is not an endorsement of source reliability.")
+    md.append("| Claim | Title | Domain | Retrieval | HTTP | URL |")
+    md.append("| :--- | :--- | :--- | :--- | :---: | :--- |")
+    for r in results:
+        for source in r["source_records"]:
+            title = (source["title"] or "Untitled").replace("|", "\\|")
+            domain = (source["domain"] or "unknown").replace("|", "\\|")
+            url = source["url"]
+            link = f"[{url}]({url})" if url else "(no URL)"
+            status = source["http_status"] if source["http_status"] is not None else "—"
+            md.append(f"| {r['claim'][:45]}... | {title} | {domain} | {source['retrieval_method']} | {status} | {link} |")
     
     md.append("\n## 🔍 Protocol Disclosure & Non-Comparability Note")
     md.append("> [!NOTE]")

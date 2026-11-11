@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 from typing import List, Tuple, Optional, Dict, Any
 import numpy as np
 
@@ -25,6 +26,7 @@ class DebertaNLIVerifier:
     - Falls back gracefully to rule-based verification if offline or uninitialized.
     """
     MODEL_REPO = "Xenova/nli-deberta-v3-xsmall"
+    MODEL_REVISION = "2a4f614a701367a02d51389039afc998faeda637"
     MODEL_FILE = "onnx/model_quantized.onnx"
     TOKENIZER_FILE = "tokenizer.json"
 
@@ -34,18 +36,22 @@ class DebertaNLIVerifier:
         credibility_scorer: Optional[SourceCredibilityScorer] = None,
         confidence_threshold: float = 0.60,
         model_repo: Optional[str] = None,
+        model_revision: Optional[str] = None,
         prefer_offline: bool = False
     ):
         self.alignment_gate = refnli_gate or RefNLIAlignmentGate()
         self.credibility_scorer = credibility_scorer or SourceCredibilityScorer()
         self.confidence_threshold = confidence_threshold
         self.model_repo = model_repo or self.MODEL_REPO
+        self.model_revision = model_revision or self.MODEL_REVISION
         self.prefer_offline = prefer_offline
         
         self.session = None
         self.tokenizer = None
+        self.label_mapping = ["CONTRADICTION", "ENTAILMENT", "NEUTRAL"]
         self._is_ready = False
         self._init_error = None
+        self._initialization_attempted = False
         
         if not self.prefer_offline:
             self._try_load_model()
@@ -54,20 +60,41 @@ class DebertaNLIVerifier:
         """Attempts to load ONNX model and tokenizer from local cache or Hugging Face Hub."""
         if self._is_ready:
             return True
+        if self._initialization_attempted:
+            return False
+        self._initialization_attempted = True
         try:
+            import json
             import onnxruntime as ort
             from tokenizers import Tokenizer
             import huggingface_hub
 
-            # Attempt local download/cache resolution
+            # Attempt local download/cache resolution with pinned immutable revision
             model_path = huggingface_hub.hf_hub_download(
                 repo_id=self.model_repo,
-                filename=self.MODEL_FILE
+                filename=self.MODEL_FILE,
+                revision=self.model_revision
             )
             tokenizer_path = huggingface_hub.hf_hub_download(
                 repo_id=self.model_repo,
-                filename=self.TOKENIZER_FILE
+                filename=self.TOKENIZER_FILE,
+                revision=self.model_revision
             )
+
+            # Runtime validation of authoritative label schema from model config.json
+            try:
+                cfg_path = huggingface_hub.hf_hub_download(
+                    repo_id=self.model_repo,
+                    filename="config.json",
+                    revision=self.model_revision
+                )
+                with open(cfg_path, "r", encoding="utf-8") as f:
+                    cfg = json.load(f)
+                id2label = cfg.get("id2label", {})
+                if id2label:
+                    self.label_mapping = [id2label.get(str(i), "").upper() for i in range(3)]
+            except Exception:
+                self.label_mapping = ["CONTRADICTION", "ENTAILMENT", "NEUTRAL"]
 
             # Initialize ONNX inference session on CPU with minimal threads
             opts = ort.SessionOptions()
@@ -78,18 +105,26 @@ class DebertaNLIVerifier:
             self.session = ort.InferenceSession(model_path, opts, providers=["CPUExecutionProvider"])
             self.tokenizer = Tokenizer.from_file(tokenizer_path)
             self.tokenizer.enable_truncation(max_length=512)
-            self.tokenizer.enable_padding(length=512)
+            # This verifier scores one pair at a time. Fixed 512-token padding
+            # needlessly makes every ONNX call process a full-length sequence.
+            # Keep the encoded pair at its natural length; the exported model
+            # accepts dynamic sequence lengths.
             self._is_ready = True
             return True
         except Exception as e:
             self._init_error = str(e)
             self._is_ready = False
+            warnings.warn(
+                f"Neural NLI model unavailable; this verifier will abstain. Details: {e}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             return False
 
     @property
     def is_available(self) -> bool:
         """Returns True if the ONNX session and tokenizer are initialized."""
-        if not self._is_ready and not self.prefer_offline:
+        if not self._is_ready and not self.prefer_offline and not self._initialization_attempted:
             self._try_load_model()
         return self._is_ready
 
@@ -114,9 +149,8 @@ class DebertaNLIVerifier:
         exp_logits = np.exp(logits - np.max(logits))
         probs = exp_logits / np.sum(exp_logits)
         
-        labels = ["CONTRADICTION", "ENTAILMENT", "NEUTRAL"]
         best_idx = int(np.argmax(probs))
-        return probs, labels[best_idx]
+        return probs, self.label_mapping[best_idx]
 
     def verify_claim(self, claim: AtomicClaim, evidence_passages: List[EvidencePassage]) -> ClaimVerdict:
         """

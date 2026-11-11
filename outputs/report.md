@@ -1,5 +1,5 @@
 # ProofGraph: Evidence-Backed Claim Review Report
-*Generated on: 2026-11-11 09:44:20 UTC*
+*Generated on: 2026-11-11 10:48:19 UTC*
 
 ## 📊 Executive Summary
 - **Total Atomic Claims Analyzed:** `3`

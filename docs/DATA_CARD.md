@@ -83,12 +83,14 @@ In standard Fact Extraction and VERification (FEVER) and Natural Language Infere
 * **Underlying Architecture:** DeBERTa-v3 cross-encoder fine-tuned for Natural Language Inference (MNLI / SNLI).
 * **Format & Execution Engine:** Quantized ONNX (`model.onnx`, 83.3 MB) executed via `onnxruntime` and Rust-backed `tokenizers`.
 * **Zero-PyTorch Guarantee:** Runs on standard CPU architectures without PyTorch, torch-vision, CUDA, or heavy C++ build toolchains.
-* **Inference Latency:** Sub-10ms per premise-hypothesis pair on modern 4-core CPUs.
-* **Stance Output:** 3-way softmax distribution over `[CONTRADICTION, ENTAILMENT, NEUTRAL]`.
+* **Inference Latency:** A local warm-run microbenchmark (25 calls after warm-up) measured 10.2 ms median and 11.2 ms p95 per pair in the development environment after removing unnecessary fixed-length padding. Treat this as a machine-specific observation, not a cross-device guarantee.
+* **Stance Output:** 3-way softmax distribution over `[CONTRADICTION, ENTAILMENT, NEUTRAL]` dynamically validated from model `config.json` at startup (`id2label`: `0: contradiction, 1: entailment, 2: neutral`).
+* **Pinned Model Revision & License:** Model weights are pinned to immutable commit SHA `2a4f614a701367a02d51389039afc998faeda637` on Hugging Face Hub. The underlying base model is `cross-encoder/nli-deberta-v3-xsmall` released under the [Apache-2.0 License](https://huggingface.co/cross-encoder/nli-deberta-v3-xsmall), fully compatible with ProofGraph's Apache-2.0 license.
+* **Calibrated Hybrid Fallback:** `HybridNLIVerifier` enforces `neural_fallback_threshold=0.90` before overturning rule-based abstentions, preventing false contradictions on ambiguous claims while lifting Contradiction Recall to 0.333 and Macro-F1 to 0.504.
 
 ### 4.2 Guardrails & Pre-Filtering
 * **Context Alignment Gate (`RefNLIAlignmentGate`):** Evaluated strictly *prior* to neural cross-encoder execution. Unaligned premise-hypothesis pairs (e.g., distinct named individuals sharing dates or verbs) are intercepted and marked `Context Mismatch`, bypassing neural inference to prevent reference-indeterminacy false refutations.
-* **Domain Credibility Prior Fusion (`SourceCredibilityScorer`):** Softmax probabilities are modulated by static domain authority priors ($[0.0, 1.0]$) and normalized retrieval relevance ($[0.0, 1.0]$).
+* **Domain Credibility Prior Fusion (`SourceCredibilityScorer`):** Model softmax scores are multiplied by static domain-authority priors and retrieval relevance for evidence aggregation. The resulting verdict confidence is heuristic and is not probability-calibrated.
 
 ---
 
@@ -103,4 +105,3 @@ To rigorously evaluate the live TinySearch $\rightarrow$ TinyFetch pipeline inde
 * **Latency Profile:** Individual breakdown of query dispatch, search round-trip, and page fetch durations.
 * **Source Quality:** Canonical domain credibility scores and content excerpt lengths.
 * **Output Artifact:** Persisted as a self-contained, auditable Markdown report at [`outputs/tinyfish_live_evaluation.md`](../outputs/tinyfish_live_evaluation.md).
-

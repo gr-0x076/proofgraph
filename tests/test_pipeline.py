@@ -354,7 +354,7 @@ def test_tinyfish_fetch_request_contract_and_error_status(monkeypatch):
 def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
     from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
     mock_agent = TinyFishWebAgent(api_key="sk-tinyfish-mock")
-    
+
     mock_passage = EvidencePassage(
         id="tf_1",
         text="The Great Wall of China is over 13,000 miles long.",
@@ -363,7 +363,7 @@ def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
         relevance_score=0.92
     )
     monkeypatch.setattr(mock_agent, "research_claim_on_web", lambda q, max_evidence=3: [mock_passage])
-    
+
     retriever = HybridRetriever(prefer_offline=True, tinyfish_agent=mock_agent)
     # Search with empty local index: should trigger TinyFish fallback
     claim = AtomicClaim(text="Great wall of china length", parent_sentence="")
@@ -371,7 +371,7 @@ def test_hybrid_retriever_with_tinyfish_agent(monkeypatch):
     assert len(results) == 1
     assert results[0].id == "tf_1"
     assert "Great Wall of China" in results[0].text
-    
+
     # Also test direct search_tinyfish_live
     tf_direct = retriever.search_tinyfish_live("test query", max_results=2)
     assert len(tf_direct) == 1
@@ -399,6 +399,93 @@ def test_neural_nli_verifier_offline_fallback():
     verdict = verifier.verify_claim(claim, [])
     assert verdict.label == VeracityLabel.INSUFFICIENT_EVIDENCE
     assert verdict.confidence == 0.50
+    probs, label = verifier.predict_pair("Evidence premise.", "Claim hypothesis.")
+    assert label == "NEUTRAL"
+    assert probs.tolist() == [0.0, 0.0, 1.0]
+
+def test_neural_nli_predict_pair_uses_unpadded_sequence():
+    import numpy as np
+    from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+
+    class Encoding:
+        ids = [101, 42, 102, 77, 102]
+        attention_mask = [1, 1, 1, 1, 1]
+
+    class Tokenizer:
+        def encode(self, premise, hypothesis):
+            return Encoding()
+
+    class Session:
+        def run(self, _outputs, inputs):
+            assert inputs["input_ids"].shape == (1, 5)
+            assert inputs["attention_mask"].shape == (1, 5)
+            return [np.array([[0.0, 4.0, 0.0]], dtype=np.float32)]
+
+    verifier = DebertaNLIVerifier(prefer_offline=True)
+    verifier.tokenizer = Tokenizer()
+    verifier.session = Session()
+    verifier._is_ready = True
+    probs, label = verifier.predict_pair("premise", "hypothesis")
+    assert label == "ENTAILMENT"
+    assert probs[1] > 0.9
+
+def test_neural_nli_does_not_retry_failed_model_initialization():
+    from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+
+    verifier = DebertaNLIVerifier(prefer_offline=True)
+    verifier.prefer_offline = False
+    verifier._initialization_attempted = True
+    assert verifier.is_available is False
+
+@pytest.mark.parametrize(
+    ("probabilities", "expected_label", "evidence_field"),
+    [
+        ([0.01, 0.97, 0.02], VeracityLabel.SUPPORTED, "supporting_evidence_ids"),
+        ([0.97, 0.01, 0.02], VeracityLabel.CONTRADICTED, "contradicting_evidence_ids"),
+    ],
+)
+def test_neural_nli_verdict_aggregates_pairwise_stance(probabilities, expected_label, evidence_field):
+    import numpy as np
+    from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+
+    verifier = DebertaNLIVerifier(prefer_offline=True)
+    verifier.predict_pair = lambda _premise, _hypothesis: (np.asarray(probabilities), "unused")
+    claim = AtomicClaim(text="Apollo 11 landed on the Moon in 1969.", parent_sentence="")
+    evidence = EvidencePassage(
+        id="e1",
+        text="Apollo 11 landed on the Moon in 1969.",
+        source_domain="nasa.gov",
+        relevance_score=0.95,
+    )
+    verdict = verifier.verify_claim(claim, [evidence])
+    assert verdict.label == expected_label
+    assert getattr(verdict, evidence_field) == ["e1"]
+
+def test_benchmark_verifier_receives_only_the_current_candidate_pool():
+    from types import SimpleNamespace
+    from evaluate import verify_claim_against_pool
+
+    evidence = [EvidencePassage(id="current", text="Current pool passage.")]
+    seen = {}
+
+    class Decomposer:
+        def decompose(self, text):
+            return [AtomicClaim(text=text, parent_sentence=text)]
+
+    class Verifier:
+        def verify_claim(self, claim, passages):
+            seen["claim"] = claim.text
+            seen["passages"] = passages
+            return SimpleNamespace(label=VeracityLabel.SUPPORTED)
+
+    prediction = verify_claim_against_pool(
+        SimpleNamespace(decomposer=Decomposer(), verifier=Verifier()),
+        "A test claim.",
+        evidence,
+    )
+    assert prediction == VeracityLabel.SUPPORTED.value
+    assert seen["claim"] == "A test claim."
+    assert seen["passages"] is evidence
 
 def test_neural_nli_inference():
     from proofgraph.verifier.neural_nli import DebertaNLIVerifier
@@ -425,7 +512,7 @@ def test_neural_nli_inference():
 def test_hybrid_nli_verifier_ensemble():
     from proofgraph.verifier.nli import HybridNLIVerifier
     hybrid = HybridNLIVerifier()
-    
+
     # 1. Deterministic rule check: numeric conflict
     claim = AtomicClaim(text="Water boils at 50 degrees Celsius at sea level.", parent_sentence="")
     evid = EvidencePassage(id="e1", text="Pure water boils at 100 degrees Celsius at sea level.", source_url="https://britannica.com", relevance_score=0.95)
@@ -484,3 +571,82 @@ def test_tinyfish_domain_parsing_fallback():
     assert len(passages) == 1
     assert passages[0].source_domain == "www.nasa.gov"
     assert passages[0].metadata.get("domain") == "www.nasa.gov"
+
+def test_hybrid_calibrated_fallback_threshold():
+    from proofgraph.verifier.nli import HybridNLIVerifier
+    import warnings
+
+    hybrid = HybridNLIVerifier(prefer_offline=True, neural_fallback_threshold=0.90)
+    assert hybrid.neural_fallback_threshold == 0.90
+    assert hybrid.neural_active is False
+
+    # Simulate mock neural verifier that emits a medium-confidence verdict (0.75)
+    class MockNeuralVerifier:
+        is_available = True
+        def verify_claim(self, claim, passages):
+            return ClaimVerdict(
+                claim_id=claim.id,
+                label=VeracityLabel.CONTRADICTED,
+                confidence=0.75, # below 0.90
+                justification="Medium confidence refutation"
+            )
+
+    hybrid._neural_verifier = MockNeuralVerifier()
+    assert hybrid.neural_active is True
+
+    claim = AtomicClaim(text="Ambiguous claim where rules abstain", parent_sentence="")
+    # Because confidence 0.75 < 0.90, hybrid must NOT overturn rule-based abstention!
+    v = hybrid.verify_claim(claim, [])
+    assert v.label == VeracityLabel.INSUFFICIENT_EVIDENCE
+
+    # Now simulate high-confidence neural verdict (0.94 >= 0.90)
+    class HighConfNeuralVerifier:
+        is_available = True
+        def verify_claim(self, claim, passages):
+            return ClaimVerdict(
+                claim_id=claim.id,
+                label=VeracityLabel.CONTRADICTED,
+                confidence=0.94, # above 0.90
+                justification="High confidence refutation"
+            )
+
+    hybrid._neural_verifier = HighConfNeuralVerifier()
+    v_high = hybrid.verify_claim(claim, [])
+    assert v_high.label == VeracityLabel.CONTRADICTED
+    assert v_high.confidence == 0.94
+
+def test_hybrid_warning_on_neural_init_failure():
+    from proofgraph.verifier.nli import HybridNLIVerifier
+    import warnings
+
+    class BadNeuralVerifier:
+        def __init__(self, **kwargs):
+            raise RuntimeError("Simulated missing ONNX runtime or network failure")
+
+    hybrid = HybridNLIVerifier(prefer_offline=False)
+    # Monkeypatch import
+    import proofgraph.verifier.nli as nli_mod
+    with warnings.catch_warnings(record=True) as record:
+        warnings.simplefilter("always")
+        # trigger property access with broken constructor
+        hybrid._neural_verifier = None
+        orig = nli_mod.DebertaNLIVerifier if hasattr(nli_mod, "DebertaNLIVerifier") else None
+        try:
+            import proofgraph.verifier.neural_nli as nnli
+            old_cls = nnli.DebertaNLIVerifier
+            nnli.DebertaNLIVerifier = BadNeuralVerifier
+            nv = hybrid.neural_verifier
+            assert nv is None
+            assert hybrid.neural_active is False
+            assert any("Neural NLI could not be initialized" in str(w.message) for w in record)
+        finally:
+            nnli.DebertaNLIVerifier = old_cls
+
+def test_neural_nli_runtime_label_schema_verification():
+    from proofgraph.verifier.neural_nli import DebertaNLIVerifier
+    verifier = DebertaNLIVerifier(prefer_offline=True)
+    # Verify authoritative label ordering
+    assert verifier.label_mapping[0] == "CONTRADICTION"
+    assert verifier.label_mapping[1] == "ENTAILMENT"
+    assert verifier.label_mapping[2] == "NEUTRAL"
+    assert verifier.MODEL_REVISION == "2a4f614a701367a02d51389039afc998faeda637"

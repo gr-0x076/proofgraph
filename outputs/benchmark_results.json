@@ -1,0 +1,1054 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-11-11T10:35:21.374395+00:00",
+  "dataset": "data/benchmarks/averitec_dev_sample.json",
+  "dataset_sha256": "3a7b3c9a7c81837b048147b386ea3de5c3a43ddea3eb4e361b8a638ee44841ef",
+  "sample_size": 60,
+  "label_mapping": {
+    "Supported": "SUPPORTED",
+    "Refuted": "CONTRADICTED",
+    "Conflicting Evidence/Cherrypicking": "INSUFFICIENT_EVIDENCE",
+    "Not Enough Evidence": "INSUFFICIENT_EVIDENCE"
+  },
+  "protocol": "Direct verifier on each claim's provided evidence pool; no open-web retrieval.",
+  "neural_status": {
+    "hybrid_fallback_active": true,
+    "neural_only_active": true
+  },
+  "metrics": {
+    "rules": {
+      "accuracy": 0.5166666666666667,
+      "macro_f1": 0.49259259259259264,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.5238095238095238,
+          "recall": 0.7333333333333333,
+          "f1": 0.611111111111111,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.4444444444444444,
+          "recall": 0.26666666666666666,
+          "f1": 0.33333333333333337,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.5333333333333333,
+          "recall": 0.5333333333333333,
+          "f1": 0.5333333333333333,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 11,
+          "CONTRADICTED": 0,
+          "INSUFFICIENT_EVIDENCE": 4
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 1,
+          "CONTRADICTED": 4,
+          "INSUFFICIENT_EVIDENCE": 10
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 9,
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 16
+        }
+      },
+      "total": 60
+    },
+    "hybrid": {
+      "accuracy": 0.5166666666666667,
+      "macro_f1": 0.5043226250122802,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.5238095238095238,
+          "recall": 0.7333333333333333,
+          "f1": 0.611111111111111,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.45454545454545453,
+          "recall": 0.3333333333333333,
+          "f1": 0.3846153846153846,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.5357142857142857,
+          "recall": 0.5,
+          "f1": 0.5172413793103449,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 11,
+          "CONTRADICTED": 0,
+          "INSUFFICIENT_EVIDENCE": 4
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 1,
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 9
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 9,
+          "CONTRADICTED": 6,
+          "INSUFFICIENT_EVIDENCE": 15
+        }
+      },
+      "total": 60
+    },
+    "neural": {
+      "accuracy": 0.48333333333333334,
+      "macro_f1": 0.3430155527018488,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.6666666666666666,
+          "recall": 0.13333333333333333,
+          "f1": 0.2222222222222222,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.25,
+          "recall": 0.13333333333333333,
+          "f1": 0.1739130434782609,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.5102040816326531,
+          "recall": 0.8333333333333334,
+          "f1": 0.6329113924050633,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 2,
+          "CONTRADICTED": 2,
+          "INSUFFICIENT_EVIDENCE": 11
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 0,
+          "CONTRADICTED": 2,
+          "INSUFFICIENT_EVIDENCE": 13
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 1,
+          "CONTRADICTED": 4,
+          "INSUFFICIENT_EVIDENCE": 25
+        }
+      },
+      "total": 60
+    },
+    "without_alignment_gate": {
+      "accuracy": 0.5166666666666667,
+      "macro_f1": 0.49259259259259264,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.5238095238095238,
+          "recall": 0.7333333333333333,
+          "f1": 0.611111111111111,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.4444444444444444,
+          "recall": 0.26666666666666666,
+          "f1": 0.33333333333333337,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.5333333333333333,
+          "recall": 0.5333333333333333,
+          "f1": 0.5333333333333333,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 11,
+          "CONTRADICTED": 0,
+          "INSUFFICIENT_EVIDENCE": 4
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 1,
+          "CONTRADICTED": 4,
+          "INSUFFICIENT_EVIDENCE": 10
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 9,
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 16
+        }
+      },
+      "total": 60
+    },
+    "dense_baseline": {
+      "accuracy": 0.4166666666666667,
+      "macro_f1": 0.3499278499278499,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.375,
+          "recall": 1.0,
+          "f1": 0.5454545454545454,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.16666666666666666,
+          "recall": 0.06666666666666667,
+          "f1": 0.09523809523809522,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.6428571428571429,
+          "recall": 0.3,
+          "f1": 0.4090909090909091,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 15,
+          "CONTRADICTED": 0,
+          "INSUFFICIENT_EVIDENCE": 0
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 9,
+          "CONTRADICTED": 1,
+          "INSUFFICIENT_EVIDENCE": 5
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 16,
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 9
+        }
+      },
+      "total": 60
+    },
+    "lexical_baseline": {
+      "accuracy": 0.4666666666666667,
+      "macro_f1": 0.3984126984126984,
+      "per_class": {
+        "SUPPORTED": {
+          "precision": 0.4482758620689655,
+          "recall": 0.8666666666666667,
+          "f1": 0.5909090909090909,
+          "support": 15
+        },
+        "CONTRADICTED": {
+          "precision": 0.16666666666666666,
+          "recall": 0.06666666666666667,
+          "f1": 0.09523809523809522,
+          "support": 15
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "precision": 0.56,
+          "recall": 0.4666666666666667,
+          "f1": 0.509090909090909,
+          "support": 30
+        }
+      },
+      "confusion_matrix": {
+        "SUPPORTED": {
+          "SUPPORTED": 13,
+          "CONTRADICTED": 0,
+          "INSUFFICIENT_EVIDENCE": 2
+        },
+        "CONTRADICTED": {
+          "SUPPORTED": 5,
+          "CONTRADICTED": 1,
+          "INSUFFICIENT_EVIDENCE": 9
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "SUPPORTED": 11,
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 14
+        }
+      },
+      "total": 60
+    }
+  },
+  "predictions": [
+    {
+      "sample_index": 0,
+      "claim_sha256": "114a906e11745ccfcab2917ced703b5039c746715c5575f93a82988ae41feaa7",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 1,
+      "claim_sha256": "7ce15b68648c835c5a93b6c91e59c81c3962f45155d2fd54bd1bf85bf274924a",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 2,
+      "claim_sha256": "48e531559506bd275a3859b4ac2d5287b63b19b59dedf264125cf98bcb927a2d",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 3,
+      "claim_sha256": "2a93dbaedd338e835835fc761c74eae37ecd9921e33431f755ee928d3a7557cc",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 4,
+      "claim_sha256": "b0aca0d7d61eddc39e945eac9b244c7cf7186a717b4386e00386161b09e65f54",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 5,
+      "claim_sha256": "34f23af3e7d9489cfd6cd77ebcc61a59942320d562a7a11782e6dfbb90c87791",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 6,
+      "claim_sha256": "a3a7a6fd135c297d5a2d81cccfa4e86a9d490ecbd008032a6f9f6de0354989a4",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 7,
+      "claim_sha256": "3bdc1e97b66f501594981ec031187cc9dfe812bae1428c353bc31e7b6d7bf9c2",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 8,
+      "claim_sha256": "6c73cd87f3f52c13ba064b8cd1d1f6a4f172054e5aa09a0aed556a5e0821cd6d",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 9,
+      "claim_sha256": "260535d8a898fd0dc617e56726eb01280fbd678a818e052943ab7d26a07dacf3",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 10,
+      "claim_sha256": "4c2c32b2f53f39d31ce05dd2fd4aeb472cadae3a603e43b59a21ac146dcf8473",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "CONTRADICTED",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 11,
+      "claim_sha256": "e766d65f77458e38b3b763c6b738cc77fd04e7afdd4607cf61a577c42bcf936e",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 12,
+      "claim_sha256": "6964584c71669e43cfba38e4d863d8070ea416adc06483b064bb610c62aaea44",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 13,
+      "claim_sha256": "cb2f5e8c92a10fda089fc9f0e0e99c7e107936eb05234d3c114f3ddbfe014070",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 14,
+      "claim_sha256": "7c24b1db55c3650bf2e44c955171f8eb7dfb70babbb8d7b0951b82874fa235ac",
+      "ground_truth": "CONTRADICTED",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "CONTRADICTED",
+        "lexical_baseline": "CONTRADICTED"
+      }
+    },
+    {
+      "sample_index": 15,
+      "claim_sha256": "2bf0009cf5a74cde8bad88cbb49718c8f4172d6abbc409f3e74001c40d2a64f8",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 16,
+      "claim_sha256": "d7f2935779691bac9a09c11cf875577c308f5ebb57653cd997fbf7f8afd9d363",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 17,
+      "claim_sha256": "2e02619ac0f41b698f72b3b17e72d17bc89930d1a0102c8dcf34968e7aba5d29",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 18,
+      "claim_sha256": "7c7897d533ef6b52f97f22c97fd3c15cbcc3aa65f1ccb21fcbf56e920f51347e",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 19,
+      "claim_sha256": "af8ac2071c27f72917cc309fda03ff2dcb40cc6fccc913b88d1556d2995487dc",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 20,
+      "claim_sha256": "c85b91088e8c064eed7f0c4f8d6c117320e7560c683dc89c0d87eae58897b31d",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "SUPPORTED",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 21,
+      "claim_sha256": "6bac2c13ee6c2a8ca59a037a0efe7a158cbcc11e7e90e4950011cc1daee4a5ae",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 22,
+      "claim_sha256": "15d9e3323852ab6e2cea5ecb038ece45948e9f51911785af3a74107823b40d8e",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 23,
+      "claim_sha256": "e1c371a4fcf94a265a934b13d74bbb2b471834b4196c5d4934df246568d3f413",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 24,
+      "claim_sha256": "1d9ee643c3271b3c68c14c79eeb9e89fca77a3f8aa8ebd8333b90e0a64c3315f",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 25,
+      "claim_sha256": "874318daa3292036b00d824da7db58163f091557d9a2be6644690495029f0195",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 26,
+      "claim_sha256": "50e54fd38994727186a824f8299c5d53f827fda1dc0034072a4ac3ae7f035615",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 27,
+      "claim_sha256": "c775b98637fe2ef554403ff43c6e0680a9abbbaea5c1d53106ceabaae6541974",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 28,
+      "claim_sha256": "fd4b8cd55073d96e0a355789b6e40e3c7305ca3d6464358851827c45ee83acbe",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "SUPPORTED",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 29,
+      "claim_sha256": "1ffac11298b526ee8536f2d221691e6aebb3550e9dc2433316a173695e82abfc",
+      "ground_truth": "SUPPORTED",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 30,
+      "claim_sha256": "9602cacf81e7cbcbd653e5173dbc34368536ab49f7559519647e3c6610a575d7",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 31,
+      "claim_sha256": "f7c14ba9984e3401b4df65c715d4f1238f6e8ad3ab392db8ce5b561b58d00380",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "CONTRADICTED",
+        "lexical_baseline": "CONTRADICTED"
+      }
+    },
+    {
+      "sample_index": 32,
+      "claim_sha256": "4dc484adc4a03167716eb19401fdd5d5939890ed56e54245b673e8d12fc46feb",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 33,
+      "claim_sha256": "b609e1aa3ba34738f7d72a175cbf5c8eeacfc767204b363a107a5069991bca60",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 34,
+      "claim_sha256": "b827421e0e12bd4c1074e13bc37a510cdde5a61016f35206a5a97946b5e37f64",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 35,
+      "claim_sha256": "d9f46f58609820cebebdb80457e45a3dcac688661b1020131db2e9aec5df0abf",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "CONTRADICTED",
+        "lexical_baseline": "CONTRADICTED"
+      }
+    },
+    {
+      "sample_index": 36,
+      "claim_sha256": "b3061d02334147fb228d767bb6c045be93681b8636024c55d18025d8e6247274",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 37,
+      "claim_sha256": "14964eca8a26e09a31365f4297e920908262e36b05748a2799292b30f4099721",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 38,
+      "claim_sha256": "9a90535596786046e61dd6f2b78321c29c8df96144f69ce136780c2674454158",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 39,
+      "claim_sha256": "4f93e825d4d40ca0d81188c6b8be2959b707d3dd41b0e5cdd525a73864258d0e",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 40,
+      "claim_sha256": "5ba2508f4d49ecb3677e0567689f107d75c65503effe662f233ef4d11f0c8b61",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "SUPPORTED",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "CONTRADICTED",
+        "lexical_baseline": "CONTRADICTED"
+      }
+    },
+    {
+      "sample_index": 41,
+      "claim_sha256": "ad3836eb75700940c15146f2d0bf7a2cc043583519428a749f56e3de501f1a4f",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 42,
+      "claim_sha256": "e27eb82376c2090c1d79225ed1c132a6fdc7c38d7d27dd5206e2d93bc487557f",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "CONTRADICTED"
+      }
+    },
+    {
+      "sample_index": 43,
+      "claim_sha256": "ccdb77cd6bcd0749539f75d4a19699535dbdea32142fecbd070366cfb027c67a",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 44,
+      "claim_sha256": "c2aca5a79bae0f5089ddcdd2109f12820dd0f95616f2f489fa3bad3524516717",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 45,
+      "claim_sha256": "50014320e5b99a486a15818b0f865c79a9940aba8fec6d98020cfe32400b5b5a",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "CONTRADICTED",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 46,
+      "claim_sha256": "1c9d9015fb5f2417e8c88a6c994129d1bf26c8e8ad59c0a7203549880ee3f8d3",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 47,
+      "claim_sha256": "bf11f73b80e592613e3d455a794e887feff0f14f727e015c9152699f34b57f13",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 48,
+      "claim_sha256": "38463233f43b22d37b4dde5e33aa5b19d08eb6f9c86cb3b84889ef4a409e3bec",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 49,
+      "claim_sha256": "882b07eeff894291b38d053ff187e0bc307b9096fd82112a1fa5b14c8cb8ea01",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 50,
+      "claim_sha256": "41deab2b139b950d2906a285a50fa0d002259ea3e975eba02a2174795c3974a6",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "CONTRADICTED"
+      }
+    },
+    {
+      "sample_index": 51,
+      "claim_sha256": "ad26ac380750165037020082a076f3b9a6e2286a83a51d908a5cdec55960cc48",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "CONTRADICTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 52,
+      "claim_sha256": "5984ac4b46c02b8bce7ee9befdb9f4322a2dc6533be45897be992443831cafdf",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "CONTRADICTED",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "SUPPORTED",
+        "lexical_baseline": "SUPPORTED"
+      }
+    },
+    {
+      "sample_index": 53,
+      "claim_sha256": "b4f7416fa29f2fa454e3645562c0e0dd356f9a7782fccf49a7e517c7ad6c0cd7",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "SUPPORTED",
+        "hybrid": "SUPPORTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "SUPPORTED",
+        "dense_baseline": "CONTRADICTED",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 54,
+      "claim_sha256": "01acc4534b4be8913b9feff356f343bd5d389ec58c0f5c5c589e9426b1667896",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 55,
+      "claim_sha256": "f892a405e4a91ee7f8bb9dee6ae998805000c9093cfee5a64a4d721e7efe679b",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 56,
+      "claim_sha256": "25cb4ff204919cc9eedcbd68f9a276515e6340d0a8a2c16bc1dada73c668fe57",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "CONTRADICTED",
+        "hybrid": "CONTRADICTED",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "CONTRADICTED",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 57,
+      "claim_sha256": "099dec0c9eeb4b84142e5556da113a0134ea8f21cb920e6f0329ec8ec12a46d9",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 58,
+      "claim_sha256": "492bc8cb1f72b7fced435a46687314e365e788159b7e51792d6e2551e5bd0705",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "sample_index": 59,
+      "claim_sha256": "099dec0c9eeb4b84142e5556da113a0134ea8f21cb920e6f0329ec8ec12a46d9",
+      "ground_truth": "INSUFFICIENT_EVIDENCE",
+      "predictions": {
+        "rules": "INSUFFICIENT_EVIDENCE",
+        "hybrid": "INSUFFICIENT_EVIDENCE",
+        "neural": "INSUFFICIENT_EVIDENCE",
+        "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
+        "dense_baseline": "INSUFFICIENT_EVIDENCE",
+        "lexical_baseline": "INSUFFICIENT_EVIDENCE"
+      }
+    }
+  ]
+}
