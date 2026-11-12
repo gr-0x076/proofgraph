@@ -10,4 +10,6 @@ class AtomicClaim(BaseModel):
     context_brackets: Optional[str] = Field(None, description="Context inferred from surrounding text (e.g. '[in 2024]')")
     is_verifiable: bool = Field(True, description="Whether this claim is factually verifiable (vs subjective opinion)")
     ambiguity_flag: bool = Field(False, description="Flagged if claim cannot be safely disambiguated")
+    is_underspecified: bool = Field(False, description="Flagged if subject/entity is an underspecified mononym or missing context")
+    ambiguity_reason: Optional[str] = Field(None, description="Explanation of why claim cannot be verified without disambiguation")
     confidence: float = Field(1.0, ge=0.0, le=1.0)

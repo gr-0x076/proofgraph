@@ -15,7 +15,7 @@ class TinyFishWebAgent:
     TinyFish Search and Fetch integration:
     - TinySearch API (api.search.tinyfish.ai): Real-time structured search results.
     - TinyFetch API (api.fetch.tinyfish.ai): Chromium page rendering and clean markdown extraction.
-    
+
     Searches for candidate pages, fetches their rendered content, and preserves
     the source URL/title returned by TinyFish. The relevance value is a lexical
     retrieval proxy, not a calibrated probability or semantic relevance model.
@@ -202,7 +202,7 @@ class TinyFishWebAgent:
             snippet = item.get("snippet", "")
             title = item.get("title", "")
             src_url = item.get("url", "")
-            
+
             if not snippet or len(snippet.strip()) < 15:
                 continue
 
@@ -244,6 +244,59 @@ class TinyFishWebAgent:
         results = data.get("results", [])
         return results[0].get("text") if results and isinstance(results[0], dict) else None
 
+    def audit_citation_url(self, url: str, claim_text: str, max_evidence: int = 5) -> List[EvidencePassage]:
+        """Fetches and extracts evidence passages from a cited source URL using TinyFetch or HTTP fallback."""
+        return self.research_claim_on_web(claim_text, target_url=url, max_evidence=max_evidence)
+
+    def _fetch_via_http_fallback(self, url: str, query: str, max_evidence: int = 5) -> List[EvidencePassage]:
+        """Direct HTTP fetch fallback when TinyFish API key is unavailable or in offline/test environment."""
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "Mozilla/5.0 (compatible; ProofGraph-CitationAuditor/1.0)"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                raw_html = resp.read().decode("utf-8", errors="replace")
+
+            # Strip scripts, styles, and HTML tags
+            clean_text = re.sub(r'<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>', '', raw_html, flags=re.IGNORECASE)
+            clean_text = re.sub(r'<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>', '', clean_text, flags=re.IGNORECASE)
+            clean_text = re.sub(r'<[^>]+>', ' ', clean_text)
+            clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+
+            paragraphs = [p.strip() for p in re.split(r'(?<=[.!?])\s+', clean_text) if len(p.strip()) >= 30]
+            if not paragraphs:
+                return []
+
+            q_terms = {t for t in re.findall(r'\w+', query.lower()) if len(t) > 2}
+            scored = []
+            for p in paragraphs:
+                p_terms = {t for t in re.findall(r'\w+', p.lower()) if len(t) > 2}
+                score = len(q_terms.intersection(p_terms)) / float(len(q_terms)) if q_terms else 0.0
+                scored.append((score, p))
+
+            scored.sort(key=lambda x: x[0], reverse=True)
+            domain = urllib.parse.urlsplit(url).hostname or "unknown"
+
+            passages = []
+            for idx, (score, p_text) in enumerate(scored[:max_evidence]):
+                passages.append(EvidencePassage(
+                    id=f"http_fetch_{idx+1}",
+                    text=p_text[:800].strip(),
+                    source_url=url,
+                    source_domain=domain,
+                    source_title=f"Source: {domain}",
+                    relevance_score=round(float(score), 3),
+                    metadata={
+                        "retrieval_method": "http_direct_fetch",
+                        "audit_url": url,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    }
+                ))
+            return passages
+        except Exception:
+            return []
+
     def research_claim_on_web(
         self,
         claim_text: str,
@@ -252,19 +305,20 @@ class TinyFishWebAgent:
     ) -> List[EvidencePassage]:
         """
         Primary entry point for claim research:
-        1. If target_url is provided, fetches the page using TinyFetch.
+        1. If target_url is provided, fetches the page using TinyFetch (with HTTP fallback).
         2. Otherwise, executes a targeted web search using TinySearch to discover
            authoritative pages and extracts evidence passages with verified URLs.
         """
+        if target_url:
+            if self.is_available:
+                data = self._post_fetch([target_url])
+                fetched = self._passages_from_fetch(data, claim_text)
+                if fetched:
+                    return fetched[:max_evidence]
+            return self._fetch_via_http_fallback(target_url, claim_text, max_evidence)
+
         if not self.is_available:
             self.last_status = "unconfigured_key"
-            return []
-
-        if target_url:
-            data = self._post_fetch([target_url])
-            fetched = self._passages_from_fetch(data, claim_text)
-            if fetched:
-                return fetched
             return []
 
         # Search, then fetch the discovered pages so the verifier receives page text,

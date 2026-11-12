@@ -6,7 +6,7 @@ import numpy as np
 
 from proofgraph.schemas.claim import AtomicClaim
 from proofgraph.schemas.evidence import EvidencePassage
-from proofgraph.schemas.verdict import VeracityLabel, ClaimVerdict
+from proofgraph.schemas.verdict import VeracityLabel, EvidenceTier, ClaimVerdict, determine_evidence_tier
 from proofgraph.verifier.alignment import RefNLIAlignmentGate
 from proofgraph.verifier.credibility import SourceCredibilityScorer
 
@@ -157,11 +157,24 @@ class DebertaNLIVerifier:
         Aggregates pairwise NLI cross-encoder inferences over retrieved evidence passages.
         Applies RefNLI alignment filtering and source credibility priors.
         """
+        if getattr(claim, "is_underspecified", False):
+            return ClaimVerdict(
+                claim_id=claim.id,
+                label=VeracityLabel.ENTITY_UNDERSPECIFIED,
+                confidence=0.0,
+                evidence_tier=EvidenceTier.UNDERSPECIFIED,
+                supporting_evidence_ids=[],
+                contradicting_evidence_ids=[],
+                justification=claim.ambiguity_reason or "Subject is an underspecified entity lacking context.",
+                refnli_passed=False
+            )
+
         if not evidence_passages:
             return ClaimVerdict(
                 claim_id=claim.id,
                 label=VeracityLabel.INSUFFICIENT_EVIDENCE,
                 confidence=0.50,
+                evidence_tier=EvidenceTier.WEAK,
                 supporting_evidence_ids=[],
                 contradicting_evidence_ids=[],
                 justification="No evidence passages provided for neural stance verification."
@@ -222,10 +235,18 @@ class DebertaNLIVerifier:
         if rationale_snippets:
             summary += " Detail: " + "; ".join(rationale_snippets[:3])
 
+        is_conflicting = (entailment_weight > 0 and contradiction_weight > 0 and diff < 0.20)
+        evidence_tier = determine_evidence_tier(
+            label=final_label,
+            confidence=float(final_conf),
+            is_conflicting=is_conflicting
+        )
+
         return ClaimVerdict(
             claim_id=claim.id,
             label=final_label,
             confidence=round(final_conf, 3),
+            evidence_tier=evidence_tier,
             justification=summary,
             supporting_evidence_ids=supporting_ids,
             contradicting_evidence_ids=contradicting_ids,

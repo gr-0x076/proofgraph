@@ -53,6 +53,7 @@ class RefNLIAlignmentGate:
         if claim.entities:
             non_numeric = [e for e in claim.entities if not re.match(r'^\d+$', e)]
             primary_subject = non_numeric[0] if non_numeric else claim.entities[0]
+            is_attr_or_nationality = primary_subject.lower() in self.NATIONALITIES
             
             # Primary subject verification: if claim has a named subject entity,
             # verify that core subject stems (excluding titles and short words) are present in evidence
@@ -64,6 +65,26 @@ class RefNLIAlignmentGate:
             has_primary = bool(subject_parts) and any(
                 p in evidence.text.lower() for p in subject_parts
             )
+
+            # RefNLI Reference Indeterminacy Defense: If claim specifies only a single given name,
+            # but evidence refers to that name followed by an explicit surname not present in the claim,
+            # reject alignment as referencing an indeterminate or different individual.
+            if len(subject_parts) == 1 and not is_attr_or_nationality and has_primary:
+                name_stem = subject_parts[0]
+                surname_match = re.search(rf"\b{re.escape(name_stem)}\s+([a-z]+)\b", evidence.text.lower())
+                if surname_match:
+                    found_surname = surname_match.group(1)
+                    if (
+                        found_surname not in self.SUBJECT_STOPWORDS
+                        and found_surname not in self.NATIONALITIES
+                        and found_surname not in claim_tokens
+                        and len(found_surname) >= 3
+                    ):
+                        return False, jaccard, (
+                            f"Context Mismatch (RefNLI Reference Indeterminacy): "
+                            f"Evidence refers to specific entity '{name_stem.capitalize()} {found_surname.capitalize()}', "
+                            f"which was not identified in the claim."
+                        )
 
             other_entity_match = any(
                 e.lower() in evidence.text.lower()

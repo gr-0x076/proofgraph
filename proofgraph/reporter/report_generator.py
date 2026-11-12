@@ -20,6 +20,7 @@ class ReportGenerator:
         total = len(claims)
         supported_cnt = sum(1 for v in verdicts.values() if v.label == VeracityLabel.SUPPORTED)
         contradicted_cnt = sum(1 for v in verdicts.values() if v.label == VeracityLabel.CONTRADICTED)
+        underspecified_cnt = sum(1 for v in verdicts.values() if v.label == VeracityLabel.ENTITY_UNDERSPECIFIED)
         insufficient_cnt = sum(1 for v in verdicts.values() if v.label == VeracityLabel.INSUFFICIENT_EVIDENCE)
 
         md = []
@@ -30,7 +31,8 @@ class ReportGenerator:
         md.append(f"- **Total Atomic Claims Analyzed:** `{total}`")
         md.append(f"- **Supported (Entailed):** `{supported_cnt}` ({(supported_cnt/total*100 if total else 0):.1f}%)")
         md.append(f"- **Contradicted (Refuted):** `{contradicted_cnt}` ({(contradicted_cnt/total*100 if total else 0):.1f}%)")
-        md.append(f"- **Insufficient Evidence / Conflicting:** `{insufficient_cnt}` ({(insufficient_cnt/total*100 if total else 0):.1f}%)")
+        md.append(f"- **Entity Underspecified / Ambiguous:** `{underspecified_cnt}` ({(underspecified_cnt/total*100 if total else 0):.1f}%)")
+        md.append(f"- **Insufficient Evidence / Unestablished:** `{insufficient_cnt}` ({(insufficient_cnt/total*100 if total else 0):.1f}%)")
         if graph_html_rel_path:
             md.append(f"\n🔍 **Interactive Knowledge Graph:** [View Interactive Evidence Graph]({graph_html_rel_path})\n")
         else:
@@ -42,12 +44,22 @@ class ReportGenerator:
         md.append("## 🔬 Claim-by-Claim Audit Trail")
         for idx, claim in enumerate(claims, 1):
             verdict = verdicts.get(claim.id)
-            status_emoji = "✅" if verdict and verdict.label == VeracityLabel.SUPPORTED else ("❌" if verdict and verdict.label == VeracityLabel.CONTRADICTED else "⚠️")
+            if verdict and verdict.label == VeracityLabel.SUPPORTED:
+                status_emoji = "✅"
+            elif verdict and verdict.label == VeracityLabel.CONTRADICTED:
+                status_emoji = "❌"
+            elif verdict and verdict.label == VeracityLabel.ENTITY_UNDERSPECIFIED:
+                status_emoji = "⚠️"
+            else:
+                status_emoji = "⚪"
             label_str = verdict.label.value if verdict else "UNVERIFIED"
-            conf_str = f"{verdict.confidence * 100:.1f}%" if verdict else "N/A"
+            tier_str = verdict.evidence_tier.value if verdict and hasattr(verdict, "evidence_tier") else "UNKNOWN"
 
-            md.append(f"### Claim {idx}: {status_emoji} `{label_str}` (Uncalibrated rule score: {conf_str})")
+            md.append(f"### Claim {idx}: {status_emoji} `{label_str}` [Evidence Tier: `{tier_str}`]")
             md.append(f"**Assertion:** *\"{claim.text}\"*")
+            if claim.is_underspecified and claim.ambiguity_reason:
+                md.append(f"> ⚠️ **Ambiguity Notice:** {claim.ambiguity_reason}")
+                md.append(f"> **Action Required:** Please specify the full name or contextual identifiers to verify this claim.")
             if claim.entities:
                 md.append(f"**Identified Entities:** {', '.join([f'`{e}`' for e in claim.entities])}")
             if verdict:

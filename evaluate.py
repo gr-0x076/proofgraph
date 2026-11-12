@@ -302,12 +302,20 @@ def get_stratified_dev_test_split(
 # =====================================================================
 # RUNNERS
 # =====================================================================
-def verify_claim_against_pool(pipeline: ProofGraphPipeline, claim_text: str, evidence: List[EvidencePassage]) -> str:
+def verify_claim_against_pool(
+    pipeline: ProofGraphPipeline,
+    claim_text: str,
+    evidence: List[EvidencePassage],
+    map_to_3way: bool = True
+) -> str:
     """Evaluate stance on this example's supplied evidence only, without index leakage."""
     claims = pipeline.decomposer.decompose(claim_text)
     claim = claims[0] if claims else AtomicClaim(text=claim_text, parent_sentence=claim_text)
     verdict = pipeline.verifier.verify_claim(claim, evidence)
-    return verdict.label.value
+    val = verdict.label.value
+    if map_to_3way and val == "ENTITY_UNDERSPECIFIED":
+        return "INSUFFICIENT_EVIDENCE"
+    return val
 
 
 def run_diagnostic_suite(pipeline: ProofGraphPipeline, baseline: LexicalHeuristicBaseline):
@@ -321,14 +329,15 @@ def run_diagnostic_suite(pipeline: ProofGraphPipeline, baseline: LexicalHeuristi
     for item in DIAGNOSTIC_DATASET:
         c_text = item["claim"]
         gt = item["ground_truth"].value
-        pg_pred = verify_claim_against_pool(pipeline, c_text, item["evidence"])
+        pg_raw = verify_claim_against_pool(pipeline, c_text, item["evidence"], map_to_3way=False)
+        pg_pred = "INSUFFICIENT_EVIDENCE" if pg_raw == "ENTITY_UNDERSPECIFIED" else pg_raw
         base_pred = baseline.verify(c_text, item["evidence"]).value
 
         y_true.append(gt)
         y_base.append(base_pred)
         y_pg.append(pg_pred)
 
-        print(f"{c_text[:38] + '..':<40} | {item['type']:<22} | {gt:<11} | {base_pred:<11} | {pg_pred:<11}")
+        print(f"{c_text[:38] + '..':<40} | {item['type']:<22} | {gt:<11} | {base_pred:<11} | {pg_raw:<11}")
 
     labels = ["SUPPORTED", "CONTRADICTED", "INSUFFICIENT_EVIDENCE"]
     m_base = compute_classification_metrics(y_true, y_base, labels)

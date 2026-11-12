@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at_utc": "2026-11-11T16:23:59.987386+00:00",
+  "generated_at_utc": "2026-11-12T09:13:42.238327+00:00",
   "dataset": "data/benchmarks/averitec_dev_sample.json",
   "dataset_sha256": "3a7b3c9a7c81837b048147b386ea3de5c3a43ddea3eb4e361b8a638ee44841ef",
   "total_sample_size": 60,
@@ -27,57 +27,57 @@
     "threshold_evaluations": [
       {
         "threshold": 0.5,
-        "accuracy": 0.425,
-        "macro_f1": 0.39799331103678925,
+        "accuracy": 0.45,
+        "macro_f1": 0.41692242114237005,
         "contra_recall": 0.4,
         "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.6,
-        "accuracy": 0.425,
-        "macro_f1": 0.39799331103678925,
+        "accuracy": 0.45,
+        "macro_f1": 0.41692242114237005,
         "contra_recall": 0.4,
         "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.7,
-        "accuracy": 0.425,
-        "macro_f1": 0.39799331103678925,
+        "accuracy": 0.45,
+        "macro_f1": 0.41692242114237005,
         "contra_recall": 0.4,
         "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.75,
-        "accuracy": 0.425,
-        "macro_f1": 0.39799331103678925,
+        "accuracy": 0.45,
+        "macro_f1": 0.41692242114237005,
         "contra_recall": 0.4,
         "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.8,
-        "accuracy": 0.425,
-        "macro_f1": 0.39799331103678925,
+        "accuracy": 0.45,
+        "macro_f1": 0.41692242114237005,
         "contra_recall": 0.4,
         "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.85,
-        "accuracy": 0.425,
-        "macro_f1": 0.39799331103678925,
+        "accuracy": 0.45,
+        "macro_f1": 0.41692242114237005,
         "contra_recall": 0.4,
         "contra_precision": 0.3076923076923077
       },
       {
         "threshold": 0.9,
-        "accuracy": 0.425,
-        "macro_f1": 0.3857142857142857,
+        "accuracy": 0.45,
+        "macro_f1": 0.4036935704514364,
         "contra_recall": 0.3,
         "contra_precision": 0.3
       },
       {
         "threshold": 0.95,
-        "accuracy": 0.425,
-        "macro_f1": 0.3857142857142857,
+        "accuracy": 0.45,
+        "macro_f1": 0.4036935704514364,
         "contra_recall": 0.3,
         "contra_precision": 0.3
       }
@@ -86,13 +86,13 @@
   "retrospective_subset_metrics": {
     "test_sample_size": 20,
     "rules": {
-      "accuracy": 0.55,
-      "macro_f1": 0.5003663003663004,
+      "accuracy": 0.5,
+      "macro_f1": 0.45238095238095233,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.5,
-          "recall": 0.8,
-          "f1": 0.6153846153846154,
+          "precision": 0.42857142857142855,
+          "recall": 0.6,
+          "f1": 0.5,
           "support": 5
         },
         "CONTRADICTED": {
@@ -102,17 +102,17 @@
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.6,
+          "precision": 0.5454545454545454,
           "recall": 0.6,
-          "f1": 0.6,
+          "f1": 0.5714285714285713,
           "support": 10
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 4,
+          "SUPPORTED": 3,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 1
+          "INSUFFICIENT_EVIDENCE": 2
         },
         "CONTRADICTED": {
           "SUPPORTED": 1,
@@ -130,12 +130,12 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.35,
-          0.75
+          0.3,
+          0.7
         ],
         "macro_f1_ci_95": [
-          0.285,
-          0.722
+          0.234,
+          0.669
         ],
         "contra_recall_ci_95": [
           0.0,
@@ -148,13 +148,13 @@
       }
     },
     "hybrid": {
-      "accuracy": 0.75,
-      "macro_f1": 0.760546642899584,
+      "accuracy": 0.7,
+      "macro_f1": 0.7070707070707071,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.5714285714285714,
-          "recall": 0.8,
-          "f1": 0.6666666666666666,
+          "precision": 0.5,
+          "recall": 0.6,
+          "f1": 0.5454545454545454,
           "support": 5
         },
         "CONTRADICTED": {
@@ -164,17 +164,17 @@
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.8571428571428571,
+          "precision": 0.75,
           "recall": 0.6,
-          "f1": 0.7058823529411764,
+          "f1": 0.6666666666666665,
           "support": 10
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 4,
+          "SUPPORTED": 3,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 1
+          "INSUFFICIENT_EVIDENCE": 2
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
@@ -192,12 +192,12 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.6,
+          0.5,
           0.9
         ],
         "macro_f1_ci_95": [
-          0.6,
-          0.907
+          0.516,
+          0.899
         ],
         "contra_recall_ci_95": [
           1.0,
@@ -210,13 +210,13 @@
       }
     },
     "neural": {
-      "accuracy": 0.75,
-      "macro_f1": 0.6894409937888198,
+      "accuracy": 0.7,
+      "macro_f1": 0.5833333333333334,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.5,
-          "recall": 0.2,
-          "f1": 0.28571428571428575,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
           "support": 5
         },
         "CONTRADICTED": {
@@ -226,17 +226,17 @@
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.6923076923076923,
+          "precision": 0.6428571428571429,
           "recall": 0.9,
-          "f1": 0.7826086956521738,
+          "f1": 0.75,
           "support": 10
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 1,
+          "SUPPORTED": 0,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 4
+          "INSUFFICIENT_EVIDENCE": 5
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
@@ -255,11 +255,11 @@
         "confidence_level": 0.95,
         "accuracy_ci_95": [
           0.6,
-          0.9
+          0.75
         ],
         "macro_f1_ci_95": [
-          0.565,
-          0.886
+          0.545,
+          0.6
         ],
         "contra_recall_ci_95": [
           1.0,
@@ -272,13 +272,13 @@
       }
     },
     "without_alignment_gate": {
-      "accuracy": 0.55,
-      "macro_f1": 0.5003663003663004,
+      "accuracy": 0.5,
+      "macro_f1": 0.45238095238095233,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.5,
-          "recall": 0.8,
-          "f1": 0.6153846153846154,
+          "precision": 0.42857142857142855,
+          "recall": 0.6,
+          "f1": 0.5,
           "support": 5
         },
         "CONTRADICTED": {
@@ -288,17 +288,17 @@
           "support": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.6,
+          "precision": 0.5454545454545454,
           "recall": 0.6,
-          "f1": 0.6,
+          "f1": 0.5714285714285713,
           "support": 10
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 4,
+          "SUPPORTED": 3,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 1
+          "INSUFFICIENT_EVIDENCE": 2
         },
         "CONTRADICTED": {
           "SUPPORTED": 1,
@@ -316,12 +316,12 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.35,
-          0.75
+          0.3,
+          0.7
         ],
         "macro_f1_ci_95": [
-          0.285,
-          0.722
+          0.234,
+          0.669
         ],
         "contra_recall_ci_95": [
           0.0,
@@ -462,32 +462,32 @@
     "full_sample_size": 60,
     "rules": {
       "accuracy": 0.48333333333333334,
-      "macro_f1": 0.44037145650048876,
+      "macro_f1": 0.4360726833552921,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.42857142857142855,
-          "recall": 0.6,
-          "f1": 0.5,
+          "precision": 0.4444444444444444,
+          "recall": 0.5333333333333333,
+          "f1": 0.4848484848484848,
           "support": 15
         },
         "CONTRADICTED": {
-          "precision": 0.42857142857142855,
+          "precision": 0.375,
           "recall": 0.2,
-          "f1": 0.27272727272727276,
+          "f1": 0.26086956521739135,
           "support": 15
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.53125,
-          "recall": 0.5666666666666667,
-          "f1": 0.5483870967741935,
+          "precision": 0.5294117647058824,
+          "recall": 0.6,
+          "f1": 0.5625,
           "support": 30
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 9,
+          "SUPPORTED": 8,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 6
+          "INSUFFICIENT_EVIDENCE": 7
         },
         "CONTRADICTED": {
           "SUPPORTED": 3,
@@ -495,9 +495,9 @@
           "INSUFFICIENT_EVIDENCE": 9
         },
         "INSUFFICIENT_EVIDENCE": {
-          "SUPPORTED": 9,
-          "CONTRADICTED": 4,
-          "INSUFFICIENT_EVIDENCE": 17
+          "SUPPORTED": 7,
+          "CONTRADICTED": 5,
+          "INSUFFICIENT_EVIDENCE": 18
         }
       },
       "total": 60,
@@ -506,10 +506,10 @@
         "confidence_level": 0.95,
         "accuracy_ci_95": [
           0.367,
-          0.6
+          0.617
         ],
         "macro_f1_ci_95": [
-          0.31,
+          0.303,
           0.563
         ],
         "contra_recall_ci_95": [
@@ -518,18 +518,18 @@
         ],
         "contra_precision_ci_95": [
           0.0,
-          0.833
+          0.75
         ]
       }
     },
     "hybrid": {
       "accuracy": 0.5333333333333333,
-      "macro_f1": 0.5225023342670402,
+      "macro_f1": 0.5147300299430116,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.4666666666666667,
-          "recall": 0.4666666666666667,
-          "f1": 0.4666666666666667,
+          "precision": 0.46153846153846156,
+          "recall": 0.4,
+          "f1": 0.42857142857142855,
           "support": 15
         },
         "CONTRADICTED": {
@@ -539,17 +539,17 @@
           "support": 15
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.6153846153846154,
-          "recall": 0.5333333333333333,
-          "f1": 0.5714285714285715,
+          "precision": 0.6071428571428571,
+          "recall": 0.5666666666666667,
+          "f1": 0.5862068965517241,
           "support": 30
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 7,
+          "SUPPORTED": 6,
           "CONTRADICTED": 3,
-          "INSUFFICIENT_EVIDENCE": 5
+          "INSUFFICIENT_EVIDENCE": 6
         },
         "CONTRADICTED": {
           "SUPPORTED": 1,
@@ -557,9 +557,9 @@
           "INSUFFICIENT_EVIDENCE": 5
         },
         "INSUFFICIENT_EVIDENCE": {
-          "SUPPORTED": 7,
+          "SUPPORTED": 6,
           "CONTRADICTED": 7,
-          "INSUFFICIENT_EVIDENCE": 16
+          "INSUFFICIENT_EVIDENCE": 17
         }
       },
       "total": 60,
@@ -567,31 +567,31 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.4,
+          0.417,
           0.667
         ],
         "macro_f1_ci_95": [
-          0.392,
-          0.657
+          0.386,
+          0.648
         ],
         "contra_recall_ci_95": [
           0.333,
           0.867
         ],
         "contra_precision_ci_95": [
-          0.316,
-          0.667
+          0.318,
+          0.688
         ]
       }
     },
     "neural": {
-      "accuracy": 0.55,
-      "macro_f1": 0.46349206349206346,
+      "accuracy": 0.5333333333333333,
+      "macro_f1": 0.4288279383905775,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.4,
-          "recall": 0.13333333333333333,
-          "f1": 0.2,
+          "precision": 0.25,
+          "recall": 0.06666666666666667,
+          "f1": 0.10526315789473685,
           "support": 15
         },
         "CONTRADICTED": {
@@ -601,17 +601,17 @@
           "support": 15
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.575,
+          "precision": 0.5609756097560976,
           "recall": 0.7666666666666667,
-          "f1": 0.6571428571428571,
+          "f1": 0.6478873239436621,
           "support": 30
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 2,
+          "SUPPORTED": 1,
           "CONTRADICTED": 3,
-          "INSUFFICIENT_EVIDENCE": 10
+          "INSUFFICIENT_EVIDENCE": 11
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
@@ -629,51 +629,51 @@
         "n_bootstraps": 1000,
         "confidence_level": 0.95,
         "accuracy_ci_95": [
-          0.45,
-          0.65
+          0.433,
+          0.633
         ],
         "macro_f1_ci_95": [
-          0.347,
-          0.586
+          0.324,
+          0.549
         ],
         "contra_recall_ci_95": [
           0.267,
           0.8
         ],
         "contra_precision_ci_95": [
-          0.353,
+          0.35,
           0.778
         ]
       }
     },
     "without_alignment_gate": {
       "accuracy": 0.4666666666666667,
-      "macro_f1": 0.42848657638393917,
+      "macro_f1": 0.4248436748436748,
       "per_class": {
         "SUPPORTED": {
-          "precision": 0.42857142857142855,
-          "recall": 0.6,
-          "f1": 0.5,
+          "precision": 0.4444444444444444,
+          "recall": 0.5333333333333333,
+          "f1": 0.4848484848484848,
           "support": 15
         },
         "CONTRADICTED": {
-          "precision": 0.375,
+          "precision": 0.3333333333333333,
           "recall": 0.2,
-          "f1": 0.26086956521739135,
+          "f1": 0.25,
           "support": 15
         },
         "INSUFFICIENT_EVIDENCE": {
-          "precision": 0.5161290322580645,
-          "recall": 0.5333333333333333,
-          "f1": 0.5245901639344263,
+          "precision": 0.5151515151515151,
+          "recall": 0.5666666666666667,
+          "f1": 0.5396825396825397,
           "support": 30
         }
       },
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 9,
+          "SUPPORTED": 8,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 6
+          "INSUFFICIENT_EVIDENCE": 7
         },
         "CONTRADICTED": {
           "SUPPORTED": 3,
@@ -681,9 +681,9 @@
           "INSUFFICIENT_EVIDENCE": 9
         },
         "INSUFFICIENT_EVIDENCE": {
-          "SUPPORTED": 9,
-          "CONTRADICTED": 5,
-          "INSUFFICIENT_EVIDENCE": 16
+          "SUPPORTED": 7,
+          "CONTRADICTED": 6,
+          "INSUFFICIENT_EVIDENCE": 17
         }
       },
       "total": 60,
@@ -696,7 +696,7 @@
         ],
         "macro_f1_ci_95": [
           0.292,
-          0.559
+          0.548
         ],
         "contra_recall_ci_95": [
           0.0,
@@ -704,7 +704,7 @@
         ],
         "contra_precision_ci_95": [
           0.0,
-          0.75
+          0.667
         ]
       }
     },
@@ -853,7 +853,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_af584c4b",
+          "claim_id": "claim_2e16daf8",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -877,7 +877,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_9ed0a3a9",
+          "claim_id": "claim_67317290",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -902,7 +902,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_8ac88c58",
+          "claim_id": "claim_c676b8b2",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -926,7 +926,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_083d9217",
+          "claim_id": "claim_4207928a",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -950,7 +950,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_2815859e",
+          "claim_id": "claim_3a9d6a78",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -974,7 +974,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_e6aafee9",
+          "claim_id": "claim_a0c83ce5",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -998,7 +998,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_84c7e63b",
+          "claim_id": "claim_796a3ba5",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1022,7 +1022,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_e3351baa",
+          "claim_id": "claim_c2005ad7",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1038,21 +1038,21 @@
         "claim_sha256": "fd4b8cd55073d96e0a355789b6e40e3c7305ca3d6464358851827c45ee83acbe",
         "ground_truth": "SUPPORTED",
         "predictions": {
-          "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
-          "neural": "SUPPORTED",
-          "without_alignment_gate": "SUPPORTED",
+          "rules": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "INSUFFICIENT_EVIDENCE",
+          "neural": "INSUFFICIENT_EVIDENCE",
+          "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_f68c4595",
+          "claim_id": "claim_c2005ad7",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "SUPPORTED",
-          "neural_confidence": 0.894,
-          "agreement": true,
+          "neural_label": "INSUFFICIENT_EVIDENCE",
+          "neural_confidence": 0.5,
+          "agreement": false,
           "overturned_abstention": false
         }
       },
@@ -1070,7 +1070,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_54a55009",
+          "claim_id": "claim_a091e1f6",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1094,7 +1094,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_b881b2aa",
+          "claim_id": "claim_1a813d21",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1118,7 +1118,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_e11b0f82",
+          "claim_id": "claim_3337c61f",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1142,7 +1142,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_df8bb14d",
+          "claim_id": "claim_b027e357",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1166,7 +1166,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_4335ce41",
+          "claim_id": "claim_317f1385",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1190,7 +1190,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_a53ddf15",
+          "claim_id": "claim_80ddd13d",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1214,7 +1214,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_e5a5fae7",
+          "claim_id": "claim_cb365e6e",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1238,7 +1238,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_02ab4a58",
+          "claim_id": "claim_6648d363",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1262,13 +1262,13 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_752d3b88",
-          "rule_label": "INSUFFICIENT_EVIDENCE",
-          "rule_confidence": 0.3,
+          "claim_id": "claim_6648d363",
+          "rule_label": "CONTRADICTED",
+          "rule_confidence": 0.95,
           "neural_evaluated": true,
           "neural_label": "INSUFFICIENT_EVIDENCE",
           "neural_confidence": 0.5,
-          "agreement": null,
+          "agreement": false,
           "overturned_abstention": false
         }
       },
@@ -1286,7 +1286,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_ef526329",
+          "claim_id": "claim_9cb5382a",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1310,7 +1310,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_d6e2afc4",
+          "claim_id": "claim_9cb5382a",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1335,7 +1335,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_a114e469",
+          "claim_id": "claim_5a7124c9",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1358,7 +1358,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_7e76ec7d",
+          "claim_id": "claim_042020e1",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1381,7 +1381,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_ba5b7736",
+          "claim_id": "claim_c221e05d",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1404,7 +1404,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_a04fecda",
+          "claim_id": "claim_e8808467",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1428,7 +1428,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_acada995",
+          "claim_id": "claim_68250338",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.533620823359577,
           "neural_evaluated": true,
@@ -1451,7 +1451,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_7ba2af7a",
+          "claim_id": "claim_d2330d66",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1474,7 +1474,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_03d6cc5f",
+          "claim_id": "claim_6aac12b4",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1497,7 +1497,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_f64ec88d",
+          "claim_id": "claim_968dc787",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1520,7 +1520,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_5c23fad9",
+          "claim_id": "claim_db12c3f5",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1543,7 +1543,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_3496e488",
+          "claim_id": "claim_e04c55d2",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1566,7 +1566,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_c3f90dfa",
+          "claim_id": "claim_333a9778",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1589,7 +1589,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_e1937d61",
+          "claim_id": "claim_6f347c18",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1613,7 +1613,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_491e2813",
+          "claim_id": "claim_dbce0ee0",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1636,7 +1636,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_877dea1c",
+          "claim_id": "claim_33b8c7eb",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1659,7 +1659,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_4406d446",
+          "claim_id": "claim_8778411d",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1682,7 +1682,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_6aab5e08",
+          "claim_id": "claim_1b4ca52b",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1705,7 +1705,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_a1454ed6",
+          "claim_id": "claim_5eab01c9",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1728,7 +1728,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_5f7ad1e3",
+          "claim_id": "claim_f5de3c56",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1751,7 +1751,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_6f638d82",
+          "claim_id": "claim_92061270",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1774,7 +1774,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_2e310281",
+          "claim_id": "claim_2a484bae",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1797,7 +1797,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_28aa1852",
+          "claim_id": "claim_bd067d74",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1820,7 +1820,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_6cb81fe2",
+          "claim_id": "claim_99db938a",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -1843,7 +1843,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_4babde9e",
+          "claim_id": "claim_21a38462",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1867,7 +1867,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_e6b5cffe",
+          "claim_id": "claim_e46ad7b4",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1891,7 +1891,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_54dc88fd",
+          "claim_id": "claim_4b8a16ff",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1914,7 +1914,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_dee6a95e",
+          "claim_id": "claim_4f533f20",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1937,7 +1937,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_ab9253aa",
+          "claim_id": "claim_7f577bd3",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1960,7 +1960,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_5fd7ae16",
+          "claim_id": "claim_d8cd2a2b",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -1975,21 +1975,21 @@
         "claim_sha256": "fd4b8cd55073d96e0a355789b6e40e3c7305ca3d6464358851827c45ee83acbe",
         "ground_truth": "SUPPORTED",
         "predictions": {
-          "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
-          "neural": "SUPPORTED",
-          "without_alignment_gate": "SUPPORTED",
+          "rules": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "INSUFFICIENT_EVIDENCE",
+          "neural": "INSUFFICIENT_EVIDENCE",
+          "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_0df43d99",
+          "claim_id": "claim_d8cd2a2b",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "SUPPORTED",
-          "neural_confidence": 0.894,
-          "agreement": true,
+          "neural_label": "INSUFFICIENT_EVIDENCE",
+          "neural_confidence": 0.5,
+          "agreement": false,
           "overturned_abstention": false
         }
       },
@@ -2006,7 +2006,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_0d9c89ef",
+          "claim_id": "claim_1d314637",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2029,7 +2029,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_1e513f4a",
+          "claim_id": "claim_2098ada9",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2052,7 +2052,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_81d24220",
+          "claim_id": "claim_2d58f860",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2075,7 +2075,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_227609bd",
+          "claim_id": "claim_7a98c74b",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2098,7 +2098,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_acb6ac75",
+          "claim_id": "claim_da6efab3",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2121,7 +2121,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_27cbdfd9",
+          "claim_id": "claim_39880bba",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2144,7 +2144,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_c8bde281",
+          "claim_id": "claim_07ecc1db",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2167,9 +2167,9 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_a31fab3a",
+          "claim_id": "claim_4f261fdf",
           "rule_label": "SUPPORTED",
-          "rule_confidence": 0.6505667956673388,
+          "rule_confidence": 0.95,
           "neural_evaluated": true,
           "neural_label": "INSUFFICIENT_EVIDENCE",
           "neural_confidence": 0.5,
@@ -2182,21 +2182,21 @@
         "claim_sha256": "14964eca8a26e09a31365f4297e920908262e36b05748a2799292b30f4099721",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
-          "rules": "SUPPORTED",
-          "hybrid": "SUPPORTED",
-          "neural": "INSUFFICIENT_EVIDENCE",
-          "without_alignment_gate": "SUPPORTED",
+          "rules": "CONTRADICTED",
+          "hybrid": "CONTRADICTED",
+          "neural": "CONTRADICTED",
+          "without_alignment_gate": "CONTRADICTED",
           "dense_baseline": "SUPPORTED",
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_d6a39bcb",
-          "rule_label": "SUPPORTED",
-          "rule_confidence": 0.6525409903792577,
+          "claim_id": "claim_993d88eb",
+          "rule_label": "CONTRADICTED",
+          "rule_confidence": 0.95,
           "neural_evaluated": true,
-          "neural_label": "INSUFFICIENT_EVIDENCE",
-          "neural_confidence": 0.5,
-          "agreement": false,
+          "neural_label": "CONTRADICTED",
+          "neural_confidence": 0.866,
+          "agreement": true,
           "overturned_abstention": false
         }
       },
@@ -2213,7 +2213,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_49124052",
+          "claim_id": "claim_b5dcff35",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2236,7 +2236,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_a747b522",
+          "claim_id": "claim_9de331c6",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2259,7 +2259,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_89525b54",
+          "claim_id": "claim_89f07e12",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2282,7 +2282,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_d47e57f2",
+          "claim_id": "claim_fbd85ae3",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2305,7 +2305,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_c902f887",
+          "claim_id": "claim_dcda0e70",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2328,7 +2328,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_ed3b162b",
+          "claim_id": "claim_0328ad7c",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2351,7 +2351,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_84010e08",
+          "claim_id": "claim_028b7e41",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2374,7 +2374,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_a0a16eea",
+          "claim_id": "claim_69afe960",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2397,7 +2397,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_f6ab55dd",
+          "claim_id": "claim_2e0fa9b5",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2420,7 +2420,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_afb5ffa9",
+          "claim_id": "claim_a715edc5",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2443,7 +2443,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_9e5f47d8",
+          "claim_id": "claim_4786941a",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2466,7 +2466,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_7ea04b4e",
+          "claim_id": "claim_5494d8df",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2489,7 +2489,7 @@
           "lexical_baseline": "CONTRADICTED"
         },
         "diagnostics": {
-          "claim_id": "claim_2bd4ef12",
+          "claim_id": "claim_ad8c310f",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2512,7 +2512,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_331990eb",
+          "claim_id": "claim_53d9e459",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2535,7 +2535,7 @@
           "lexical_baseline": "SUPPORTED"
         },
         "diagnostics": {
-          "claim_id": "claim_565251c8",
+          "claim_id": "claim_32e997c5",
           "rule_label": "SUPPORTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2551,23 +2551,22 @@
         "claim_sha256": "b4f7416fa29f2fa454e3645562c0e0dd356f9a7782fccf49a7e517c7ad6c0cd7",
         "ground_truth": "INSUFFICIENT_EVIDENCE",
         "predictions": {
-          "rules": "SUPPORTED",
-          "hybrid": "CONTRADICTED",
-          "neural": "CONTRADICTED",
-          "without_alignment_gate": "SUPPORTED",
+          "rules": "INSUFFICIENT_EVIDENCE",
+          "hybrid": "INSUFFICIENT_EVIDENCE",
+          "neural": "INSUFFICIENT_EVIDENCE",
+          "without_alignment_gate": "INSUFFICIENT_EVIDENCE",
           "dense_baseline": "CONTRADICTED",
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_9df1e008",
-          "rule_label": "SUPPORTED",
-          "rule_confidence": 0.95,
+          "claim_id": "claim_d53d6372",
+          "rule_label": "INSUFFICIENT_EVIDENCE",
+          "rule_confidence": 0.3,
           "neural_evaluated": true,
-          "neural_label": "CONTRADICTED",
-          "neural_confidence": 0.879,
-          "agreement": false,
-          "overturned_abstention": false,
-          "overturned_lexical_support": true
+          "neural_label": "INSUFFICIENT_EVIDENCE",
+          "neural_confidence": 0.5,
+          "agreement": null,
+          "overturned_abstention": false
         }
       },
       {
@@ -2583,7 +2582,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_b57b1dc1",
+          "claim_id": "claim_c5037ad8",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2606,7 +2605,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_7041a60c",
+          "claim_id": "claim_7923e9f0",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2629,7 +2628,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_20575fd3",
+          "claim_id": "claim_9f607ea2",
           "rule_label": "CONTRADICTED",
           "rule_confidence": 0.95,
           "neural_evaluated": true,
@@ -2652,13 +2651,13 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_b5cbb0ae",
-          "rule_label": "INSUFFICIENT_EVIDENCE",
-          "rule_confidence": 0.3,
+          "claim_id": "claim_9f607ea2",
+          "rule_label": "CONTRADICTED",
+          "rule_confidence": 0.95,
           "neural_evaluated": true,
           "neural_label": "INSUFFICIENT_EVIDENCE",
           "neural_confidence": 0.5,
-          "agreement": null,
+          "agreement": false,
           "overturned_abstention": false
         }
       },
@@ -2675,7 +2674,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_1db1c3e0",
+          "claim_id": "claim_125c9713",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,
@@ -2698,7 +2697,7 @@
           "lexical_baseline": "INSUFFICIENT_EVIDENCE"
         },
         "diagnostics": {
-          "claim_id": "claim_88ae2aa6",
+          "claim_id": "claim_125c9713",
           "rule_label": "INSUFFICIENT_EVIDENCE",
           "rule_confidence": 0.3,
           "neural_evaluated": true,

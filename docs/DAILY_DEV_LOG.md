@@ -170,3 +170,32 @@ The entries above record the Day 7 state and should not be read as the current t
   * *Retrospective Diagnostic Subset ($N=20$):* Accuracy rose from 55.0% to **75.0%** [60–90%], Macro-F1 from 0.425 to **0.761** [0.60–0.91], and Contradiction Recall from 0.000 (0/5) to **1.000 (5/5)**.
   * *Full Descriptive Sample ($N=60$):* Accuracy rose to **53.3%** [40–67%], Macro-F1 to **0.523** [0.39–0.66], and Contradiction Recall to **0.600** (9/15).
   * *Unit & Regression Tests:* **37 passed, 1 skipped**, 82% coverage. Fixture replay test passed 10/10 (90% accuracy). Output artifacts verified.
+
+---
+
+### Day 9: November 12, 2026 — Product Pivot: AI Citation & Source Attribution Auditor, Entity Disambiguation Gate & Qualitative Evidence Tiers
+* **Team:** AltF4 (Mohith GR & Sudarshan Patil HJ) | Hack on Holiday 2026
+* **Motivation & Real-World Failure Analysis:**
+  * Real-world terminal testing on open-domain claims revealed two critical failure modes:
+    1. *"Peter was born in 1995 in Toronto."*: ProofGraph retrieved random Wikipedia biographies for famous Peters (Peter Jennings, Peter Munk), treated "Peter" as matching "Peter Jennings", detected birth year mismatch ($1995 \ne 1938$), and declared a false `[CONTRADICTED] (67.5%)`. Google AI Overview correctly abstained due to subject underspecification.
+    2. *"William was born in 1995 in Toronto to diplomat parents."*: Open-domain retrieval returned irrelevant Toronto cemetery and school articles due to dense keyword attraction.
+    3. *Calibration Misrepresentation:* Emitting raw heuristic percentages (`67.5%`) misled users into interpreting heuristic rule scores as calibrated probabilities of truth.
+* **Architecture Pivot & Engineering Implementations:**
+  * **First-Class AI Citation & Attribution Auditor (`--audit-citation`):**
+    * Implemented `ProofGraphPipeline.verify_citation` and `proofgraph.cli --audit-citation --claim "..." --url "https://..."`.
+    * Utilizes **TinyFish Fetch** (headless Chromium rendering & clean markdown extraction) with a direct HTTP fallback to inspect the exact cited URL.
+    * Identifies whether the cited source verifies the assertion, refutes it, or represents a **citation hallucination** (source fails to establish assertion).
+  * **Entity Ambiguity Gate (`ENTITY_UNDERSPECIFIED`):**
+    * Added `ClaimDecomposer.check_underspecified_mononym` with comprehensive common given-names index and title/honorific parsing.
+    * Flags claims with isolated given names ("Peter", "William", "John") or unresolved pronouns lacking surname or context.
+    * Verifier immediately returns `label=ENTITY_UNDERSPECIFIED`, `evidence_tier=UNDERSPECIFIED`, and actionable clarification guidance.
+  * **Source-Entity Overlap Gate & Reference Indeterminacy Defense:**
+    * Implemented `HybridRetriever.filter_relevant_passages` to discard candidate passages that share zero substantive named entities or core subject tokens with the claim.
+    * Updated `RefNLIAlignmentGate` to detect when evidence refers to an unmentioned full surname (e.g. "Peter Jennings") for a single given-name claim ("Peter"), rejecting alignment.
+  * **Qualitative Evidence Tiers:**
+    * Replaced uncalibrated percentages with discrete qualitative tiers: `STRONG`, `MODERATE`, `WEAK`, `UNDERSPECIFIED`, `CONFLICTING`.
+    * Updated CLI, Markdown report generator, and graph visualizer to render clear evidence tier badges.
+* **Verification & Test Coverage:**
+  * Expanded test suite from 37 to **44 passing tests, 1 skipped**.
+  * Total package test coverage increased to **85.86%** (comfortably exceeding the `--cov-fail-under=80` threshold).
+  * Validated live CLI runs on both failure cases and live Wikipedia Apollo 11 citation audits.

@@ -117,3 +117,68 @@ class ProofGraphPipeline:
             report_markdown=report_md,
             graph_html_path=graph_path
         )
+
+    def verify_citation(
+        self,
+        claim_or_text: str,
+        cited_url: str,
+        output_dir: Optional[str] = "outputs",
+        top_k_passages: int = 5
+    ) -> ProofGraphResult:
+        """
+        AI Citation & Source Attribution Auditor:
+        Directly fetches and inspects the user-specified cited URL via TinyFish Fetch (or HTTP fallback),
+        extracts relevant passages, and determines whether the cited page supports, contradicts,
+        or fails to establish the asserted claim (detecting citation hallucination).
+        """
+        # 1. Decompose into Atomic Claims
+        claims = self.decomposer.decompose(claim_or_text)
+
+        # 2. Fetch evidence strictly from the cited URL
+        evidence_map: Dict[str, List[EvidencePassage]] = {}
+        for claim in claims:
+            # Fetch passages relevant to this claim from the exact cited URL
+            passages = self.retriever.tinyfish_agent.audit_citation_url(
+                url=cited_url,
+                claim_text=claim.text,
+                max_evidence=top_k_passages
+            )
+            # Filter for relevance to claim
+            relevant = self.retriever.filter_relevant_passages(claim, passages)
+            evidence_map[claim.id] = relevant
+
+        # 3. Verify claim against the cited page passages
+        verdicts: Dict[str, ClaimVerdict] = {}
+        for claim in claims:
+            verdict = self.verifier.verify_claim(claim, evidence_map.get(claim.id, []))
+            verdicts[claim.id] = verdict
+
+        # 4. Construct graph
+        graph = self.graph_builder.build_graph(claims, evidence_map, verdicts)
+
+        # 5. Export Visualizer & Report
+        graph_path = None
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+            graph_path = os.path.join(output_dir, "graph.html")
+            self.visualizer.export_html(graph, graph_path)
+            report_path = os.path.join(output_dir, "report.md")
+            report_md = self.reporter.generate_markdown(
+                claim_or_text, claims, evidence_map, verdicts, graph_html_rel_path="graph.html"
+            )
+            with open(report_path, "w") as f:
+                f.write(report_md)
+        else:
+            report_md = self.reporter.generate_markdown(
+                claim_or_text, claims, evidence_map, verdicts, graph_html_rel_path=None
+            )
+
+        return ProofGraphResult(
+            input_text=claim_or_text,
+            claims=claims,
+            evidence_map=evidence_map,
+            verdicts=verdicts,
+            graph=graph,
+            report_markdown=report_md,
+            graph_html_path=graph_path
+        )

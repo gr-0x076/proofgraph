@@ -3,7 +3,7 @@ from typing import List, Tuple, Set, Optional, Dict, Any
 import warnings
 from proofgraph.schemas.claim import AtomicClaim
 from proofgraph.schemas.evidence import EvidencePassage
-from proofgraph.schemas.verdict import VeracityLabel, ClaimVerdict
+from proofgraph.schemas.verdict import VeracityLabel, EvidenceTier, ClaimVerdict, determine_evidence_tier
 from proofgraph.verifier.alignment import RefNLIAlignmentGate
 from proofgraph.verifier.credibility import SourceCredibilityScorer
 
@@ -83,15 +83,13 @@ class RuleStanceVerifier:
         def extract_bound_numbers(text: str) -> dict:
             bindings = {}
             for p in predicates:
-                pat = rf"\b{p}\w*\b[^.\n]{{0,35}}?(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)[^.\n]{{0,35}}?\b{p}\w*\b"
-                matches = re.findall(pat, text.lower())
-                nums = set()
-                for m in matches:
-                    val = m[0] or m[1]
-                    if val:
-                        nums.add(val)
-                if nums:
-                    bindings[p] = nums
+                for m in re.finditer(rf"\b{p}\w*\b", text.lower()):
+                    start = max(0, m.start() - 50)
+                    end = min(len(text), m.end() + 50)
+                    window = text[start:end]
+                    window_nums = set(re.findall(r'\b\d+(?:\.\d+)?\b', window))
+                    if window_nums:
+                        bindings.setdefault(p, set()).update(window_nums)
             return bindings
 
         bound_a = extract_bound_numbers(text_a)
@@ -100,8 +98,18 @@ class RuleStanceVerifier:
         # Check for shared predicates that have conflicting number sets
         for p in bound_a:
             if p in bound_b:
-                if bound_a[p].isdisjoint(bound_b[p]):
-                    return True
+                # 1. Distinguish 4-digit years: if both bind 4-digit years, check year agreement first
+                years_a = {n for n in bound_a[p] if re.match(r'^(?:1[89]\d\d|20\d\d)$', n)}
+                years_b = {n for n in bound_b[p] if re.match(r'^(?:1[89]\d\d|20\d\d)$', n)}
+                if years_a and years_b:
+                    if years_a.isdisjoint(years_b):
+                        return True
+                    continue
+
+                # 2. If neither binds a year, check if number sets are disjoint
+                if not years_a and not years_b:
+                    if bound_a[p].isdisjoint(bound_b[p]):
+                        return True
         return False
 
     def _has_named_inventor_conflict(self, text_a: str, text_b: str) -> bool:
@@ -186,11 +194,22 @@ class RuleStanceVerifier:
         Aggregates evidence for a single atomic claim using lexical rules, an alignment
         filter, and a static source prior. Returned scores are not calibrated probabilities.
         """
+        if getattr(claim, "is_underspecified", False):
+            return ClaimVerdict(
+                claim_id=claim.id,
+                label=VeracityLabel.ENTITY_UNDERSPECIFIED,
+                confidence=0.0,
+                evidence_tier=EvidenceTier.UNDERSPECIFIED,
+                justification=claim.ambiguity_reason or "Subject is an underspecified entity lacking context.",
+                refnli_passed=False
+            )
+
         if not claim.is_verifiable:
             return ClaimVerdict(
                 claim_id=claim.id,
                 label=VeracityLabel.INSUFFICIENT_EVIDENCE,
                 confidence=1.0,
+                evidence_tier=EvidenceTier.WEAK,
                 justification="Claim was classified as subjective or non-verifiable opinion.",
                 refnli_passed=True
             )
@@ -200,6 +219,7 @@ class RuleStanceVerifier:
                 claim_id=claim.id,
                 label=VeracityLabel.INSUFFICIENT_EVIDENCE,
                 confidence=0.0,
+                evidence_tier=EvidenceTier.WEAK,
                 justification="No relevant evidence was retrieved from any source.",
                 refnli_passed=False
             )
@@ -245,10 +265,18 @@ class RuleStanceVerifier:
             confidence = 0.5
             justification = f"Conflicting evidence from competing sources with comparable weight (Support: {support_weight:.2f}, Contradict: {contradict_weight:.2f})."
 
+        is_conflicting = (support_weight > 0 and contradict_weight > 0 and abs(support_weight - contradict_weight) < 0.25)
+        evidence_tier = determine_evidence_tier(
+            label=final_label,
+            confidence=float(confidence),
+            is_conflicting=is_conflicting
+        )
+
         return ClaimVerdict(
             claim_id=claim.id,
             label=final_label,
             confidence=float(confidence),
+            evidence_tier=evidence_tier,
             justification=justification,
             supporting_evidence_ids=supporting_ids,
             contradicting_evidence_ids=contradicting_ids,
@@ -312,6 +340,9 @@ class HybridNLIVerifier:
     def verify_claim(self, claim: AtomicClaim, evidence_passages: List[EvidencePassage]) -> ClaimVerdict:
         # 1. Run deterministic rule-based verification
         rule_verdict = self.rule_verifier.verify_claim(claim, evidence_passages)
+
+        if rule_verdict.label == VeracityLabel.ENTITY_UNDERSPECIFIED:
+            return rule_verdict
 
         diagnostics: Dict[str, Any] = {
             "claim_id": claim.id,

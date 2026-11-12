@@ -28,17 +28,27 @@ class ProofGraphBuilder:
             label = verdict.label.value if verdict else "UNVERIFIED"
             conf = verdict.confidence if verdict else 0.0
 
+            tier = verdict.evidence_tier.value if verdict and hasattr(verdict, "evidence_tier") else "UNKNOWN"
+
             # Color coding for claim nodes
-            color = "#10b981" if label == "SUPPORTED" else ("#ef4444" if label == "CONTRADICTED" else "#f59e0b")
+            if label == "SUPPORTED":
+                color = "#10b981"  # Emerald
+            elif label == "CONTRADICTED":
+                color = "#ef4444"  # Red
+            elif label == "ENTITY_UNDERSPECIFIED":
+                color = "#f59e0b"  # Amber warning
+            else:
+                color = "#64748b"  # Slate
             
             # 1. Add Claim Node
             self.graph.add_node(
                 claim.id,
                 node_type="claim",
-                title=f"Claim: {claim.text[:60]}...",
+                title=f"Claim: {claim.text[:60]}...\nTier: {tier}\nStatus: {label}",
                 full_text=claim.text,
-                label=f"[{label}]\n{claim.text[:35]}...",
+                label=f"[{label} | {tier}]\n{claim.text[:32]}...",
                 veracity=label,
+                evidence_tier=tier,
                 confidence=conf,
                 color=color,
                 shape="box",

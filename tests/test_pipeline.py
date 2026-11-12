@@ -727,3 +727,195 @@ def test_demo_case_study_execution(tmp_path):
     assert "Lexical Context Alignment Heuristic" in content
     assert "REJECTED" in content
     assert "does not perform live TinyFish search or fetch" in content
+
+def test_underspecified_mononym_detection():
+    decomposer = ClaimDecomposer()
+    # Case 1: isolated given name
+    claims_peter = decomposer.decompose("Peter was born in 1995 in Toronto.")
+    assert len(claims_peter) == 1
+    assert claims_peter[0].is_underspecified is True
+    assert "Peter" in claims_peter[0].ambiguity_reason
+
+    # Case 2: isolated given name with complex predicate
+    claims_william = decomposer.decompose("William was born in 1995 in Toronto to diplomat parents.")
+    assert len(claims_william) == 1
+    assert claims_william[0].is_underspecified is True
+
+    # Case 3: multi-word full name with surname is NOT underspecified
+    claims_full = decomposer.decompose("Peter Jennings was born in 1938 in Toronto.")
+    assert len(claims_full) == 1
+    assert claims_full[0].is_underspecified is False
+
+    # Case 4: title/honorific is NOT underspecified
+    claims_title = decomposer.decompose("Prince William visited Canada in 2016.")
+    assert len(claims_title) == 1
+    assert claims_title[0].is_underspecified is False
+
+    # Case 5: pronoun without context
+    claims_pronoun = decomposer.decompose("He was born in 1995 in Toronto.")
+    assert len(claims_pronoun) == 1
+    assert claims_pronoun[0].is_underspecified is True
+
+def test_underspecified_mononym_verifier_abstains():
+    from proofgraph.verifier.nli import RuleStanceVerifier, HybridNLIVerifier
+    from proofgraph.schemas import EvidenceTier
+    claim = AtomicClaim(
+        text="Peter was born in 1995 in Toronto.",
+        parent_sentence="Peter was born in 1995 in Toronto.",
+        entities=["Peter", "1995", "Toronto"],
+        is_underspecified=True,
+        ambiguity_reason="Subject 'Peter' is an underspecified common given name lacking surname."
+    )
+    # Evidence for Peter Jennings (who was born in 1938)
+    evidence = EvidencePassage(
+        id="ev_pj",
+        text="Peter Jennings was born in Toronto on July 29, 1938.",
+        source_title="Wikipedia"
+    )
+
+    # 1. Rule Verifier must return ENTITY_UNDERSPECIFIED instead of CONTRADICTED
+    rule_verifier = RuleStanceVerifier()
+    v_rule = rule_verifier.verify_claim(claim, [evidence])
+    assert v_rule.label == VeracityLabel.ENTITY_UNDERSPECIFIED
+    assert v_rule.evidence_tier == EvidenceTier.UNDERSPECIFIED
+    assert "underspecified" in v_rule.justification.lower()
+
+    # 2. Hybrid Verifier must also abstain immediately without falling through
+    hybrid_verifier = HybridNLIVerifier(prefer_offline=True)
+    v_hybrid = hybrid_verifier.verify_claim(claim, [evidence])
+    assert v_hybrid.label == VeracityLabel.ENTITY_UNDERSPECIFIED
+    assert v_hybrid.evidence_tier == EvidenceTier.UNDERSPECIFIED
+
+def test_reference_indeterminacy_blocks_surname_mismatch():
+    gate = RefNLIAlignmentGate(jaccard_threshold=0.12)
+    # Claim only says 'Peter', does not specify Jennings
+    claim = AtomicClaim(text="Peter was born in 1995 in Toronto.", parent_sentence="", entities=["Peter", "1995", "Toronto"])
+    evidence = EvidencePassage(text="Peter Jennings was born in 1938 in Toronto.", source_title="Wikipedia")
+    aligned, score, msg = gate.check_alignment(claim, evidence)
+    assert aligned is False
+    assert "RefNLI Reference Indeterminacy" in msg
+    assert "Jennings" in msg
+
+def test_retriever_filter_relevant_passages():
+    retriever = HybridRetriever(prefer_offline=True)
+    claim = AtomicClaim(
+        text="William was born in 1995 in Toronto to diplomat parents.",
+        parent_sentence="",
+        entities=["William", "1995", "Toronto"]
+    )
+    passages = [
+        EvidencePassage(id="p1", text="Mount Pleasant Cemetery is a historic cemetery in Toronto, Ontario.", source_title="Mount Pleasant Cemetery"),
+        EvidencePassage(id="p2", text="William Vance was a Canadian diplomat who lived in Toronto.", source_title="William Vance Bio")
+    ]
+    filtered = retriever.filter_relevant_passages(claim, passages)
+    assert len(filtered) == 1
+    assert filtered[0].id == "p2"
+
+def test_pipeline_citation_audit_mode(tmp_path):
+    pipeline = ProofGraphPipeline()
+    # Mock tinyfish_agent.audit_citation_url
+    target_url = "https://en.wikipedia.org/wiki/Apollo_11"
+    mock_passages = [
+        EvidencePassage(
+            id="ap1",
+            text="Apollo 11 was the American spaceflight that first landed humans on the Moon on July 20, 1969.",
+            source_url=target_url,
+            source_title="Apollo 11 - Wikipedia",
+            source_domain="wikipedia.org",
+            relevance_score=0.92
+        )
+    ]
+    pipeline.retriever.tinyfish_agent.audit_citation_url = lambda url, claim_text, max_evidence=5: mock_passages
+
+    # Supported claim
+    res = pipeline.verify_citation(
+        claim_or_text="Apollo 11 landed humans on the Moon in 1969.",
+        cited_url=target_url,
+        output_dir=str(tmp_path)
+    )
+    assert len(res.claims) == 1
+    verdict = list(res.verdicts.values())[0]
+    assert verdict.label == VeracityLabel.SUPPORTED
+    assert os.path.exists(tmp_path / "report.md")
+    assert os.path.exists(tmp_path / "graph.html")
+
+    # Contradicted claim
+    res_contra = pipeline.verify_citation(
+        claim_or_text="Apollo 11 landed humans on Mars in 1985.",
+        cited_url=target_url,
+        output_dir=str(tmp_path)
+    )
+    verdict_contra = list(res_contra.verdicts.values())[0]
+    assert verdict_contra.label == VeracityLabel.CONTRADICTED
+
+    # Citation hallucination / unmentioned claim
+    pipeline.retriever.tinyfish_agent.audit_citation_url = lambda url, claim_text, max_evidence=5: []
+    res_empty = pipeline.verify_citation(
+        claim_or_text="Albert Einstein flew on Apollo 11.",
+        cited_url=target_url,
+        output_dir=str(tmp_path)
+    )
+    verdict_empty = list(res_empty.verdicts.values())[0]
+    assert verdict_empty.label == VeracityLabel.INSUFFICIENT_EVIDENCE
+
+def test_cli_execution_modes(monkeypatch, tmp_path, capsys):
+    from proofgraph import cli
+
+    # Test Mode 1: Citation audit mode
+    monkeypatch.setattr(
+        "sys.argv",
+        ["cli.py", "--audit-citation", "--claim", "Water boils at 100 degrees Celsius.", "--url", "https://example.com/water", "--output", str(tmp_path / "audit_out")]
+    )
+    # Mock audit_citation_url to return relevant evidence
+    monkeypatch.setattr(
+        "proofgraph.retriever.tinyfish_agent.TinyFishWebAgent.audit_citation_url",
+        lambda self, url, claim_text, max_evidence=5: [
+            EvidencePassage(id="w1", text="Pure water boils at 100 degrees Celsius at 1 atm.", source_url=url, source_title="Water Properties")
+        ]
+    )
+    cli.main()
+    captured = capsys.readouterr()
+    assert "ProofGraph: AI Citation & Attribution Audit Result" in captured.out
+    assert "SUPPORTED" in captured.out
+
+    # Test Mode 2: Multi-claim document mode with underspecified entity
+    monkeypatch.setattr(
+        "sys.argv",
+        ["cli.py", "--text", "Peter was born in 1995 in Toronto.", "--no-live-search", "--output", str(tmp_path / "doc_out")]
+    )
+    cli.main()
+    captured2 = capsys.readouterr()
+    assert "ENTITY_UNDERSPECIFIED" in captured2.out
+    assert "Ambiguity Notice" in captured2.out
+
+    # Test Mode 3: File input mode
+    file_path = tmp_path / "claims.txt"
+    file_path.write_text("Marie Curie won the Nobel Prize in Chemistry in 1911.")
+    monkeypatch.setattr(
+        "sys.argv",
+        ["cli.py", "--file", str(file_path), "--no-live-search", "--output", str(tmp_path / "file_out")]
+    )
+    cli.main()
+    captured3 = capsys.readouterr()
+    assert "Analyzing Document" in captured3.out
+
+def test_tinyfish_agent_offline_http_fallback(monkeypatch):
+    from proofgraph.retriever.tinyfish_agent import TinyFishWebAgent
+    monkeypatch.delenv("TINYFISH_API_KEY", raising=False)
+    agent = TinyFishWebAgent(api_key="")
+    assert not agent.is_available
+
+    # Mock urllib response for _fetch_via_http_fallback
+    class MockResponse:
+        def read(self):
+            return b"<html><body><p>Apollo 11 landed on the moon on July 20, 1969 with astronauts Armstrong and Aldrin.</p></body></html>"
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("urllib.request.urlopen", lambda req, timeout=5: MockResponse())
+    passages = agent.audit_citation_url("https://en.wikipedia.org/wiki/Apollo_11", "Apollo 11 landed on the moon in 1969")
+    assert len(passages) >= 1
+    assert "Apollo 11" in passages[0].text
+    assert passages[0].metadata["retrieval_method"] == "http_direct_fetch"

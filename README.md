@@ -1,4 +1,4 @@
-# ProofGraph: Autonomous AI Evidence Intelligence & Claim Verification Engine
+# ProofGraph: AI Citation & Source Attribution Auditor
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CI](https://github.com/gr-0x076/proofgraph/actions/workflows/ci.yml/badge.svg)](https://github.com/gr-0x076/proofgraph/actions/workflows/ci.yml)
@@ -6,22 +6,44 @@
 [![Reproducible Builds](https://img.shields.io/badge/dependencies-pinned-success)](requirements-lock.txt)
 [![Data Card](https://img.shields.io/badge/dataset%20card-documented-informational)](docs/DATA_CARD.md)
 
-> **Project:** Hack on Holiday 2026 (Reinforce Club, Scaler School of Technology)  
-> **Track:** Advanced Track / Product  
-> **Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)  
-> **Status:** Working End-to-End MVP Implemented & Benchmarked ✅
+> **Team:** AltF4 (Mohith GR & Sudarshan Patil HJ)
+> **Event:** Hack on Holiday 2026 (The Reinforce Club, Scaler School of Technology)
+> **Track:** Advanced Track / Product
+> **Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)
+> **Core Mission:** AI Citation & Source Attribution Auditor — Auditing LLM answers, cited URLs, and hallucinated sources.
 
 ---
 
-## 🧭 Executive Summary
+## 🧭 Executive Summary & Product Pivot
 
-**ProofGraph** is a research prototype for evidence-backed claim review. It decomposes text with a heuristic claim splitter, retrieves from a local corpus using BM25 and FastEmbed ONNX embeddings, and can search the web with TinyFish Search and fetch candidate pages with TinyFish Fetch. Its current stance verifier is rule-based, its alignment and source-prior components are inspired by published work rather than reproductions of those systems, and its NetworkX graph is PROV-DM-inspired rather than certified as standards-conformant. The goal is to make evidence and source provenance inspectable, while abstaining when its rules cannot justify a verdict.
+General-purpose LLMs (Google AI, Claude, Grok, Perplexity) provide conversational answers with attached web links. However, research and real-world audits show that up to 30% of AI-cited URLs suffer from **citation hallucination**, **context misalignment**, or **referential indeterminacy** (citing a real page that actually contradicts or fails to mention the claimed fact).
+
+**ProofGraph is not a conversational search chatbot.** Instead, ProofGraph is a dedicated **AI Citation & Source Attribution Auditor**. Given an AI assertion and a cited URL:
+1. **TinyFish Fetch Chromium Extraction:** Directly navigates to and renders the cited URL, extracting clean, structured markdown paragraphs.
+2. **Entity Ambiguity Gate:** Detects isolated common given names / mononyms ("Peter", "William") and returns `ENTITY_UNDERSPECIFIED` with actionable clarification prompts, eliminating false contradictions against random celebrities.
+3. **RefNLI Context Alignment & Source-Entity Overlap Gate:** Rejects irrelevant distractor passages and blocks reference indeterminacy where an entity's name stem matches an unrelated full name.
+4. **Qualitative Evidence Tiers:** Completely eliminates uncalibrated percentage scores (`67.5%`), providing discrete qualitative tiers (`STRONG`, `MODERATE`, `WEAK`, `UNDERSPECIFIED`, `CONFLICTING`).
+5. **Auditable Attribution Verdict:** Delivers inspectable attribution statuses:
+   - `🟢 SUPPORTED` [`STRONG`]: Passage verified; source directly confirms assertion.
+   - `🔴 CONTRADICTED` [`CONFLICTING`]: Citation refutation; source contradicts assertion.
+   - `⚪ INSUFFICIENT_EVIDENCE` [`WEAK`]: Citation hallucination / unmentioned in source.
+   - `⚠️ ENTITY_UNDERSPECIFIED` [`UNDERSPECIFIED`]: Subject lacks distinguishing context.
 
 ---
 
-## 🏆 Empirical Benchmark & Ablation Study Results
+## ⚡ Quick Start: AI Citation Audit Mode
 
-The percentages emitted by the rule verifier are uncalibrated heuristic scores, not probabilities of correctness. No calibration study has been run.
+Audit whether a live web URL cited by an AI truly supports an assertion:
+
+```bash
+# Audit a cited source for factual support
+python -m proofgraph.cli --audit-citation \
+  --claim "Apollo 11 landed humans on the Moon on July 20, 1969." \
+  --url "https://en.wikipedia.org/wiki/Apollo_11"
+
+# Audit an ambiguous mononym assertion (returns ENTITY_UNDERSPECIFIED with guidance)
+python -m proofgraph.cli --text "Peter was born in 1995 in Toronto."
+```
 
 These experiments are exploratory diagnostics, not a comprehensive or unbiased evaluation. Results below include a small sampled AVeriTeC subset and a hand-authored synthetic stress suite; see [docs/DATA_CARD.md](docs/DATA_CARD.md) for task formulations and limitations:
 1. **Evidence Retrieval Quality Diagnostic** on a pooled distractor corpus ($N=60$ claims, 170 gold & distractor passages from AVeriTeC).

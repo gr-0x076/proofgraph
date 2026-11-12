@@ -1,8 +1,8 @@
 # Data Card: Benchmarks and Datasets in ProofGraph
 
-> **Project:** ProofGraph — Autonomous AI Evidence Intelligence Engine  
-> **Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)  
-> **Last Updated:** November 2026  
+> **Project:** ProofGraph — Autonomous AI Evidence Intelligence Engine
+> **Repository:** [https://github.com/gr-0x076/proofgraph](https://github.com/gr-0x076/proofgraph)
+> **Last Updated:** November 2026
 
 ---
 
@@ -104,3 +104,20 @@ To rigorously evaluate the live TinySearch $\rightarrow$ TinyFetch pipeline inde
 * **Latency Profile:** Individual breakdown of query dispatch, search round-trip, and page fetch durations.
 * **Source Quality:** Canonical domain credibility scores and content excerpt lengths.
 * **Output Artifact:** Persisted as a self-contained, auditable Markdown report at [`outputs/tinyfish_live_evaluation.md`](../outputs/tinyfish_live_evaluation.md).
+
+---
+
+## 6. Entity Ambiguity & Qualitative Evidence Tiers Schema
+
+### 6.1 Entity Ambiguity Gate (`ENTITY_UNDERSPECIFIED`)
+* **Trigger Conditions:** Detected by `ClaimDecomposer.check_underspecified_mononym` when a claim's subject is an isolated common given name (e.g. "Peter", "William", "John") or unresolved pronoun lacking surname, title, or contextual affiliation.
+* **Epistemic Rationale:** In open-domain fact verification, searching for isolated given names matches arbitrary historical or celebrity figures sharing that name (e.g. Peter Jennings b. 1938 for a claim about "Peter b. 1995"), producing false contradictions.
+* **Resolution:** ProofGraph immediately returns `ENTITY_UNDERSPECIFIED` with an actionable clarification notice, requesting full-name or distinguishing context before verification can proceed.
+
+### 6.2 Qualitative Evidence Tiers (`EvidenceTier`)
+ProofGraph completely eliminates continuous percentage scores (e.g. `67.5%`) from user-facing output, replacing them with discrete qualitative tiers:
+* **`STRONG`:** Supported or contradicted by authoritative sources with high cross-model confidence ($\ge 0.85$).
+* **`MODERATE`:** Direct semantic alignment with consistent evidence ($0.65 \le c < 0.85$).
+* **`WEAK`:** Insufficient direct semantic entailment or unestablished assertions ($< 0.65$).
+* **`UNDERSPECIFIED`:** Claim lacks identifying subject context; verification cannot proceed.
+* **`CONFLICTING`:** Competing evidence with comparable credibility from multiple sources.

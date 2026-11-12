@@ -197,6 +197,54 @@ class HybridRetriever:
                 
         return [passages[i] for i in keep_indices]
 
+    NATIONALITIES = {
+        "american", "french", "german", "british", "russian", "chinese",
+        "pakistani", "indian", "japanese", "korean", "italian", "spanish",
+        "canadian", "australian"
+    }
+
+    def filter_relevant_passages(self, claim: AtomicClaim, passages: List[EvidencePassage]) -> List[EvidencePassage]:
+        """
+        Filters candidate passages to ensure they have substantive entity or subject overlap with the claim.
+        Drops completely irrelevant distractors (e.g. cemetery/school articles for unrelated personal claims).
+        """
+        if not passages:
+            return []
+
+        claim_entities = [
+            e.strip().lower() for e in (claim.entities or [])
+            if not re.match(r'^\d+$', e.strip()) and len(e.strip()) >= 3
+        ]
+
+        if not claim_entities:
+            return passages
+
+        primary_subject = claim_entities[0]
+        subj_parts = [p for p in primary_subject.split() if len(p) >= 3]
+        is_attr_or_nationality = primary_subject in self.NATIONALITIES
+
+        filtered: List[EvidencePassage] = []
+        for p in passages:
+            p_text_lower = f"{p.source_title} {p.text}".lower()
+
+            # Check if primary subject is mentioned
+            has_primary = any(p_stem in p_text_lower for p_stem in subj_parts) if subj_parts else False
+            if has_primary:
+                filtered.append(p)
+                continue
+
+            # If primary subject is an attribute or nationality, 1 other entity match is sufficient
+            other_matches = sum(
+                1 for e in claim_entities[1:]
+                if e in p_text_lower or any(w in p_text_lower for w in e.split() if len(w) >= 3)
+            )
+            if is_attr_or_nationality and other_matches >= 1:
+                filtered.append(p)
+            elif other_matches >= 2:
+                filtered.append(p)
+
+        return filtered
+
     def retrieve(self, claim: AtomicClaim, top_k: int = 5, use_live_fallback: bool = True) -> List[EvidencePassage]:
         """
         Executes the FIRE iterative retrieval loop:
@@ -253,6 +301,7 @@ class HybridRetriever:
             current_query = next_query
             executed_queries.append(current_query)
 
-        # Deduplicate and return top_k
+        # Deduplicate, filter irrelevant distractors, and return top_k
         deduped = self._deduplicate_passages(pooled_evidence)
-        return deduped[:top_k]
+        relevant = self.filter_relevant_passages(claim, deduped)
+        return relevant[:top_k]
